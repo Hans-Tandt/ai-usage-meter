@@ -3,6 +3,16 @@
 # Drag to move. Right-click (on the strip or the tray icon) for the menu.
 # Keep this file ASCII-only: Windows PowerShell 5.1 misreads UTF-8 without a BOM.
 
+param([switch]$Detached)
+
+# Started from a console (e.g. "Run with PowerShell"): relaunch hidden and let the
+# console close, so closing that window doesn't take the strip with it.
+if (-not $Detached) {
+    Start-Process "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe" -WindowStyle Hidden `
+        -ArgumentList '-NoProfile', '-STA', '-WindowStyle', 'Hidden', '-File', "`"$PSCommandPath`"", '-Detached'
+    exit
+}
+
 Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawing
 
 $AppName      = 'Claude Usage Meter'
@@ -61,7 +71,7 @@ function New-Launcher($path) {
     $sh = New-Object -ComObject WScript.Shell
     $l = $sh.CreateShortcut($path)
     $l.TargetPath = "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe"
-    $l.Arguments = '-NoProfile -STA -WindowStyle Hidden -File "' + (Join-Path $Here 'strip.ps1') + '"'
+    $l.Arguments = '-NoProfile -STA -WindowStyle Hidden -File "' + (Join-Path $Here 'strip.ps1') + '" -Detached'
     $l.WorkingDirectory = $Here
     $l.WindowStyle = 7   # minimised, so no console flashes up
     $l.Description = $AppName
