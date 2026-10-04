@@ -2,6 +2,8 @@
 
 An always-on-top strip for Windows that shows your Claude 5-hour and weekly usage, turns orange and then red as you approach the limits, and pops up a Windows notification at each warning level.
 
+![The usage strip: 5-hour limit at 52%, weekly limit at 7%, with time until each resets](Screenshot/strip.jpg)
+
 Made by Hans Tandt.
 
 **[Download the latest version](https://github.com/Hans-Tandt/claude-usage-meter/releases/latest)**: unzip it and double-click `Install.cmd`. Needs Windows 10/11 and an up-to-date Claude desktop app (Pro or Max plan).
