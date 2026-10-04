@@ -1,0 +1,6 @@
+{
+  "name": "usage-meter",
+  "version": "0.1.0",
+  "description": "Always-visible 5-hour and weekly usage bar above the prompt, coloured by level, with warnings at 75%, 90% and 100%",
+  "types": "./types/index.d.ts"
+}
