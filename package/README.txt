@@ -10,6 +10,8 @@ Claude usage you have used: the 5-hour limit and the weekly limit.
   - Shows when each limit resets
   - Always on top of other windows; drag it wherever you like
 
+  See screenshots\strip.jpg for what it looks like.
+
 
 WHAT YOU NEED
 -------------
@@ -44,8 +46,11 @@ USING IT
   Tray icon (near the clock)  same menu; double-click brings the strip back
   Start menu ................ "Claude Usage Meter" starts it again after closing
 
+  The menu is shown in screenshots\menu.jpg
+
 Settings lets you change both warning levels, turn notifications on or
 off, pick the three colours, and choose whether it starts at login.
+See screenshots\settings.jpg
 
 The figures update while a Claude Code session is open. With no session
 open, the strip keeps showing the last figures it received.

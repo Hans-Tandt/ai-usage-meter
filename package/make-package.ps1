@@ -32,6 +32,7 @@ Copy-Plugin (Join-Path $App 'plugin')
 # What the person double-clicks and reads
 Copy-Item (Join-Path $PSScriptRoot 'Install.cmd'), (Join-Path $PSScriptRoot 'Uninstall.cmd'), (Join-Path $PSScriptRoot 'README.txt') $Stage
 Copy-Item (Join-Path $Root 'LICENSE') (Join-Path $Stage 'LICENSE.txt')
+Copy-Item -Recurse (Join-Path $Root 'Screenshot') (Join-Path $Stage 'screenshots')
 
 # The source code
 $SrcOut = Join-Path $Stage 'source'
