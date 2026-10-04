@@ -4,6 +4,8 @@ An always-on-top strip for Windows that shows your Claude 5-hour and weekly usag
 
 Made by Hans Tandt.
 
+**[Download the latest version](https://github.com/Hans-Tandt/claude-usage-meter/releases/latest)**: unzip it and double-click `Install.cmd`. Needs Windows 10/11 and an up-to-date Claude desktop app (Pro or Max plan).
+
 ## How it works
 
 Two parts:
