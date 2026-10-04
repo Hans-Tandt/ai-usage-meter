@@ -1,5 +1,5 @@
 import { atom, read, update } from 'claude-code'
-import type { Register } from 'claude-code'
+import type { EngineInterface, Register } from 'claude-code'
 
 import type { Window } from '../types'
 
@@ -33,31 +33,53 @@ function resetIn(resetsAt: string | undefined, now: number): string {
   return ` · resets in ${mins}m`
 }
 
-export const register: Register = on => {
-  async function ingest($: any, list: Window[]) {
-    await update($, windows, () => list)
+async function ingest($: EngineInterface, list: Window[]) {
+  await update($, windows, () => list)
 
-    // Toast once each time a window crosses 80 / 95 %; re-arm after it resets.
-    const seen = { ...(await read($, warned)) }
-    for (const w of list) {
-      const label = LABELS[w.kind] ?? w.kind
-      const hit = THRESHOLDS.filter(t => w.percentUsed >= t).pop() ?? 0
-      const before = seen[w.kind] ?? 0
-      if (hit > before) {
-        $.ui.toast(`⚠️ ${label} usage at ${w.percentUsed}%`)
-      }
-      seen[w.kind] = hit
+  // Toast once each time a window crosses 80 / 95 %; re-arm after it resets.
+  const seen = { ...(await read($, warned)) }
+  for (const w of list) {
+    const label = LABELS[w.kind] ?? w.kind
+    const hit = THRESHOLDS.filter(t => w.percentUsed >= t).pop() ?? 0
+    const before = seen[w.kind] ?? 0
+    if (hit > before) {
+      $.ui.toast(`⚠️ ${label} usage at ${w.percentUsed}%`)
     }
-    await update($, warned, () => seen)
+    seen[w.kind] = hit
   }
+  await update($, warned, () => seen)
+}
 
+export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const result = await next(e)
+    await $.command.register({
+      name: 'usage-demo',
+      description: 'Preview the usage bar at a given percentage (e.g. /usage-demo 85), or /usage-demo off',
+    })
     try {
       const u = await $.session.usage()
       await ingest($, u.rateLimits)
     } catch {}
     return result
+  })
+
+  // Fake figures so the colours and pop-ups can be seen without spending usage.
+  on('command.run', { command: 'usage-demo' }, async ($, e) => {
+    const arg = e.args.trim()
+    if (arg === '' || arg === 'off') {
+      const u = await $.session.usage()
+      await ingest($, u.rateLimits)
+      return { text: 'Usage bar back to your real figures.' }
+    }
+    const pct = Math.max(0, Math.min(100, Number(arg)))
+    if (Number.isNaN(pct)) return { text: 'Usage: /usage-demo <0-100> or /usage-demo off' }
+    const resetsAt = new Date((await $.clock.now()) + 2 * 3600000).toISOString()
+    await ingest($, [
+      { kind: 'five_hour', percentUsed: pct, resetsAt },
+      { kind: 'seven_day', percentUsed: Math.round(pct / 2), resetsAt },
+    ])
+    return { text: `Demo: 5h at ${pct}%, week at ${Math.round(pct / 2)}%. Type /usage-demo off to go back.` }
   })
 
   on('session.measure', async ($, e, next) => {
