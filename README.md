@@ -42,3 +42,7 @@ This writes `dist\ClaudeUsageMeter-<version>.zip`. The installer and its README 
 | `package/make-package.ps1` | Builds the shareable zip |
 
 Settings are stored in `%USERPROFILE%\.claude\usage-meter-settings.json`.
+
+## Licence
+
+MIT, © 2026 Hans Tandt. See [LICENSE](LICENSE).

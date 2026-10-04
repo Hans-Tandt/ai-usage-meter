@@ -31,11 +31,12 @@ Copy-Plugin (Join-Path $App 'plugin')
 
 # What the person double-clicks and reads
 Copy-Item (Join-Path $PSScriptRoot 'Install.cmd'), (Join-Path $PSScriptRoot 'Uninstall.cmd'), (Join-Path $PSScriptRoot 'README.txt') $Stage
+Copy-Item (Join-Path $Root 'LICENSE') (Join-Path $Stage 'LICENSE.txt')
 
 # The source code
 $SrcOut = Join-Path $Stage 'source'
 Copy-Plugin $SrcOut
-foreach ($p in 'overlay\src\ClaudeUsageMeter.cs', 'overlay\src\app.ico', 'overlay\build.ps1', 'README.md',
+foreach ($p in 'overlay\src\ClaudeUsageMeter.cs', 'overlay\src\app.ico', 'overlay\build.ps1', 'README.md', 'LICENSE',
                'package\install.ps1', 'package\uninstall.ps1', 'package\Install.cmd', 'package\Uninstall.cmd',
                'package\README.txt', 'package\make-package.ps1') {
     $d = Join-Path $SrcOut $p

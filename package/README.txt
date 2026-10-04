@@ -62,3 +62,9 @@ ANTIVIRUS / SMARTSCREEN
 The program is not code-signed, so Windows SmartScreen or your antivirus
 may warn the first time. Choose "More info" > "Run anyway", or allow it
 in your antivirus. The full source code is in the "source" folder.
+
+
+LICENCE
+-------
+MIT License, Copyright (c) 2026 Hans Tandt. Free to use, copy, change
+and share. See LICENSE.txt for the full text.

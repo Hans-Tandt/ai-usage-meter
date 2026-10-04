@@ -24,7 +24,7 @@ using Drawing = System.Drawing;
 [assembly: AssemblyTitle("Claude Usage Meter")]
 [assembly: AssemblyProduct("Claude Usage Meter")]
 [assembly: AssemblyCompany("Hans Tandt")]
-[assembly: AssemblyCopyright("Hans Tandt")]
+[assembly: AssemblyCopyright("Copyright (c) 2026 Hans Tandt. MIT License.")]
 [assembly: AssemblyVersion("1.2.0.0")]
 [assembly: AssemblyFileVersion("1.2.0.0")]
 
@@ -377,6 +377,7 @@ namespace ClaudeUsageMeter
         {
             MessageBox.Show(
                 Program.AppName + "  -  version " + Program.Version + "\n\nMade by " + Program.Author +
+                "\nCopyright (c) 2026 " + Program.Author + ". MIT License." +
                 "\n\nShows your Claude 5-hour and weekly usage on top of your screen, with colours and warnings as you approach your limits." +
                 "\n\nFigures update while a Claude Code session is open.",
                 "About " + Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
