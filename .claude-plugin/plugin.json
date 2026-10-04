@@ -1,6 +1,7 @@
 {
   "name": "usage-meter",
-  "version": "0.1.0",
-  "description": "Always-visible 5-hour and weekly usage bar above the prompt, coloured by level, with warnings at 75%, 90% and 100%",
+  "version": "1.2.0",
+  "description": "Writes Claude's 5-hour and weekly usage to ~/.claude/usage-meter.json for the Claude Usage Meter strip",
+  "author": { "name": "Hans Tandt" },
   "types": "./types/index.d.ts"
 }

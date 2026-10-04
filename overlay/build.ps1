@@ -1,10 +1,12 @@
 # Builds overlay\ClaudeUsageMeter.exe with the C# compiler that ships with Windows (.NET Framework 4).
 # Keep this file ASCII-only: Windows PowerShell 5.1 misreads UTF-8 without a BOM.
 
+param([string]$Out = (Join-Path $PSScriptRoot 'ClaudeUsageMeter.exe'))
+
 $ErrorActionPreference = 'Stop'
 $fw   = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319"
 $src  = Join-Path $PSScriptRoot 'src'
-$out  = Join-Path $PSScriptRoot 'ClaudeUsageMeter.exe'
+$out  = $Out
 $ico  = Join-Path $src 'app.ico'
 
 # Draw the app icon (a rounded bar in three colours) if it isn't there yet.
