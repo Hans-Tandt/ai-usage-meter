@@ -8,6 +8,18 @@ Made by Hans Tandt.
 
 **[Download the latest version](https://github.com/Hans-Tandt/claude-usage-meter/releases/latest)**: unzip it and double-click `Install.cmd`. Needs Windows 10/11 and an up-to-date Claude desktop app (Pro or Max plan).
 
+## Using it
+
+Drag the strip to move it. Right-click it, or the tray icon near the clock, for the menu:
+
+![Right-click menu: Settings, Move to top centre, About, Close Claude Usage Meter](Screenshot/menu.jpg)
+
+**Settings** sets both warning levels, Windows notifications, the three colours, and whether the strip starts when you log in:
+
+![Settings window: first warning 80%, second warning 95%, notifications on, colour pickers for normal, first and second warning, start at login on](Screenshot/settings.jpg)
+
+If you close the strip, start it again from the Start menu ("Claude Usage Meter") or double-click the tray icon.
+
 ## How it works
 
 Two parts:
