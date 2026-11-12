@@ -1,0 +1,437 @@
+{
+  "meta": {
+    "title": "AI Usage Meter",
+    "subtitle": "Wat het doet, waarom het helpt en hoe je het gebruikt",
+    "version": "Versie 1.6",
+    "date": "23 oktober 2026",
+    "project": "AI Usage Meter",
+    "author": "Hans Tandt",
+    "tocTitle": "Inhoud",
+    "labels": {
+      "tip": "TIP",
+      "note": "OPMERKING",
+      "trap": "VALKUIL",
+      "page": "Pagina"
+    }
+  },
+  "blocks": [
+    {
+      "type": "h1",
+      "text": "Hoe je deze handleiding gebruikt"
+    },
+    {
+      "type": "p",
+      "text": "Hoofdstuk 1 tot 7 zijn voor iedereen die Claude Code gebruikt. De bijlage is voor ontwikkelaars: hoe het vanbinnen werkt en hoe je het uit de broncode bouwt."
+    },
+    {
+      "type": "p",
+      "text": "Het programma is in het Engels. Schermafbeeldingen en menunamen blijven daarom in het Engels."
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Onofficieel project",
+      "text": "AI Usage Meter is een onofficieel communityproject. Het is niet verbonden met Anthropic en wordt niet door Anthropic goedgekeurd of gesponsord. \"Claude\" is een handelsmerk van Anthropic."
+    },
+    {
+      "type": "h1",
+      "text": "1. Zie je limieten in één oogopslag"
+    },
+    {
+      "type": "p",
+      "text": "AI Usage Meter is een dunne balk bovenaan je Windows-scherm. Terwijl je werkt, toont hij hoeveel van je Claude-gebruik je al hebt verbruikt."
+    },
+    {
+      "type": "figure",
+      "path": "figures/strip.jpg",
+      "width": 560,
+      "caption": "Figuur 1. 34 % van de 5-uurslimiet en 21 % van de weeklimiet zijn gebruikt. De tijden tonen wanneer elke limiet opnieuw begint.",
+      "alt": "De balk toont twee meters, 5h en Week, elk met een percentage en de tijd tot de reset."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "`5h`: hoeveel van je 5-uurslimiet je hebt gebruikt, en wanneer die opnieuw begint.",
+        "`Week`: hetzelfde voor je weeklimiet.",
+        "`Context`: hoe vol het gesprek van je Claude Code-sessie is (hoofdstuk 4)."
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "2. Waarom je het gebruikt"
+    },
+    {
+      "type": "figure",
+      "path": "figures/context-window_nl.png",
+      "width": 520,
+      "caption": "Figuur 2. Na het comprimeren houdt Claude een samenvatting over, niet de details. De Session-weergave waarschuwt je daarvoor.",
+      "alt": "Vier balken tonen hoe het contextvenster volloopt, na het comprimeren krimpt tot een samenvatting, en de waarschuwingslijnen op 80 % en 90 %."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Zonder de meter",
+        "Met de meter"
+      ],
+      "widths": [
+        1,
+        1
+      ],
+      "rows": [
+        [
+          "Je botst midden in een taak op een gebruikslimiet, zonder waarschuwing.",
+          "De meter wordt oranje, dan rood, en een Windows-melding waarschuwt je op tijd."
+        ],
+        [
+          "De sessie loopt vol. Claude Code comprimeert ze: oudere delen worden een korte samenvatting. Claude kan dan paden, regels en beslissingen vergeten.",
+          "De Session-weergave waarschuwt je op 80 % en 90 % van het comprimeerpunt. Zo schrijf je eerst je notities en start je een nieuwe sessie."
+        ],
+        [
+          "Je weet niet wanneer een limiet opnieuw begint.",
+          "De balk toont de tijd tot elke reset en meldt wanneer een limiet opnieuw is begonnen."
+        ],
+        [
+          "Je werkt snel en zit te vroeg aan je limiet.",
+          "De balk toont \"100% in 1h 20m\" als je tempo de limiet vóór de reset zou bereiken."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Het programma leest alleen de gebruikscijfers die Claude Code zelf doorgeeft. Het leest nooit je Claude-login en stuurt je gegevens nergens naartoe."
+    },
+    {
+      "type": "h1",
+      "text": "3. Installeer het in drie stappen"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Pak `AIUsageMeter-1.6.zip` uit waar je wilt, bijvoorbeeld in Downloads.",
+        "Dubbelklik op `AIUsageMeter.exe`. Het toont wat het zal wijzigen en vraagt of het mag installeren. Klik op Yes.",
+        "Herstart de Claude-app, open het tabblad Code en stuur een bericht. Na het eerste antwoord van Claude vult de balk zich."
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Wat je nodig hebt",
+      "text": "Windows 10 of 11, een Claude-abonnement met gebruikslimieten (Pro of Max) en een bijgewerkte Claude-app."
+    },
+    {
+      "type": "callout",
+      "variant": "trap",
+      "title": "Windows heeft uw pc beveiligd",
+      "text": "Het programma is niet ondertekend, dus Windows SmartScreen kan deze waarschuwing tonen. Klik op Meer informatie en dan op Toch uitvoeren. Ook je antivirus kan het vragen; sta het toe als je de download vertrouwt."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Controleer je download",
+      "text": "Vergelijk de controlesom van het bestand met `SHA256SUMS.txt` in de zip. Typ in een opdrachtprompt `certutil -hashfile AIUsageMeter.exe SHA256`. Beide waarden moeten gelijk zijn."
+    },
+    {
+      "type": "table",
+      "header": [
+        "De installatie voegt toe",
+        "Waar"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "Het programma en zijn add-on voor Claude Code",
+          "`%LOCALAPPDATA%\\AIUsageMeter`"
+        ],
+        [
+          "Eén regel, zodat Claude Code de add-on laadt (eerst wordt een reservekopie gemaakt)",
+          "`%USERPROFILE%\\.claude\\settings.json`"
+        ],
+        [
+          "Een snelkoppeling",
+          "Startmenu: AI Usage Meter"
+        ],
+        [
+          "Een vermelding, zodat je het kunt verwijderen",
+          "Windows-instellingen > Apps > Geïnstalleerde apps"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Claude Code in de terminal werkt ook: controleer de versie met `claude --version` en werk bij met `claude update`."
+    },
+    {
+      "type": "h1",
+      "text": "4. Lees de kleuren en waarschuwingen"
+    },
+    {
+      "type": "h2",
+      "text": "Je 5-uurs- en weeklimiet"
+    },
+    {
+      "type": "table",
+      "header": [
+        "Als de meter",
+        "Dan"
+      ],
+      "widths": [
+        1,
+        3
+      ],
+      "rows": [
+        [
+          "Groen is (onder 80 %)",
+          "Werk gewoon verder."
+        ],
+        [
+          "Oranje is (vanaf 80 %)",
+          "Een melding waarschuwt je. Plan de rest van je werk."
+        ],
+        [
+          "Rood is (vanaf 95 %)",
+          "Een tweede melding. Bewaar je werk; de limiet is dichtbij."
+        ],
+        [
+          "`?` toont met een lege meter",
+          "De limiet is opnieuw begonnen. Het nieuwe cijfer komt met het volgende antwoord van Claude."
+        ],
+        [
+          "Gedimd is, \"updated 3h ago\"",
+          "De cijfers zijn oud. Stuur Claude Code een bericht om ze bij te werken."
+        ]
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Wanneer de cijfers bijwerken",
+      "text": "De balk werkt bij wanneer een Claude Code-sessie start of antwoordt. Gebruik in Chat telt mee voor dezelfde limieten, maar werkt de balk niet bij."
+    },
+    {
+      "type": "h2",
+      "text": "Het contextvenster van je sessie"
+    },
+    {
+      "type": "p",
+      "text": "Het contextvenster is alles wat Claude tijdens één sessie onthoudt. Als het vol is, comprimeert Claude Code het. De Session-weergave meet hoe dicht je bij dat punt bent."
+    },
+    {
+      "type": "figure",
+      "path": "figures/session-levels_nl.png",
+      "width": 380,
+      "caption": "Figuur 3. De kleur zegt wat je nu moet doen.",
+      "alt": "Drie Session-weergaven: groen op 46 %, geel op 84 % en rood op 93 % met Start a new session."
+    },
+    {
+      "type": "callout",
+      "variant": "trap",
+      "title": "Rood betekent: start nu een nieuwe sessie",
+      "text": "Bij rood blijft de balk op de Session-weergave en knippert hij. Schrijf op wat belangrijk is (bijvoorbeeld in je sessienotities) en start een nieuwe sessie voordat het comprimeren begint."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Toch je gebruikscijfers nodig?",
+      "text": "Klik met de rechtermuisknop op de balk en kies Show usage (10 min). De meters voor 5 uur en week komen 10 minuten terug."
+    },
+    {
+      "type": "h1",
+      "text": "5. Kies je weergave"
+    },
+    {
+      "type": "figure",
+      "path": "figures/layouts_nl.png",
+      "width": 420,
+      "caption": "Figuur 4. Dezelfde cijfers in drie weergaven.",
+      "alt": "Een horizontale balk, drie staande meters en drie kleine vierkanten met ringen die na elkaar verschijnen."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Weergave",
+        "Het best voor"
+      ],
+      "widths": [
+        1,
+        3
+      ],
+      "rows": [
+        [
+          "Horizontal",
+          "Een breed scherm: alles op één regel. Hij wisselt tussen de gebruikscijfers en de Session-weergave."
+        ],
+        [
+          "Vertical",
+          "Een smalle hoek: Session (5-uurslimiet), Week en Compress (contextvenster) naast elkaar, allemaal tegelijk."
+        ],
+        [
+          "Square (vierkant)",
+          "De kleinste: 72 x 72 pixels. Toont Session, Week en Compress na elkaar."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Beweeg de muis over een cijfer voor de details: resettijd, tempo en de lijst met sessies."
+    },
+    {
+      "type": "h1",
+      "text": "6. Wijzig de instellingen"
+    },
+    {
+      "type": "figure",
+      "path": "figures/menu.jpg",
+      "width": 360,
+      "caption": "Figuur 5. Klik met de rechtermuisknop op de balk, of op het pictogram bij de klok, voor het menu.",
+      "alt": "Het menu toont Refresh now, Show usage, Settings, Move to top centre, About en Close."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Om",
+        "Doe dit"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "De balk te verplaatsen",
+          "Sleep hem."
+        ],
+        [
+          "Hem op die plek te houden",
+          "Settings > Save current position > Save."
+        ],
+        [
+          "De weergave te wijzigen",
+          "Settings > Layout."
+        ],
+        [
+          "Te kiezen hoe snel de weergaven wisselen",
+          "Settings > Switch views every … seconds (0 = niet wisselen)."
+        ],
+        [
+          "De waarschuwingsniveaus of kleuren te wijzigen",
+          "Settings: first en second warning, Session view yellow en red."
+        ],
+        [
+          "Hem met Windows te starten",
+          "Settings > Start automatically when I log in to Windows."
+        ],
+        [
+          "Hem na het sluiten terug te halen",
+          "Startmenu > AI Usage Meter."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Eén keer per dag kijkt het programma op hanstandt.be of er een nieuwe versie is. Zo ja, dan toont de balk \"update\" en opent Settings > Download update de downloadpagina. Er wordt niets vanzelf geïnstalleerd. Je kunt deze controle uitzetten in Settings."
+    },
+    {
+      "type": "h1",
+      "text": "7. Verwijder het"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Open Windows-instellingen > Apps > Geïnstalleerde apps, zoek AI Usage Meter en klik op Verwijderen. Of klik met de rechtermuisknop op de balk en kies Settings > Uninstall.",
+        "Klik op Yes. De snelkoppelingen, de regel van de add-on en de instellingen van het programma worden verwijderd.",
+        "Verwijder de map AIUsageMeter die opengaat.",
+        "Herstart de Claude-app."
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "Bijlage: technische details"
+    },
+    {
+      "type": "h2",
+      "text": "Hoe het werkt"
+    },
+    {
+      "type": "figure",
+      "path": "figures/how-it-works_nl.png",
+      "width": 460,
+      "caption": "Figuur 6. De add-on schrijft de cijfers; het programma leest ze alleen.",
+      "alt": "Claude Code voedt de add-on, die bestanden schrijft die AI Usage Meter elke 3 seconden leest."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "De add-on is een Claude Code-plugin (`hooks/register.tsx`). Na elk antwoord schrijft hij de cijfers voor 5 uur en week, en per sessie hoe vol de context is, gemeten tegen de drempel voor automatisch comprimeren.",
+        "Het programma (`overlay/src/AIUsageMeter.cs`, WPF, .NET Framework 4) leest die bestanden elke 3 seconden en tekent de balk.",
+        "Elke schrijfactie van de add-on is afgeschermd, zodat hij nooit een Claude-sessie kan breken."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Wat het leest en bewaart"
+    },
+    {
+      "type": "table",
+      "header": [
+        "Bestand",
+        "Inhoud"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "`.claude\\usage-meter.json`",
+          "Percentages voor 5 uur en week, resettijden, tijd van de laatste update"
+        ],
+        [
+          "`.claude\\usage-meter-context\\<sessie>.json`",
+          "Per sessie: mapnaam, vulling, laatste activiteit, tijd van het comprimeren"
+        ],
+        [
+          "`.claude\\usage-meter-settings.json`",
+          "Je instellingen"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Sessiebestanden ouder dan 7 dagen worden verwijderd. Het enige netwerkgebruik is de optionele dagelijkse versiecontrole: die leest één klein bestand van hanstandt.be en stuurt geen gegevens van jou."
+    },
+    {
+      "type": "h2",
+      "text": "Bouw het uit de broncode"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Open de map `source` uit de zip.",
+        "Voer `overlay\\build.cmd` uit om `AIUsageMeter.exe` te compileren met de C#-compiler die in Windows zit.",
+        "Voer `package\\make-package.cmd` uit om de zip met het controlesombestand te maken."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Om de balk te bekijken zonder gebruik te verbruiken, typ je `/usage-demo 85`, `/usage-demo context 93` of `/usage-demo off` in Claude Code."
+    },
+    {
+      "type": "h2",
+      "text": "Beperkingen"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Het ziet alleen Claude Code-sessies op deze pc (app en terminal), geen cloud- of WSL-sessies of andere computers.",
+        "Het heeft een recente Claude Code nodig; een oude terminalversie laadt de add-on niet."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Versie 1.6: eerste handleiding. MIT-licentie, © 2026 Hans Tandt."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "usage-meter",
+  "version": "1.6.0",
+  "description": "Writes Claude Code's 5-hour and weekly usage figures to ~/.claude/usage-meter.json for the AI Usage Meter strip (unofficial; not affiliated with Anthropic)",
+  "author": { "name": "Hans Tandt" },
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

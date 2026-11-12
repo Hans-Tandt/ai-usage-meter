@@ -1,0 +1,437 @@
+{
+  "meta": {
+    "title": "AI Usage Meter",
+    "subtitle": "Was es tut, warum es hilft und wie Sie es verwenden",
+    "version": "Version 1.6",
+    "date": "23. Oktober 2026",
+    "project": "AI Usage Meter",
+    "author": "Hans Tandt",
+    "tocTitle": "Inhalt",
+    "labels": {
+      "tip": "TIPP",
+      "note": "HINWEIS",
+      "trap": "FALLE",
+      "page": "Seite"
+    }
+  },
+  "blocks": [
+    {
+      "type": "h1",
+      "text": "So verwenden Sie dieses Handbuch"
+    },
+    {
+      "type": "p",
+      "text": "Die Kapitel 1 bis 7 sind für alle, die Claude Code verwenden. Der Anhang ist für Entwickler: wie es intern funktioniert und wie Sie es aus dem Quellcode erstellen."
+    },
+    {
+      "type": "p",
+      "text": "Das Programm ist auf Englisch. Bildschirmfotos und Menünamen bleiben deshalb auf Englisch."
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Inoffizielles Projekt",
+      "text": "AI Usage Meter ist ein inoffizielles Community-Projekt. Es ist nicht mit Anthropic verbunden und wird von Anthropic weder unterstützt noch gesponsert. „Claude“ ist eine Marke von Anthropic."
+    },
+    {
+      "type": "h1",
+      "text": "1. Ihre Limits auf einen Blick"
+    },
+    {
+      "type": "p",
+      "text": "AI Usage Meter ist eine schmale Leiste oben auf Ihrem Windows-Bildschirm. Während Sie arbeiten, zeigt sie, wie viel Ihrer Claude-Nutzung Sie schon verbraucht haben."
+    },
+    {
+      "type": "figure",
+      "path": "figures/strip.jpg",
+      "width": 560,
+      "caption": "Abbildung 1. 34 % des 5-Stunden-Limits und 21 % des Wochenlimits sind verbraucht. Die Zeiten zeigen, wann jedes Limit zurückgesetzt wird.",
+      "alt": "Die Leiste zeigt zwei Balken, 5h und Week, jeweils mit Prozentwert und Zeit bis zum Zurücksetzen."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "`5h`: wie viel Ihres 5-Stunden-Limits verbraucht ist und wann es zurückgesetzt wird.",
+        "`Week`: dasselbe für Ihr Wochenlimit.",
+        "`Context`: wie voll das Gespräch Ihrer Claude Code-Sitzung ist (Kapitel 4)."
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "2. Warum Sie es verwenden sollten"
+    },
+    {
+      "type": "figure",
+      "path": "figures/context-window_de.png",
+      "width": 520,
+      "caption": "Abbildung 2. Nach der Komprimierung behält Claude eine Zusammenfassung, nicht die Details. Die Session-Ansicht warnt Sie vorher.",
+      "alt": "Vier Balken zeigen, wie sich das Kontextfenster füllt, nach der Komprimierung zu einer Zusammenfassung schrumpft, und die Warnlinien bei 80 % und 90 %."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Ohne die Anzeige",
+        "Mit der Anzeige"
+      ],
+      "widths": [
+        1,
+        1
+      ],
+      "rows": [
+        [
+          "Sie stoßen mitten in einer Aufgabe ohne Warnung an ein Nutzungslimit.",
+          "Der Balken wird orange, dann rot, und eine Windows-Benachrichtigung warnt Sie rechtzeitig."
+        ],
+        [
+          "Die Sitzung wird voll. Claude Code komprimiert sie: Ältere Teile werden zu einer kurzen Zusammenfassung. Claude kann dann Pfade, Regeln und Entscheidungen vergessen.",
+          "Die Session-Ansicht warnt Sie bei 80 % und 90 % des Komprimierungspunkts. So schreiben Sie zuerst Ihre Notizen und starten eine neue Sitzung."
+        ],
+        [
+          "Sie wissen nicht, wann ein Limit zurückgesetzt wird.",
+          "Die Leiste zeigt die Zeit bis zu jedem Zurücksetzen und meldet, wenn ein Limit zurückgesetzt wurde."
+        ],
+        [
+          "Sie arbeiten schnell und sind zu früh am Limit.",
+          "Die Leiste zeigt „100% in 1h 20m“, wenn Ihr Tempo das Limit vor dem Zurücksetzen erreichen würde."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Das Programm liest nur die Nutzungswerte, die Claude Code selbst meldet. Es liest nie Ihre Claude-Anmeldung und sendet Ihre Daten nirgendwohin."
+    },
+    {
+      "type": "h1",
+      "text": "3. In drei Schritten installieren"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Entpacken Sie `AIUsageMeter-1.6.zip` an einem beliebigen Ort, zum Beispiel in Downloads.",
+        "Doppelklicken Sie auf `AIUsageMeter.exe`. Es zeigt, was es ändern wird, und fragt, ob es installieren darf. Klicken Sie auf Yes.",
+        "Starten Sie die Claude-App neu, öffnen Sie den Tab Code und senden Sie eine Nachricht. Nach der ersten Antwort von Claude füllt sich die Leiste."
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Was Sie brauchen",
+      "text": "Windows 10 oder 11, ein Claude-Abo mit Nutzungslimits (Pro oder Max) und eine aktuelle Claude-App."
+    },
+    {
+      "type": "callout",
+      "variant": "trap",
+      "title": "Der Computer wurde durch Windows geschützt",
+      "text": "Das Programm ist nicht signiert, daher kann Windows SmartScreen diese Warnung zeigen. Klicken Sie auf Weitere Informationen und dann auf Trotzdem ausführen. Auch Ihr Virenschutz kann nachfragen; erlauben Sie es, wenn Sie dem Download vertrauen."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Prüfen Sie Ihren Download",
+      "text": "Vergleichen Sie die Prüfsumme der Datei mit `SHA256SUMS.txt` in der Zip-Datei. Geben Sie in einer Eingabeaufforderung `certutil -hashfile AIUsageMeter.exe SHA256` ein. Beide Werte müssen gleich sein."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Die Installation fügt hinzu",
+        "Wo"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "Das Programm und sein Add-on für Claude Code",
+          "`%LOCALAPPDATA%\\AIUsageMeter`"
+        ],
+        [
+          "Einen Eintrag, damit Claude Code das Add-on lädt (vorher wird eine Sicherung gespeichert)",
+          "`%USERPROFILE%\\.claude\\settings.json`"
+        ],
+        [
+          "Eine Verknüpfung",
+          "Startmenü: AI Usage Meter"
+        ],
+        [
+          "Einen Eintrag, damit Sie es deinstallieren können",
+          "Windows-Einstellungen > Apps > Installierte Apps"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Claude Code im Terminal funktioniert auch: Prüfen Sie die Version mit `claude --version` und aktualisieren Sie mit `claude update`."
+    },
+    {
+      "type": "h1",
+      "text": "4. Farben und Warnungen lesen"
+    },
+    {
+      "type": "h2",
+      "text": "Ihr 5-Stunden- und Wochenlimit"
+    },
+    {
+      "type": "table",
+      "header": [
+        "Wenn der Balken",
+        "Dann"
+      ],
+      "widths": [
+        1,
+        3
+      ],
+      "rows": [
+        [
+          "grün ist (unter 80 %)",
+          "Arbeiten Sie weiter."
+        ],
+        [
+          "orange ist (ab 80 %)",
+          "Eine Benachrichtigung warnt Sie. Planen Sie den Rest Ihrer Arbeit."
+        ],
+        [
+          "rot ist (ab 95 %)",
+          "Eine zweite Benachrichtigung. Speichern Sie Ihre Arbeit; das Limit ist nah."
+        ],
+        [
+          "`?` mit leerem Balken zeigt",
+          "Das Limit wurde zurückgesetzt. Der neue Wert kommt mit der nächsten Antwort von Claude."
+        ],
+        [
+          "abgedunkelt ist, „updated 3h ago“",
+          "Die Werte sind alt. Senden Sie Claude Code eine Nachricht, um sie zu aktualisieren."
+        ]
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Wann die Werte aktualisiert werden",
+      "text": "Die Leiste wird aktualisiert, wenn eine Claude Code-Sitzung startet oder antwortet. Die Nutzung im Chat zählt zu denselben Limits, aktualisiert die Leiste aber nicht."
+    },
+    {
+      "type": "h2",
+      "text": "Das Kontextfenster Ihrer Sitzung"
+    },
+    {
+      "type": "p",
+      "text": "Das Kontextfenster ist alles, was Claude während einer Sitzung im Blick behält. Wenn es voll ist, komprimiert Claude Code es. Die Session-Ansicht misst, wie nah Sie diesem Punkt sind."
+    },
+    {
+      "type": "figure",
+      "path": "figures/session-levels_de.png",
+      "width": 380,
+      "caption": "Abbildung 3. Die Farbe sagt Ihnen, was als Nächstes zu tun ist.",
+      "alt": "Drei Session-Ansichten: grün bei 46 %, gelb bei 84 % und rot bei 93 % mit Start a new session."
+    },
+    {
+      "type": "callout",
+      "variant": "trap",
+      "title": "Rot heißt: jetzt eine neue Sitzung starten",
+      "text": "Bei Rot bleibt die Leiste auf der Session-Ansicht und blinkt. Schreiben Sie auf, was wichtig ist (zum Beispiel in Ihre Sitzungsnotizen), und starten Sie eine neue Sitzung, bevor die Komprimierung beginnt."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Brauchen Sie trotzdem Ihre Nutzungswerte?",
+      "text": "Klicken Sie mit der rechten Maustaste auf die Leiste und wählen Sie Show usage (10 min). Die Balken für 5 Stunden und Woche kommen für 10 Minuten zurück."
+    },
+    {
+      "type": "h1",
+      "text": "5. Ihre Darstellung wählen"
+    },
+    {
+      "type": "figure",
+      "path": "figures/layouts_de.png",
+      "width": 420,
+      "caption": "Abbildung 4. Dieselben Werte in drei Darstellungen.",
+      "alt": "Eine waagerechte Leiste, drei stehende Balken und drei kleine Quadrate mit Ringen, die nacheinander erscheinen."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Darstellung",
+        "Am besten für"
+      ],
+      "widths": [
+        1,
+        3
+      ],
+      "rows": [
+        [
+          "Horizontal",
+          "Einen breiten Bildschirm: alles in einer Zeile. Sie wechselt zwischen den Nutzungswerten und der Session-Ansicht."
+        ],
+        [
+          "Vertical",
+          "Eine schmale Ecke: Session (5-Stunden-Limit), Week und Compress (Kontextfenster) nebeneinander, alle gleichzeitig."
+        ],
+        [
+          "Square (Quadrat)",
+          "Die kleinste: 72 x 72 Pixel. Sie zeigt Session, Week und Compress nacheinander."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Fahren Sie mit der Maus über einen Wert für die Details: Zeit bis zum Zurücksetzen, Tempo und die Liste der Sitzungen."
+    },
+    {
+      "type": "h1",
+      "text": "6. Einstellungen ändern"
+    },
+    {
+      "type": "figure",
+      "path": "figures/menu.jpg",
+      "width": 360,
+      "caption": "Abbildung 5. Rechtsklick auf die Leiste oder auf das Symbol neben der Uhr öffnet das Menü.",
+      "alt": "Das Menü zeigt Refresh now, Show usage, Settings, Move to top centre, About und Close."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Um",
+        "Tun Sie Folgendes"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "die Leiste zu verschieben",
+          "Ziehen Sie sie."
+        ],
+        [
+          "sie an dieser Stelle zu halten",
+          "Settings > Save current position > Save."
+        ],
+        [
+          "die Darstellung zu ändern",
+          "Settings > Layout."
+        ],
+        [
+          "zu ändern, wie schnell die Ansichten wechseln",
+          "Settings > Switch views every … seconds (0 = nicht wechseln)."
+        ],
+        [
+          "Warnstufen oder Farben zu ändern",
+          "Settings: first und second warning, Session view yellow und red."
+        ],
+        [
+          "sie mit Windows zu starten",
+          "Settings > Start automatically when I log in to Windows."
+        ],
+        [
+          "sie nach dem Schließen zurückzuholen",
+          "Startmenü > AI Usage Meter."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Einmal täglich prüft das Programm auf hanstandt.be, ob es eine neue Version gibt. Wenn ja, zeigt die Leiste „update“, und Settings > Download update öffnet die Download-Seite. Nichts wird von selbst installiert. Sie können diese Prüfung in Settings ausschalten."
+    },
+    {
+      "type": "h1",
+      "text": "7. Deinstallieren"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Öffnen Sie Windows-Einstellungen > Apps > Installierte Apps, suchen Sie AI Usage Meter und klicken Sie auf Deinstallieren. Oder klicken Sie mit der rechten Maustaste auf die Leiste und wählen Sie Settings > Uninstall.",
+        "Klicken Sie auf Yes. Die Verknüpfungen, der Eintrag des Add-ons und die Einstellungen des Programms werden entfernt.",
+        "Löschen Sie den Ordner AIUsageMeter, der sich öffnet.",
+        "Starten Sie die Claude-App neu."
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "Anhang: technische Details"
+    },
+    {
+      "type": "h2",
+      "text": "So funktioniert es"
+    },
+    {
+      "type": "figure",
+      "path": "figures/how-it-works_de.png",
+      "width": 460,
+      "caption": "Abbildung 6. Das Add-on schreibt die Werte; das Programm liest sie nur.",
+      "alt": "Claude Code versorgt das Add-on, das Dateien schreibt, die AI Usage Meter alle 3 Sekunden liest."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Das Add-on ist ein Claude Code-Plugin (`hooks/register.tsx`). Nach jeder Antwort schreibt es die Werte für 5 Stunden und Woche und pro Sitzung die Füllung des Kontexts, gemessen an der Schwelle für die automatische Komprimierung.",
+        "Das Programm (`overlay/src/AIUsageMeter.cs`, WPF, .NET Framework 4) liest diese Dateien alle 3 Sekunden und zeichnet die Leiste.",
+        "Jeder Schreibvorgang des Add-ons ist abgesichert, sodass es nie eine Claude-Sitzung stören kann."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Was es liest und speichert"
+    },
+    {
+      "type": "table",
+      "header": [
+        "Datei",
+        "Inhalt"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "`.claude\\usage-meter.json`",
+          "Prozentwerte für 5 Stunden und Woche, Zeiten bis zum Zurücksetzen, Zeit der letzten Aktualisierung"
+        ],
+        [
+          "`.claude\\usage-meter-context\\<Sitzung>.json`",
+          "Pro Sitzung: Ordnername, Füllung, letzte Aktivität, Zeit der Komprimierung"
+        ],
+        [
+          "`.claude\\usage-meter-settings.json`",
+          "Ihre Einstellungen"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Sitzungsdateien, die älter als 7 Tage sind, werden gelöscht. Die einzige Netzwerknutzung ist die optionale tägliche Versionsprüfung: Sie liest eine kleine Datei von hanstandt.be und sendet keine Daten von Ihnen."
+    },
+    {
+      "type": "h2",
+      "text": "Aus dem Quellcode erstellen"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Öffnen Sie den Ordner `source` aus der Zip-Datei.",
+        "Führen Sie `overlay\\build.cmd` aus, um `AIUsageMeter.exe` mit dem in Windows enthaltenen C#-Compiler zu erstellen.",
+        "Führen Sie `package\\make-package.cmd` aus, um die Zip-Datei mit der Prüfsummendatei zu erstellen."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Um die Leiste ohne Verbrauch zu testen, geben Sie in Claude Code `/usage-demo 85`, `/usage-demo context 93` oder `/usage-demo off` ein."
+    },
+    {
+      "type": "h2",
+      "text": "Grenzen"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Es sieht nur Claude Code-Sitzungen auf diesem PC (App und Terminal), keine Cloud- oder WSL-Sitzungen und keine anderen Computer.",
+        "Es braucht ein aktuelles Claude Code; eine alte Terminal-Version lädt das Add-on nicht."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Version 1.6: erstes Handbuch. MIT-Lizenz, © 2026 Hans Tandt."
+    }
+  ]
+}

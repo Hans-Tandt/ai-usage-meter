@@ -1,2 +1,5 @@
-overlay/*.exe
+source/overlay/*.exe
 dist/
+.claude/
+source/docs/out/*.png
+source/docs/__pycache__/

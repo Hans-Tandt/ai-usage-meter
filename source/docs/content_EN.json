@@ -1,0 +1,427 @@
+{
+  "meta": {
+    "title": "AI Usage Meter",
+    "subtitle": "What it does, why it helps, and how to use it",
+    "version": "Version 1.6",
+    "date": "23 October 2026",
+    "project": "AI Usage Meter",
+    "author": "Hans Tandt",
+    "tocTitle": "Contents"
+  },
+  "blocks": [
+    {
+      "type": "h1",
+      "text": "How to use this manual"
+    },
+    {
+      "type": "p",
+      "text": "Chapters 1 to 7 are for everyone who uses Claude Code. The appendix is for developers: how it works inside, and how to build it from the source code."
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Unofficial project",
+      "text": "AI Usage Meter is an unofficial community project. It is not affiliated with, endorsed by or sponsored by Anthropic. \"Claude\" is a trademark of Anthropic."
+    },
+    {
+      "type": "h1",
+      "text": "1. See your limits at a glance"
+    },
+    {
+      "type": "p",
+      "text": "AI Usage Meter is a thin strip at the top of your Windows screen. It shows how much of your Claude usage you have used, while you work."
+    },
+    {
+      "type": "figure",
+      "path": "figures/strip.jpg",
+      "width": 560,
+      "caption": "Figure 1. 34 % of the 5-hour limit and 21 % of the weekly limit are used. The times show when each limit resets.",
+      "alt": "The strip shows two bars, 5h and Week, each with a percentage and a reset time."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "`5h`: how much of your 5-hour limit you have used, and when it resets.",
+        "`Week`: the same for your weekly limit.",
+        "`Context`: how full the conversation of your Claude Code session is (chapter 4)."
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "2. Why use it"
+    },
+    {
+      "type": "figure",
+      "path": "figures/context-window_en.png",
+      "width": 620,
+      "caption": "Figure 2. After compaction Claude keeps a summary, not the details. The Session view warns you before that happens.",
+      "alt": "Four bars show the context window filling up, shrinking to a summary after compaction, and the 80 % and 90 % warning lines."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Without the meter",
+        "With the meter"
+      ],
+      "widths": [
+        1,
+        1
+      ],
+      "rows": [
+        [
+          "You hit a usage limit in the middle of a task, without warning.",
+          "The bar turns orange, then red, and a Windows notification warns you in time."
+        ],
+        [
+          "The session gets full. Claude Code compacts it: older parts become a short summary. Claude may then forget paths, rules and decisions.",
+          "The Session view warns you at 80 % and 90 % of the compaction point, so you can write your notes and start a new session first."
+        ],
+        [
+          "You don't know when a limit resets.",
+          "The strip shows the time to each reset, and tells you when a limit has reset."
+        ],
+        [
+          "You work at a fast pace and run out early.",
+          "The strip warns \"100 % in 1h 20m\" when your pace would reach the limit before the reset."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "It only reads the usage figures that Claude Code itself reports. It never reads your Claude login and never sends your data anywhere."
+    },
+    {
+      "type": "h1",
+      "text": "3. Install it in three steps"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Unzip `AIUsageMeter-1.6.zip` anywhere, for example in Downloads.",
+        "Double-click `AIUsageMeter.exe`. It lists what it will change and asks to install. Click Yes.",
+        "Restart the Claude desktop app, open the Code tab and send any message. After Claude's first reply, the strip fills in."
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "What you need",
+      "text": "Windows 10 or 11, a Claude plan with usage limits (Pro or Max) and an up-to-date Claude desktop app."
+    },
+    {
+      "type": "callout",
+      "variant": "trap",
+      "title": "Windows protected your PC",
+      "text": "The program is not code-signed, so Windows SmartScreen may show this warning. Click More info, then Run anyway. Your antivirus may also ask; allow it if you trust the download."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Check your download",
+      "text": "Compare the file's checksum with `SHA256SUMS.txt` in the zip. In a Command Prompt, type `certutil -hashfile AIUsageMeter.exe SHA256`. The two values must be the same."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Installing changes",
+        "Where"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "The program and its Claude Code add-on",
+          "`%LOCALAPPDATA%\\AIUsageMeter`"
+        ],
+        [
+          "One entry, so Claude Code loads the add-on (a backup is saved first)",
+          "`%USERPROFILE%\\.claude\\settings.json`"
+        ],
+        [
+          "A shortcut",
+          "Start menu: AI Usage Meter"
+        ],
+        [
+          "An entry, so you can uninstall it",
+          "Windows Settings > Apps > Installed apps"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Claude Code in the terminal works too: check its version with `claude --version` and update it with `claude update`."
+    },
+    {
+      "type": "h1",
+      "text": "4. Read the colours and warnings"
+    },
+    {
+      "type": "h2",
+      "text": "Your 5-hour and weekly limits"
+    },
+    {
+      "type": "table",
+      "header": [
+        "If the bar is",
+        "Then"
+      ],
+      "widths": [
+        1,
+        3
+      ],
+      "rows": [
+        [
+          "Green (below 80 %)",
+          "Keep working."
+        ],
+        [
+          "Orange (from 80 %)",
+          "A notification warns you. Plan the rest of your work."
+        ],
+        [
+          "Red (from 95 %)",
+          "A second notification. Save your work; the limit is close."
+        ],
+        [
+          "`?` with an empty bar",
+          "The limit has reset. The new figure comes with Claude's next reply."
+        ],
+        [
+          "Dimmed, \"updated 3h ago\"",
+          "The figures are old. Send Claude Code a message to update them."
+        ]
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "When the figures update",
+      "text": "The strip updates when a Claude Code session starts or replies. Chat use counts toward the same limits but doesn't update the strip."
+    },
+    {
+      "type": "h2",
+      "text": "Your session's context window"
+    },
+    {
+      "type": "p",
+      "text": "The context window is everything Claude keeps in mind during one session. When it is full, Claude Code compacts it. The Session view measures how close you are to that point."
+    },
+    {
+      "type": "figure",
+      "path": "figures/session-levels_en.png",
+      "width": 470,
+      "caption": "Figure 3. The colour tells you what to do next.",
+      "alt": "Three Session views: green at 46 %, yellow at 84 % and red at 93 % with Start a new session."
+    },
+    {
+      "type": "callout",
+      "variant": "trap",
+      "title": "Red means: start a new session now",
+      "text": "At red the strip stays on the Session view and blinks. Write down what matters (for example in your session notes), then start a new session before compaction runs."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Still need your usage figures?",
+      "text": "Right-click the strip and choose Show usage (10 min). The 5-hour and weekly bars come back for 10 minutes."
+    },
+    {
+      "type": "h1",
+      "text": "5. Choose your layout"
+    },
+    {
+      "type": "figure",
+      "path": "figures/layouts_en.png",
+      "width": 470,
+      "caption": "Figure 4. The same figures in three layouts.",
+      "alt": "A horizontal strip, three standing bars, and three small squares with rings shown one after another."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Layout",
+        "Best for"
+      ],
+      "widths": [
+        1,
+        3
+      ],
+      "rows": [
+        [
+          "Horizontal",
+          "A wide screen: everything in one line. It switches between the usage figures and the Session view."
+        ],
+        [
+          "Vertical",
+          "A narrow corner: Session (5-hour limit), Week and Compress (context window) side by side, all at once."
+        ],
+        [
+          "Square",
+          "The smallest: 72 x 72 pixels. It shows Session, Week and Compress one at a time."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Hover over a figure for the details: reset time, pace and the list of sessions."
+    },
+    {
+      "type": "h1",
+      "text": "6. Change the settings"
+    },
+    {
+      "type": "figure",
+      "path": "figures/menu.jpg",
+      "width": 400,
+      "caption": "Figure 5. Right-click the strip, or the tray icon near the clock, for the menu.",
+      "alt": "The menu lists Refresh now, Show usage, Settings, Move to top centre, About and Close."
+    },
+    {
+      "type": "table",
+      "header": [
+        "To",
+        "Do this"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "Move the strip",
+          "Drag it."
+        ],
+        [
+          "Keep it in that place",
+          "Settings > Save current position > Save."
+        ],
+        [
+          "Change the layout",
+          "Settings > Layout."
+        ],
+        [
+          "Change how fast the views switch",
+          "Settings > Switch views every … seconds (0 = don't switch)."
+        ],
+        [
+          "Change the warning levels or colours",
+          "Settings: first and second warning, Session view yellow and red."
+        ],
+        [
+          "Start it with Windows",
+          "Settings > Start automatically when I log in to Windows."
+        ],
+        [
+          "Bring it back after closing",
+          "Start menu > AI Usage Meter."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Once a day the program checks hanstandt.be for a new version. If there is one, the strip shows \"update\" and Settings > Download update opens the download page. Nothing is installed by itself. You can switch the check off in Settings."
+    },
+    {
+      "type": "h1",
+      "text": "7. Remove it"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Open Windows Settings > Apps > Installed apps, find AI Usage Meter and click Uninstall. Or right-click the strip and choose Settings > Uninstall.",
+        "Click Yes. The shortcuts, the add-on entry and the program's settings are removed.",
+        "Delete the AIUsageMeter folder that opens.",
+        "Restart the Claude desktop app."
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "Appendix: technical details"
+    },
+    {
+      "type": "h2",
+      "text": "How it works"
+    },
+    {
+      "type": "figure",
+      "path": "figures/how-it-works_en.png",
+      "width": 560,
+      "caption": "Figure 6. The add-on writes the figures; the program only reads them.",
+      "alt": "Claude Code feeds the add-on, which writes files that AI Usage Meter reads every 3 seconds."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "The add-on is a Claude Code plugin (`hooks/register.tsx`). After each reply it writes the 5-hour and weekly figures, and per session the context fill, measured against the auto-compaction threshold.",
+        "The program (`overlay/src/AIUsageMeter.cs`, WPF, .NET Framework 4) reads those files every 3 seconds and draws the strip.",
+        "Every write in the add-on is wrapped, so it can never break a Claude session."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "What it reads and stores"
+    },
+    {
+      "type": "table",
+      "header": [
+        "File",
+        "Contents"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "`.claude\\usage-meter.json`",
+          "5-hour and weekly percentages, reset times, time of the last update"
+        ],
+        [
+          "`.claude\\usage-meter-context\\<session>.json`",
+          "Per session: folder name, fill, last activity, compaction time"
+        ],
+        [
+          "`.claude\\usage-meter-settings.json`",
+          "Your settings"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Session files older than 7 days are deleted. The only network use is the optional daily version check: it reads one small file from hanstandt.be and sends no data of yours."
+    },
+    {
+      "type": "h2",
+      "text": "Build it from the source code"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Open the `source` folder from the zip.",
+        "Run `overlay\\build.cmd` to compile `AIUsageMeter.exe` with the C# compiler built into Windows.",
+        "Run `package\\make-package.cmd` to build the zip with its checksum file."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "To preview the strip without spending usage, type `/usage-demo 85`, `/usage-demo context 93` or `/usage-demo off` in Claude Code."
+    },
+    {
+      "type": "h2",
+      "text": "Limits"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "It sees Claude Code sessions on this PC only (app and terminal), not cloud or WSL sessions or other computers.",
+        "It needs a recent Claude Code; an old terminal version doesn't load the add-on."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Version 1.6: first manual. MIT licence, © 2026 Hans Tandt."
+    }
+  ]
+}

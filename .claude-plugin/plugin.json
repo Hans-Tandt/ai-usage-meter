@@ -1,8 +1,0 @@
-{
-  "name": "usage-meter",
-  "version": "1.2.0",
-  "description": "Writes Claude's 5-hour and weekly usage to ~/.claude/usage-meter.json for the Claude Usage Meter strip",
-  "author": { "name": "Hans Tandt" },
-  "license": "MIT",
-  "types": "./types/index.d.ts"
-}

@@ -1,0 +1,437 @@
+{
+  "meta": {
+    "title": "AI Usage Meter",
+    "subtitle": "Ce qu'il fait, pourquoi il aide et comment l'utiliser",
+    "version": "Version 1.6",
+    "date": "23 octobre 2026",
+    "project": "AI Usage Meter",
+    "author": "Hans Tandt",
+    "tocTitle": "Table des matières",
+    "labels": {
+      "tip": "ASTUCE",
+      "note": "NOTE",
+      "trap": "PIÈGE",
+      "page": "Page"
+    }
+  },
+  "blocks": [
+    {
+      "type": "h1",
+      "text": "Comment utiliser ce manuel"
+    },
+    {
+      "type": "p",
+      "text": "Les chapitres 1 à 7 s'adressent à tous ceux qui utilisent Claude Code. L'annexe s'adresse aux développeurs : le fonctionnement interne et la compilation à partir du code source."
+    },
+    {
+      "type": "p",
+      "text": "Le programme est en anglais. Les captures d'écran et les noms des menus restent donc en anglais."
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Projet non officiel",
+      "text": "AI Usage Meter est un projet communautaire non officiel. Il n'est ni affilié à Anthropic, ni approuvé ou sponsorisé par Anthropic. « Claude » est une marque d'Anthropic."
+    },
+    {
+      "type": "h1",
+      "text": "1. Voir vos limites d'un coup d'œil"
+    },
+    {
+      "type": "p",
+      "text": "AI Usage Meter est une fine barre en haut de votre écran Windows. Elle montre, pendant que vous travaillez, quelle part de votre usage de Claude vous avez consommée."
+    },
+    {
+      "type": "figure",
+      "path": "figures/strip.jpg",
+      "width": 560,
+      "caption": "Figure 1. 34 % de la limite de 5 heures et 21 % de la limite hebdomadaire sont utilisés. Les durées indiquent quand chaque limite se réinitialise.",
+      "alt": "La barre montre deux jauges, 5h et Week, chacune avec un pourcentage et une durée avant réinitialisation."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "`5h` : la part utilisée de votre limite de 5 heures, et quand elle se réinitialise.",
+        "`Week` : la même chose pour votre limite hebdomadaire.",
+        "`Context` : le remplissage de la conversation de votre session Claude Code (chapitre 4)."
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "2. Pourquoi l'utiliser"
+    },
+    {
+      "type": "figure",
+      "path": "figures/context-window_fr.png",
+      "width": 520,
+      "caption": "Figure 2. Après la compaction, Claude garde un résumé, pas les détails. La vue Session vous prévient avant.",
+      "alt": "Quatre barres montrent la fenêtre de contexte qui se remplit, se réduit à un résumé après la compaction, et les lignes d'alerte à 80 % et 90 %."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Sans l'indicateur",
+        "Avec l'indicateur"
+      ],
+      "widths": [
+        1,
+        1
+      ],
+      "rows": [
+        [
+          "Vous atteignez une limite d'usage au milieu d'une tâche, sans prévenir.",
+          "La jauge passe à l'orange, puis au rouge, et une notification Windows vous prévient à temps."
+        ],
+        [
+          "La session se remplit. Claude Code la compacte : les parties anciennes deviennent un court résumé. Claude peut alors oublier des chemins, des règles et des décisions.",
+          "La vue Session vous prévient à 80 % et 90 % du point de compaction. Vous pouvez d'abord écrire vos notes et ouvrir une nouvelle session."
+        ],
+        [
+          "Vous ne savez pas quand une limite se réinitialise.",
+          "La barre montre le temps avant chaque réinitialisation et vous signale quand une limite est réinitialisée."
+        ],
+        [
+          "Vous travaillez vite et arrivez au bout trop tôt.",
+          "La barre affiche « 100% in 1h 20m » quand votre rythme atteindrait la limite avant la réinitialisation."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Le programme lit uniquement les chiffres d'usage que Claude Code fournit lui-même. Il ne lit jamais votre connexion Claude et n'envoie jamais vos données nulle part."
+    },
+    {
+      "type": "h1",
+      "text": "3. L'installer en trois étapes"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Décompressez `AIUsageMeter-1.6.zip` où vous voulez, par exemple dans Téléchargements.",
+        "Double-cliquez sur `AIUsageMeter.exe`. Il indique ce qu'il va modifier et demande s'il peut s'installer. Cliquez sur Yes.",
+        "Redémarrez l'application Claude, ouvrez l'onglet Code et envoyez un message. Après la première réponse de Claude, la barre se remplit."
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Ce qu'il vous faut",
+      "text": "Windows 10 ou 11, un abonnement Claude avec limites d'usage (Pro ou Max) et l'application Claude à jour."
+    },
+    {
+      "type": "callout",
+      "variant": "trap",
+      "title": "Windows a protégé votre ordinateur",
+      "text": "Le programme n'est pas signé, Windows SmartScreen peut donc afficher cet avertissement. Cliquez sur Informations complémentaires, puis Exécuter quand même. Votre antivirus peut aussi demander confirmation ; autorisez-le si vous faites confiance au téléchargement."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Vérifiez votre téléchargement",
+      "text": "Comparez la somme de contrôle du fichier avec `SHA256SUMS.txt` dans le zip. Dans une invite de commandes, tapez `certutil -hashfile AIUsageMeter.exe SHA256`. Les deux valeurs doivent être identiques."
+    },
+    {
+      "type": "table",
+      "header": [
+        "L'installation ajoute",
+        "Où"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "Le programme et son module pour Claude Code",
+          "`%LOCALAPPDATA%\\AIUsageMeter`"
+        ],
+        [
+          "Une ligne, pour que Claude Code charge le module (une copie de sauvegarde est faite d'abord)",
+          "`%USERPROFILE%\\.claude\\settings.json`"
+        ],
+        [
+          "Un raccourci",
+          "Menu Démarrer : AI Usage Meter"
+        ],
+        [
+          "Une entrée, pour pouvoir le désinstaller",
+          "Paramètres Windows > Applications > Applications installées"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Claude Code dans le terminal fonctionne aussi : vérifiez sa version avec `claude --version` et mettez-le à jour avec `claude update`."
+    },
+    {
+      "type": "h1",
+      "text": "4. Lire les couleurs et les alertes"
+    },
+    {
+      "type": "h2",
+      "text": "Vos limites de 5 heures et hebdomadaire"
+    },
+    {
+      "type": "table",
+      "header": [
+        "Si la jauge est",
+        "Alors"
+      ],
+      "widths": [
+        1,
+        3
+      ],
+      "rows": [
+        [
+          "Verte (sous 80 %)",
+          "Continuez à travailler."
+        ],
+        [
+          "Orange (dès 80 %)",
+          "Une notification vous prévient. Planifiez la suite de votre travail."
+        ],
+        [
+          "Rouge (dès 95 %)",
+          "Une deuxième notification. Enregistrez votre travail ; la limite est proche."
+        ],
+        [
+          "`?` avec une jauge vide",
+          "La limite s'est réinitialisée. Le nouveau chiffre arrive avec la prochaine réponse de Claude."
+        ],
+        [
+          "Grisée, « updated 3h ago »",
+          "Les chiffres sont anciens. Envoyez un message à Claude Code pour les mettre à jour."
+        ]
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Quand les chiffres sont mis à jour",
+      "text": "La barre se met à jour quand une session Claude Code démarre ou répond. L'usage du Chat compte pour les mêmes limites, mais ne met pas la barre à jour."
+    },
+    {
+      "type": "h2",
+      "text": "La fenêtre de contexte de votre session"
+    },
+    {
+      "type": "p",
+      "text": "La fenêtre de contexte, c'est tout ce que Claude garde en tête pendant une session. Quand elle est pleine, Claude Code la compacte. La vue Session mesure à quelle distance vous êtes de ce point."
+    },
+    {
+      "type": "figure",
+      "path": "figures/session-levels_fr.png",
+      "width": 380,
+      "caption": "Figure 3. La couleur vous dit quoi faire ensuite.",
+      "alt": "Trois vues Session : verte à 46 %, jaune à 84 % et rouge à 93 % avec Start a new session."
+    },
+    {
+      "type": "callout",
+      "variant": "trap",
+      "title": "Rouge veut dire : nouvelle session maintenant",
+      "text": "Au rouge, la barre reste sur la vue Session et clignote. Notez ce qui compte (par exemple dans vos notes de session), puis ouvrez une nouvelle session avant la compaction."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Besoin de vos chiffres d'usage ?",
+      "text": "Faites un clic droit sur la barre et choisissez Show usage (10 min). Les jauges 5 heures et hebdomadaire reviennent pendant 10 minutes."
+    },
+    {
+      "type": "h1",
+      "text": "5. Choisir votre disposition"
+    },
+    {
+      "type": "figure",
+      "path": "figures/layouts_fr.png",
+      "width": 420,
+      "caption": "Figure 4. Les mêmes chiffres dans trois dispositions.",
+      "alt": "Une barre horizontale, trois jauges verticales et trois petits carrés avec des anneaux affichés l'un après l'autre."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Disposition",
+        "Idéale pour"
+      ],
+      "widths": [
+        1,
+        3
+      ],
+      "rows": [
+        [
+          "Horizontal",
+          "Un écran large : tout sur une ligne. Elle alterne entre les chiffres d'usage et la vue Session."
+        ],
+        [
+          "Vertical",
+          "Un coin étroit : Session (limite de 5 heures), Week et Compress (fenêtre de contexte) côte à côte, tous visibles."
+        ],
+        [
+          "Square (carré)",
+          "La plus petite : 72 x 72 pixels. Elle montre Session, Week et Compress l'un après l'autre."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Survolez un chiffre pour voir les détails : heure de réinitialisation, rythme et liste des sessions."
+    },
+    {
+      "type": "h1",
+      "text": "6. Modifier les réglages"
+    },
+    {
+      "type": "figure",
+      "path": "figures/menu.jpg",
+      "width": 360,
+      "caption": "Figure 5. Clic droit sur la barre, ou sur l'icône près de l'horloge, pour ouvrir le menu.",
+      "alt": "Le menu propose Refresh now, Show usage, Settings, Move to top centre, About et Close."
+    },
+    {
+      "type": "table",
+      "header": [
+        "Pour",
+        "Faites ceci"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "Déplacer la barre",
+          "Faites-la glisser."
+        ],
+        [
+          "La garder à cet endroit",
+          "Settings > Save current position > Save."
+        ],
+        [
+          "Changer de disposition",
+          "Settings > Layout."
+        ],
+        [
+          "Changer la vitesse d'alternance",
+          "Settings > Switch views every … seconds (0 = pas d'alternance)."
+        ],
+        [
+          "Changer les seuils ou les couleurs",
+          "Settings : first et second warning, Session view yellow et red."
+        ],
+        [
+          "La lancer avec Windows",
+          "Settings > Start automatically when I log in to Windows."
+        ],
+        [
+          "La rouvrir après fermeture",
+          "Menu Démarrer > AI Usage Meter."
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Une fois par jour, le programme vérifie sur hanstandt.be s'il existe une nouvelle version. Si oui, la barre affiche « update » et Settings > Download update ouvre la page de téléchargement. Rien ne s'installe tout seul. Vous pouvez désactiver cette vérification dans Settings."
+    },
+    {
+      "type": "h1",
+      "text": "7. Le désinstaller"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Ouvrez Paramètres Windows > Applications > Applications installées, trouvez AI Usage Meter et cliquez sur Désinstaller. Ou faites un clic droit sur la barre et choisissez Settings > Uninstall.",
+        "Cliquez sur Yes. Les raccourcis, la ligne du module et les réglages du programme sont supprimés.",
+        "Supprimez le dossier AIUsageMeter qui s'ouvre.",
+        "Redémarrez l'application Claude."
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "Annexe : détails techniques"
+    },
+    {
+      "type": "h2",
+      "text": "Comment il fonctionne"
+    },
+    {
+      "type": "figure",
+      "path": "figures/how-it-works_fr.png",
+      "width": 460,
+      "caption": "Figure 6. Le module écrit les chiffres ; le programme ne fait que les lire.",
+      "alt": "Claude Code alimente le module, qui écrit des fichiers qu'AI Usage Meter lit toutes les 3 secondes."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Le module est un plugin Claude Code (`hooks/register.tsx`). Après chaque réponse, il écrit les chiffres 5 heures et hebdomadaire et, par session, le remplissage du contexte mesuré par rapport au seuil de compaction automatique.",
+        "Le programme (`overlay/src/AIUsageMeter.cs`, WPF, .NET Framework 4) lit ces fichiers toutes les 3 secondes et dessine la barre.",
+        "Chaque écriture du module est protégée : il ne peut jamais casser une session Claude."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Ce qu'il lit et enregistre"
+    },
+    {
+      "type": "table",
+      "header": [
+        "Fichier",
+        "Contenu"
+      ],
+      "widths": [
+        2,
+        3
+      ],
+      "rows": [
+        [
+          "`.claude\\usage-meter.json`",
+          "Pourcentages 5 heures et hebdomadaire, heures de réinitialisation, heure de la dernière mise à jour"
+        ],
+        [
+          "`.claude\\usage-meter-context\\<session>.json`",
+          "Par session : nom du dossier, remplissage, dernière activité, heure de compaction"
+        ],
+        [
+          "`.claude\\usage-meter-settings.json`",
+          "Vos réglages"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Les fichiers de session de plus de 7 jours sont supprimés. Le seul usage du réseau est la vérification quotidienne optionnelle : elle lit un petit fichier sur hanstandt.be et n'envoie aucune de vos données."
+    },
+    {
+      "type": "h2",
+      "text": "Le compiler à partir du code source"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Ouvrez le dossier `source` du zip.",
+        "Lancez `overlay\\build.cmd` pour compiler `AIUsageMeter.exe` avec le compilateur C# intégré à Windows.",
+        "Lancez `package\\make-package.cmd` pour créer le zip et son fichier de sommes de contrôle."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Pour prévisualiser la barre sans consommer d'usage, tapez `/usage-demo 85`, `/usage-demo context 93` ou `/usage-demo off` dans Claude Code."
+    },
+    {
+      "type": "h2",
+      "text": "Limites"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Il voit uniquement les sessions Claude Code de ce PC (application et terminal), pas celles du cloud, de WSL ou d'autres ordinateurs.",
+        "Il faut une version récente de Claude Code ; une ancienne version du terminal ne charge pas le module."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Version 1.6 : premier manuel. Licence MIT, © 2026 Hans Tandt."
+    }
+  ]
+}
