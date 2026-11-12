@@ -1,0 +1,94 @@
+{
+  "name": "ai-usage-meter",
+  "version": "1.8.0",
+  "description": "AI Usage Meter: your 5-hour, weekly and context figures in a band above the prompt and a /meter pane, with session-notes warnings; works with or without the AI Usage Meter strip (unofficial; not affiliated with Anthropic)",
+  "author": { "name": "Hans Tandt" },
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "useStripSettings": {
+      "type": "boolean",
+      "title": "Use the strip's Settings when it is installed",
+      "description": "On: when the AI Usage Meter strip is installed, its Settings window decides the levels, colours and notifications, and the values below are not used. Off: the values below always apply.",
+      "default": true
+    },
+    "warn1": {
+      "type": "number",
+      "title": "Limits: first warning (%)",
+      "description": "Session (5-hour) and Week turn orange, with a message, from this percentage.",
+      "default": 80
+    },
+    "warn2": {
+      "type": "number",
+      "title": "Limits: second warning (%)",
+      "description": "Session (5-hour) and Week turn red, with a message, from this percentage.",
+      "default": 95
+    },
+    "sessLevel1": {
+      "type": "number",
+      "title": "Context: yellow from (% of compaction)",
+      "description": "Compress turns yellow and asks you to finish the task and update your session notes.",
+      "default": 80
+    },
+    "sessLevel2": {
+      "type": "number",
+      "title": "Context: red from (% of compaction)",
+      "description": "Compress turns red and asks you to start a new session. Must be higher than the yellow level.",
+      "default": 90
+    },
+    "notify": {
+      "type": "boolean",
+      "title": "Message at the limit warnings",
+      "description": "A short message inside Claude Code when Session or Week reaches a warning level.",
+      "default": true
+    },
+    "notifyReset": {
+      "type": "boolean",
+      "title": "Message when a limit resets",
+      "description": "A short message when the 5-hour or weekly limit has reset.",
+      "default": true
+    },
+    "notifyCompaction": {
+      "type": "boolean",
+      "title": "Message when compaction has run",
+      "description": "A short message reminding you to check paths, rules and decisions after compaction.",
+      "default": true
+    },
+    "blink": {
+      "type": "boolean",
+      "title": "Blink at red",
+      "description": "At the red context level, the Compress figure and the \"start a new session\" line blink until the context drops back.",
+      "default": true
+    },
+    "robot": {
+      "type": "boolean",
+      "title": "Little robot in the band",
+      "description": "A small pixel robot beside Details: it blinks, scans while Claude works, its antenna shows the Compress colour, and it cheers when Close session says it is safe. In the terminal it is a short text face.",
+      "default": true
+    },
+    "staleMinutes": {
+      "type": "number",
+      "title": "Figures are old after (minutes)",
+      "description": "After this many minutes without new figures, the limits are dimmed and the band says how old they are (10 to 1440).",
+      "default": 60
+    },
+    "colorOk": {
+      "type": "string",
+      "title": "Colour: below the warnings",
+      "description": "A colour as #RRGGBB.",
+      "default": "#3FB950"
+    },
+    "colorWarn": {
+      "type": "string",
+      "title": "Colour: first warning (orange / yellow)",
+      "description": "A colour as #RRGGBB.",
+      "default": "#F0883E"
+    },
+    "colorDanger": {
+      "type": "string",
+      "title": "Colour: second warning (red)",
+      "description": "A colour as #RRGGBB.",
+      "default": "#F85149"
+    }
+  }
+}

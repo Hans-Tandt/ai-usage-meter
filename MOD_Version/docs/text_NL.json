@@ -1,0 +1,433 @@
+{
+  "meta": {
+    "title": "AI Usage Meter-mod",
+    "subtitle": "Je Claude-limieten en context, in Claude Code",
+    "version": "Versie 1.8.0",
+    "date": "8 november 2026",
+    "project": "AI Usage Meter-mod",
+    "tocTitle": "Inhoud"
+  },
+  "h_use": "Zo gebruik je deze handleiding",
+  "use": "Hoofdstuk 1 tot 10 zijn voor iedereen die Claude Code gebruikt. De bijlage is voor ontwikkelaars: hoe de mod werkt en hoe je hem controleert.",
+  "unofficial_t": "Onofficieel project",
+  "unofficial": "De AI Usage Meter-mod is een onofficieel communityproject. Het is niet verbonden aan Anthropic en wordt niet door Anthropic goedgekeurd of gesponsord. \"Claude\" is een handelsmerk van Anthropic.",
+  "h1": "1. Zie je limieten in Claude Code",
+  "p1": "De mod toont je Claude-gebruik in een band net boven het invoerveld, waar je typt. Claude Code maakt er plaats voor, zodat hij je werk nooit bedekt. Hij werkt in het tabblad Code van de app en in de terminal.",
+  "fig1": "Figuur 1. De band boven het invoerveld. Bij geel en rood zegt hij wat je moet doen, met een knop.",
+  "alt1": "Drie banden met Session, Week en Compress: groen op 46 %, geel op 84 % met een knop Write session notes, rood op 93 % met Write session notes en Compact.",
+  "see_h": [
+    "Je ziet",
+    "Wat het betekent"
+  ],
+  "see": [
+    [
+      "Session",
+      "Je limiet van 5 uur: hoeveel er gebruikt is, en de tijd tot de reset."
+    ],
+    [
+      "Week",
+      "Je weeklimiet, op dezelfde manier."
+    ],
+    [
+      "Compress",
+      "Hoe vol de context van deze sessie is, gemeten tegen het punt waarop comprimeren begint."
+    ],
+    [
+      "~6 turns",
+      "Ongeveer hoeveel beurten zoals de laatste er nog bij passen voor het comprimeren."
+    ],
+    [
+      "5h: 100% in 1h 20m",
+      "In je huidige tempo bereik je de limiet voor de reset."
+    ],
+    [
+      "limits updated 1h 10m ago",
+      "De cijfers zijn oud. Claude Code stuurt nieuwe met zijn volgende antwoord."
+    ],
+    [
+      "other: MyProject 92%",
+      "Een andere Claude Code-sessie op deze pc staat op rood."
+    ]
+  ],
+  "fold_t": "De band is weg en je ziet [+]",
+  "fold": "Claude Code heeft hem zelf ingeklapt: een klik op zijn teken `[-]` rechts in de band, of `ctrl+x ctrl+a`. Klik op `[+]` of druk nog eens op `ctrl+x ctrl+a` om de band terug te krijgen. De mod kan hem niet in- of uitklappen.",
+  "robot_t": "Het robotje",
+  "robot": "Het knippert af en toe met de ogen, kijkt rond terwijl Claude werkt, en zijn antenne heeft de kleur van Compress. Zegt Close session dat het veilig is, dan juicht het. In de terminal is het een kort gezichtje zoals [o_o]. Zet het uit in /config.",
+  "h2": "2. Waarom het helpt",
+  "p2": "Claude onthoudt alleen wat in zijn contextvenster past: alles wat Claude tijdens één sessie in gedachten houdt. Is het venster vol, dan comprimeert Claude Code het. Het oudere deel van het gesprek wordt een korte samenvatting en de details verdwijnen. Claude werkt door, maar kan paden, regels en beslissingen vergeten.",
+  "p2b": "De mod waarschuwt je vooraf, zodat je opschrijft wat belangrijk is en een nieuwe sessie start. Hij toont ook hoeveel er over is van je limiet van 5 uur en je weeklimiet, zodat een limiet je nooit verrast.",
+  "h3": "3. Installeer hem",
+  "p3": "De mod is een map. Zet hem op een plek waar hij kan blijven, bijvoorbeeld `Documents\\AI Usage Meter Mod`: Claude Code leest de mod uit die map, dus verplaats of verwijder hem later niet.",
+  "steps3": [
+    "Pak de mod uit in die map.",
+    "Open PowerShell.",
+    "Werk Claude Code eerst bij: typ `claude update`, daarna `claude --version`. Die moet 2.1.287 of nieuwer tonen. Nog altijd een oudere versie? Sluit PowerShell, open een nieuwe en controleer opnieuw.",
+    "Typ de opdracht hieronder, met je eigen map tussen de aanhalingstekens, en druk op Enter.",
+    "Sluit de Claude-app en start hem opnieuw, of start een nieuwe `claude`-sessie in de terminal.",
+    "Stuur één bericht. Na het antwoord van Claude verschijnt de band boven het invoerveld."
+  ],
+  "code3": "Eén opdracht voegt de mod toe en installeert hem voor elke sessie.",
+  "need_t": "Wat je nodig hebt",
+  "need": "Claude Code 2.1.287 of nieuwer, en een Claude-abonnement met gebruikslimieten (Pro of Max). Oudere versies kennen de installatieopdracht hieronder niet en kunnen de band niet tonen: werk dus eerst bij (stap 3).",
+  "try_t": "Probeer het eerst voor één sessie",
+  "try": "Typ in een terminal `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`. De mod laadt dan alleen voor die sessie, en er wordt niets geïnstalleerd.",
+  "key_t": "\"Detected a custom API key\"",
+  "key": "Heeft Windows een variabele `ANTHROPIC_API_KEY`, dan vraagt Claude Code of hij die moet gebruiken. Kies No: met een API-sleutel meldt Claude Code geen limiet van 5 uur of week, Session en Week blijven leeg, en elk bericht wordt per token gefactureerd.",
+  "h4": "4. Schrijf je sessienotities op tijd",
+  "steps4": [
+    "Bij geel (80 %) verschijnt een tweede regel: finish the task and update your session notes (rond de taak af en werk je notities bij).",
+    "Klik op Write session notes. Claude schrijft op wat er gedaan is, de beslissingen, wat nog open staat en de volgende stappen.",
+    "Bij rood (90 %) staat er start a new session. Start een nieuwe sessie en laat die de notities lezen. Hij knippert tot de context weer zakt."
+  ],
+  "p4": "Bij rood zegt de statusregel onder het invoerveld hetzelfde, dus je ziet het ook als de band verborgen is.",
+  "new_t": "Een nieuwe sessie is beter dan Compact",
+  "new": "Bij rood biedt de band ook Compact aan. Comprimeren houdt alleen een samenvatting van het oudere gesprek over, niet de details. Schrijf als het kan de notities en start liever een nieuwe sessie.",
+  "h5": "6. Open de details",
+  "fig2": "Figuur 3. /meter toont beide limieten, de context van deze sessie, de laatste beurten en je andere sessies.",
+  "alt2": "Het detailpaneel: de balken Session en Week met resettijden, de balk Compress op 84 %, een kleine grafiek van de laatste beurten, drie knoppen en twee andere sessies.",
+  "cmd_h": [
+    "Typ",
+    "Om"
+  ],
+  "cmd": [
+    [
+      "`/meter`",
+      "Het detailpaneel te openen. Of klik op Details in de band; klik nog eens om het te sluiten."
+    ],
+    [
+      "`/meter close`",
+      "Het paneel te sluiten."
+    ],
+    [
+      "`/meter band off`",
+      "De band te verbergen. `/meter band on` toont hem weer."
+    ]
+  ],
+  "p5": "Korte meldingen verschijnen bij elk waarschuwingsniveau, als een limiet gereset is en als er gecomprimeerd is. Een limietwaarschuwing verschijnt één keer, ook met meerdere sessies open.",
+  "h5b": "Zie de waarschuwingen met democijfers",
+  "demo": [
+    [
+      "`/meter demo 85`",
+      "Session op 85 % en Week op 43 %."
+    ],
+    [
+      "`/meter demo here 85`",
+      "Deze sessie op 85 % van het comprimeren: de gele waarschuwing."
+    ],
+    [
+      "`/meter demo context 93 A`",
+      "Een demosessie demo-A op 93 %, getoond als andere sessie."
+    ],
+    [
+      "`/meter demo off`",
+      "Terug naar je echte cijfers."
+    ]
+  ],
+  "term": "In de terminal werkt de mod net zo. De balken zijn lijnen, en `/meter` opent het paneel naast het gesprek in de volledige-schermweergave (`/tui fullscreen`, minstens 110 kolommen), of anders boven het invoerveld.",
+  "h6": "7. Wijzig de instellingen",
+  "p6": "Typ `/config` in Claude Code en zoek de regels van ai-usage-meter. Een wijziging geldt meteen.",
+  "set_h": [
+    "Instelling",
+    "Standaard"
+  ],
+  "set": [
+    [
+      "Limieten: eerste en tweede waarschuwing",
+      "80 % en 95 %"
+    ],
+    [
+      "Context: geel en rood",
+      "80 % en 90 % van het comprimeerpunt"
+    ],
+    [
+      "Melding bij de limietwaarschuwingen",
+      "Aan"
+    ],
+    [
+      "Melding als een limiet gereset is",
+      "Aan"
+    ],
+    [
+      "Melding na het comprimeren",
+      "Aan"
+    ],
+    [
+      "Knipperen bij rood",
+      "Aan"
+    ],
+    [
+      "Robotje in de band",
+      "Aan"
+    ],
+    [
+      "Cijfers zijn oud na",
+      "60 minuten"
+    ],
+    [
+      "Kleuren: onder de waarschuwingen, eerste, tweede",
+      "#3FB950, #F0883E, #F85149"
+    ],
+    [
+      "De Settings van de balk gebruiken als die geïnstalleerd is",
+      "Aan"
+    ]
+  ],
+  "which_t": "Welke instellingen gelden?",
+  "which": "De laatste regel van het paneel /meter zegt het: \"Change them in /config\", of \"Change them in the AI Usage Meter strip's Settings\" (hoofdstuk 8).",
+  "h7": "8. Gebruik hem samen met de AI Usage Meter-balk",
+  "p7": "De AI Usage Meter-balk is een apart Windows-programma: een smalle balk die boven je andere vensters blijft. De mod en de balk werken samen.",
+  "with": [
+    "Beide schrijven dezelfde cijfers naar dezelfde bestanden, zodat elk alle sessies op deze pc ziet.",
+    "Met de balk geïnstalleerd gebruikt de mod de Settings van de balk voor niveaus, kleuren en meldingen. Zet Use the strip's Settings when it is installed uit in /config om de instellingen van de mod te gebruiken.",
+    "De mod heet ai-usage-meter en de add-on van de balk usage-meter. Ze werken naast elkaar; de demo van de balk blijft /usage-demo."
+  ],
+  "h8": "10. Verwijder hem",
+  "steps8": [
+    "Typ `claude plugin uninstall ai-usage-meter@ai-usage-meter`.",
+    "Typ `claude plugin marketplace remove ai-usage-meter`.",
+    "Start Claude Code opnieuw. Nu kun je de map van de mod verwijderen."
+  ],
+  "p8": "Geïnstalleerd via `settings.json`? Haal dan in plaats daarvan de map, en de puntkomma ervoor, uit `CLAUDE_CODE_PLUGIN_DIRS`. De cijfers van de mod blijven in `%USERPROFILE%\\.claude` voor de balk; sessiebestanden ouder dan 7 dagen worden verwijderd.",
+  "h9": "Bijlage: technische details",
+  "h9a": "Hoe het werkt",
+  "how": [
+    "De mod is een Claude Code-plugin met een hooks-module (`hooks/register.tsx`). Claude Code voert hem uit in elke sessie.",
+    "Na elk antwoord leest hij de cijfers die Claude Code meldt: de limiet van 5 uur en de weeklimiet, hoe vol de context is en de kosten. Hij meet de context tegen het punt voor automatisch comprimeren.",
+    "Hij tekent de band en het paneel /meter met de eigen elementen van Claude Code (`hooks/draw.tsx`): ronde balken in de app, lijnen in de terminal.",
+    "Elke 30 seconden leest hij de bestanden van de andere sessies, zodat aftellingen, oude cijfers en andere sessies kloppen.",
+    "Elke schrijfactie is afgeschermd, zodat hij nooit een Claude-sessie kan breken."
+  ],
+  "h9b": "Wat hij leest en bewaart",
+  "store_h": [
+    "Waar",
+    "Wat"
+  ],
+  "store": [
+    [
+      "`.claude\\usage-meter.json`",
+      "Percentages voor 5 uur en week, resettijden, tijd van de laatste update"
+    ],
+    [
+      "`.claude\\usage-meter-context\\<sessie>.json`",
+      "Per sessie: mapnaam, vulling, laatste activiteit, tijd van comprimeren"
+    ],
+    [
+      "`.claude\\usage-meter-settings.json`",
+      "Alleen lezen: de instellingen van de balk, als die geïnstalleerd is"
+    ],
+    [
+      "De pluginopslag van Claude Code",
+      "Of de band verborgen is, en welke limietwaarschuwingen al getoond zijn"
+    ]
+  ],
+  "privacy": "Hij leest geen login of wachtwoorden en maakt geen netwerkverbindingen. De knop Write session notes stuurt één gewoon bericht naar Claude in je sessie, dus het telt mee voor je limieten zoals elk bericht.",
+  "h9c": "Controleer hem",
+  "check": "In de map `MOD_Version` controleert `claude plugin validate .` de plugin zoals Claude Code hem laadt, en voert `claude plugin test .` zijn tests uit in de terminal en in de app.",
+  "h9d": "Beperkingen",
+  "limits": [
+    "Hij ziet alleen Claude Code-sessies op deze pc (app en terminal), geen cloud- of WSL-sessies of andere computers.",
+    "Session en Week hebben een Claude-abonnement met gebruikslimieten nodig; met een API-sleutel blijven ze leeg.",
+    "De cijfers vernieuwen als een sessie start of antwoordt. Gebruik in Chat telt mee voor de limieten, maar werkt ze niet bij."
+  ],
+  "history": "Versie 1.7: eerste handleiding van de mod. MIT-licentie, © 2026 Hans Tandt.",
+  "h_cs": "5. Sluit en start een sessie veilig",
+  "p_cs": "Twee knoppen voeren twee prompts uit die bij de mod horen. Close session controleert alles wat deze sessie deed en bewaart het in CLAUDE.md, MEMORY.md en de sessienotities. Start session leest die bestanden in de volgende sessie, of maakt ze aan in een nieuw project, en gaat verder waar je stopte.",
+  "fig3": "Figuur 2. Close session in de band: eerst de voortgang, dan het resultaat.",
+  "alt3": "Twee banden: een oranje regel \"Closing session… step 3 of 6 · 50%\" met een balk, en een groene regel \"Now it's safe to end this session\".",
+  "where_h": [
+    "Knop",
+    "Waar"
+  ],
+  "where": [
+    [
+      "Close session",
+      "In de band bij rood, in het paneel /meter, of `/meter close-session`."
+    ],
+    [
+      "Start session",
+      "In de band van een nieuwe sessie voor je eerste bericht, in het paneel /meter, of `/meter start-session`."
+    ]
+  ],
+  "msg_h": [
+    "De band zegt",
+    "Wat je doet"
+  ],
+  "msg": [
+    [
+      "Closing session… step 3 of 6 · 50%",
+      "Wacht: Claude werkt de controle af."
+    ],
+    [
+      "✓ Now it's safe to end this session",
+      "Alles is bewaard. Sluit de sessie."
+    ],
+    [
+      "✓ Everything is ready to start this session",
+      "Claude heeft de bestanden gelezen. Begin aan je taak."
+    ],
+    [
+      "It's NOT safe to close this session: <reason>",
+      "Claude vond een probleem. Lees het antwoord, los het op en start Close session opnieuw."
+    ],
+    [
+      "Close session stopped at step 2 of 6",
+      "Het antwoord stopte te vroeg. Controleer het, of start Close session opnieuw."
+    ]
+  ],
+  "go_t": "Eén klik doet alles",
+  "go": "De knop telt als je \"go\": Claude schrijft de wijzigingen zonder te stoppen om te vragen. In een git-project maakt hij geen reservekopieën van bestanden die git al bewaart.",
+  "hand_t": "De overdracht",
+  "hand": "Close session eindigt met het eerste bericht voor de volgende sessie. De mod bewaart het, en Start session in de volgende sessie van dezelfde map stuurt het mee. Claude gaat precies verder waar je stopte.",
+  "h3b": "Zonder terminal",
+  "p3b": "Geen opdracht `claude` in je terminal? Vertel Claude Code dan waar de map staat, in `settings.json`:",
+  "steps3b": [
+    "Open `%USERPROFILE%\\.claude\\settings.json` in een teksteditor.",
+    "Zoek `CLAUDE_CODE_PLUGIN_DIRS` in het blok `env`. Staat het er niet, voeg het dan toe.",
+    "Voeg de map van de mod toe aan de waarde. Scheid mappen met een puntkomma (`;`).",
+    "Sla het bestand op en start Claude Code opnieuw."
+  ],
+  "code3b": "Het blok env met de add-on van de balk en de mod. In JSON schrijf je elke \\ twee keer.",
+  "h_test": "9. Controleer of alles werkt",
+  "p_test": "Tien minuten, zonder verbruik voor de waarschuwingen: de democijfers tonen elke kleur en elke knop. Gebruik een testmap, geen echt project. Doe de stappen in deze volgorde.",
+  "test_tip_t": "Gebruik een testmap",
+  "test_tip": "Close session en Start session schrijven CLAUDE.md, MEMORY.md en sessienotities. Probeer ze eerst in een lege map, bijvoorbeeld `Documents\\Test`, en open daar een nieuwe Claude Code-sessie.",
+  "test_h": [
+    "Doe dit",
+    "Je ziet"
+  ],
+  "tests": [
+    [
+      "Claude Code en de installatie",
+      [
+        [
+          "In PowerShell: `claude --version`",
+          "2.1.287 of nieuwer"
+        ],
+        [
+          "`claude plugin list`",
+          "ai-usage-meter@ai-usage-meter, versie 1.8.0, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
+        ]
+      ]
+    ],
+    [
+      "De band",
+      [
+        [
+          "Open een nieuwe sessie; typ nog niets",
+          "Session, Week en Compress, Details links, en \"New session:\" met Start session"
+        ],
+        [
+          "Kijk naar het robotje naast Details en stuur dan een bericht",
+          "Het knippert af en toe; terwijl Claude werkt, kijken de ogen rond"
+        ],
+        [
+          "Stuur één bericht",
+          "De regel \"New session\" verdwijnt"
+        ],
+        [
+          "Klik op het `[-]` van Claude Code rechts in de band",
+          "De band klapt in tot `[+]`"
+        ],
+        [
+          "Klik op `[+]` (of druk op `ctrl+x ctrl+a`)",
+          "De band is terug"
+        ]
+      ]
+    ],
+    [
+      "De waarschuwingen (demo)",
+      [
+        [
+          "`/meter demo here 85`",
+          "Compress oranje; \"finish the task and update your session notes\" met Write session notes"
+        ],
+        [
+          "`/meter demo here 93`",
+          "Compress rood; \"start a new session\" knippert; Close session en Compact"
+        ],
+        [
+          "`/meter demo 96`",
+          "Session rood, Week 48 %; een korte melding over de limiet van 5 uur"
+        ],
+        [
+          "`/meter demo context 92 A`",
+          "\"other: demo-A 92%\" in de band"
+        ],
+        [
+          "`/meter demo off`",
+          "Weer je echte cijfers"
+        ]
+      ]
+    ],
+    [
+      "Het detailpaneel",
+      [
+        [
+          "Klik op Details",
+          "Het paneel opent: limieten, Compress, laatste beurten, knoppen, andere sessies"
+        ],
+        [
+          "Klik nog eens op Details",
+          "Het paneel sluit"
+        ]
+      ]
+    ],
+    [
+      "De instellingen",
+      [
+        [
+          "`/config`, de regels van ai-usage-meter",
+          "De niveaus, de meldingen, Blink at red, de kleuren"
+        ],
+        [
+          "Zet Blink at red uit, dan `/meter demo here 93`",
+          "Rood zonder knipperen (zet het daarna weer aan)"
+        ],
+        [
+          "Zet Robotje in de band uit in `/config`",
+          "Het robotje is weg (zet het daarna weer aan)"
+        ]
+      ]
+    ],
+    [
+      "Close session en Start session",
+      [
+        [
+          "Geef Claude een kleine taak, bijvoorbeeld: maak hello.txt",
+          "Claude doet het"
+        ],
+        [
+          "Klik op Close session (paneel, of band bij rood)",
+          "\"Closing session… step 1 of 6\" tot 6, dan \"✓ Now it's safe to end this session\""
+        ],
+        [
+          "Kijk in de testmap",
+          "CLAUDE.md, MEMORY.md en de sessienotities, ingevuld"
+        ],
+        [
+          "Open daar een nieuwe sessie; klik op Start session voor je typt",
+          "\"Preparing session…\", dan \"✓ Everything is ready to start this session\""
+        ],
+        [
+          "Lees het eerste antwoord van Claude",
+          "Het gaat verder vanaf de overdracht van Close session"
+        ]
+      ]
+    ],
+    [
+      "Veiligheid",
+      [
+        [
+          "Klik op Close session en druk dan op Esc om Claude te stoppen",
+          "Oranje: \"Close session stopped at step … of 6\", nooit groen"
+        ],
+        [
+          "Klik twee keer snel op Close session",
+          "Een melding dat het al loopt"
+        ]
+      ]
+    ]
+  ],
+  "mp_t": "\"error: unknown option '--marketplace'\"",
+  "mp": "Je `claude` is ouder dan 2.1.287, of PowerShell gebruikt nog de oude. Werk hem bij en open een nieuwe PowerShell. Kun je niet bijwerken? Installeer dan met twee opdrachten: `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`, daarna `claude plugin install ai-usage-meter@ai-usage-meter`. De band zelf heeft wel 2.1.287 of nieuwer nodig."
+}

@@ -53,6 +53,12 @@ Choose the layout in Settings:
 
 The colours, levels, warnings and notifications are the same in every layout. In the vertical and square layouts, hover over a figure for the details: reset time, pace, how old the figures are, and the list of sessions.
 
+## Inside Claude Code: the separate mod
+
+The same figures can also be shown inside Claude Code itself, in a band above the prompt and a `/meter` pane, by the **AI Usage Meter mod** in [`../MOD_Version`](../MOD_Version). The mod is a separate product with its own README and manual. It works with or without this strip; with the strip installed, it uses this strip's Settings. The strip's add-on (`usage-meter`) and the mod (`ai-usage-meter`) run side by side and write the same files.
+
+**Known issue in the 1.6 add-on:** when a Claude Code session starts, before its first reply, the add-on writes `usage-meter.json` with no limits, so the strip has no 5h and Week figures until that session replies. The mod already keeps the last real figures; the same fix can go into this add-on in the next strip release.
+
 ## Requirements
 
 - Windows 10 or 11.

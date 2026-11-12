@@ -1,0 +1,433 @@
+{
+  "meta": {
+    "title": "Mod AI Usage Meter",
+    "subtitle": "Vos limites Claude et votre contexte, dans Claude Code",
+    "version": "Version 1.8.0",
+    "date": "8 novembre 2026",
+    "project": "Mod AI Usage Meter",
+    "tocTitle": "Table des matières"
+  },
+  "h_use": "Comment utiliser ce manuel",
+  "use": "Les chapitres 1 à 10 s'adressent à tous ceux qui utilisent Claude Code. L'annexe s'adresse aux développeurs : le fonctionnement du mod et comment le vérifier.",
+  "unofficial_t": "Projet non officiel",
+  "unofficial": "Le mod AI Usage Meter est un projet communautaire non officiel. Il n'est ni affilié à Anthropic, ni approuvé ou sponsorisé par Anthropic. « Claude » est une marque d'Anthropic.",
+  "h1": "1. Voir vos limites dans Claude Code",
+  "p1": "Le mod affiche votre utilisation de Claude dans un bandeau juste au-dessus de la zone de saisie. Claude Code lui fait de la place : il ne cache jamais votre travail. Il fonctionne dans l'onglet Code de l'application et dans le terminal.",
+  "fig1": "Figure 1. Le bandeau au-dessus de la zone de saisie. En jaune et en rouge, il vous dit quoi faire, avec un bouton.",
+  "alt1": "Trois bandeaux avec Session, Week et Compress : vert à 46 %, jaune à 84 % avec un bouton Write session notes, rouge à 93 % avec Write session notes et Compact.",
+  "see_h": [
+    "Vous voyez",
+    "Ce que cela veut dire"
+  ],
+  "see": [
+    [
+      "Session",
+      "Votre limite de 5 heures : la part utilisée et le temps avant la réinitialisation."
+    ],
+    [
+      "Week",
+      "Votre limite hebdomadaire, de la même façon."
+    ],
+    [
+      "Compress",
+      "Le remplissage du contexte de cette session, mesuré par rapport au point où la compaction commence."
+    ],
+    [
+      "~6 turns",
+      "Environ combien d'échanges comme les derniers tiennent encore avant la compaction."
+    ],
+    [
+      "5h: 100% in 1h 20m",
+      "À votre rythme actuel, vous atteignez la limite avant la réinitialisation."
+    ],
+    [
+      "limits updated 1h 10m ago",
+      "Les chiffres sont anciens. Claude Code en envoie de nouveaux avec sa prochaine réponse."
+    ],
+    [
+      "other: MyProject 92%",
+      "Une autre session Claude Code de ce PC est au rouge."
+    ]
+  ],
+  "fold_t": "Le bandeau a disparu et vous voyez [+]",
+  "fold": "Claude Code l'a replié lui-même : un clic sur sa marque `[-]` au bout droit du bandeau, ou `ctrl+x ctrl+a`. Cliquez sur `[+]` ou appuyez de nouveau sur `ctrl+x ctrl+a` pour le retrouver. Le mod ne peut ni le replier ni le déplier.",
+  "robot_t": "Le petit robot",
+  "robot": "Il cligne des yeux de temps en temps, balaie du regard pendant que Claude travaille, et son antenne prend la couleur de Compress. Quand Close session dit que c'est sûr, il se réjouit. Dans le terminal, c'est un petit visage comme [o_o]. Désactivez-le dans /config.",
+  "h2": "2. Pourquoi c'est utile",
+  "p2": "Claude ne retient que ce qui tient dans sa fenêtre de contexte : tout ce que Claude garde en tête pendant une session. Quand la fenêtre est pleine, Claude Code la compacte. L'ancienne partie de la conversation devient un court résumé et les détails disparaissent. Claude continue, mais peut oublier des chemins, des règles et des décisions.",
+  "p2b": "Le mod vous prévient avant, pour que vous puissiez noter l'essentiel et ouvrir une nouvelle session. Il montre aussi ce qui reste de vos limites de 5 heures et hebdomadaire : une limite ne vous arrête jamais par surprise.",
+  "h3": "3. L'installer",
+  "p3": "Le mod est un dossier. Placez-le à un endroit où il peut rester, par exemple `Documents\\AI Usage Meter Mod` : Claude Code lit le mod dans ce dossier, ne le déplacez donc pas et ne le supprimez pas ensuite.",
+  "steps3": [
+    "Décompressez le mod dans ce dossier.",
+    "Ouvrez PowerShell.",
+    "Mettez d'abord Claude Code à jour : tapez `claude update`, puis `claude --version`. La version doit être 2.1.287 ou plus récente. Toujours une ancienne version ? Fermez PowerShell, ouvrez-en un nouveau et vérifiez à nouveau.",
+    "Tapez la commande ci-dessous, avec votre dossier entre les guillemets, et appuyez sur Entrée.",
+    "Quittez et relancez l'application Claude, ou démarrez une nouvelle session `claude` dans le terminal.",
+    "Envoyez un message. Après la réponse de Claude, le bandeau apparaît au-dessus de la zone de saisie."
+  ],
+  "code3": "Une seule commande ajoute le mod et l'installe pour toutes les sessions.",
+  "need_t": "Ce qu'il vous faut",
+  "need": "Claude Code 2.1.287 ou plus récent, et un abonnement Claude avec limites d'utilisation (Pro ou Max). Les versions plus anciennes ne connaissent pas la commande d'installation ci-dessous et ne peuvent pas afficher le bandeau : mettez donc d'abord à jour (étape 3).",
+  "try_t": "Essayez d'abord pour une session",
+  "try": "Dans un terminal, tapez `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`. Le mod se charge alors pour cette session seulement, et rien n'est installé.",
+  "key_t": "« Detected a custom API key »",
+  "key": "Si Windows a une variable `ANTHROPIC_API_KEY`, Claude Code demande s'il doit l'utiliser. Choisissez No : avec une clé API, Claude Code n'indique pas les limites de 5 heures et hebdomadaire, Session et Week restent vides, et chaque message est facturé au token.",
+  "h4": "4. Écrire vos notes de session à temps",
+  "steps4": [
+    "En jaune (80 %), une deuxième ligne apparaît : finish the task and update your session notes (terminez la tâche et mettez vos notes à jour).",
+    "Cliquez sur Write session notes. Claude note ce qui a été fait, les décisions, ce qui reste ouvert et les prochaines étapes.",
+    "En rouge (90 %), la ligne dit start a new session. Ouvrez une nouvelle session et faites-lui lire les notes. Elle clignote jusqu'à ce que le contexte redescende."
+  ],
+  "p4": "En rouge, la ligne d'état sous la zone de saisie dit la même chose : vous la voyez même si le bandeau est masqué.",
+  "new_t": "Une nouvelle session vaut mieux que Compact",
+  "new": "En rouge, le bandeau propose aussi Compact. La compaction ne garde qu'un résumé de l'ancienne conversation, pas les détails. Quand c'est possible, écrivez les notes et ouvrez plutôt une nouvelle session.",
+  "h5": "6. Ouvrir les détails",
+  "fig2": "Figure 3. /meter affiche les deux limites, le contexte de cette session, les derniers échanges et vos autres sessions.",
+  "alt2": "Le panneau de détails : les jauges Session et Week avec l'heure de réinitialisation, la jauge Compress à 84 %, un petit graphique des derniers échanges, trois boutons et deux autres sessions.",
+  "cmd_h": [
+    "Tapez",
+    "Pour"
+  ],
+  "cmd": [
+    [
+      "`/meter`",
+      "Ouvrir le panneau de détails. Ou cliquez sur Details dans le bandeau ; un second clic le referme."
+    ],
+    [
+      "`/meter close`",
+      "Fermer le panneau."
+    ],
+    [
+      "`/meter band off`",
+      "Masquer le bandeau. `/meter band on` le réaffiche."
+    ]
+  ],
+  "p5": "De courts messages apparaissent à chaque seuil d'alerte, quand une limite est réinitialisée et quand une compaction a eu lieu. Une alerte de limite ne s'affiche qu'une fois, même avec plusieurs sessions ouvertes.",
+  "h5b": "Voir les alertes avec des chiffres de démonstration",
+  "demo": [
+    [
+      "`/meter demo 85`",
+      "Session à 85 % et Week à 43 %."
+    ],
+    [
+      "`/meter demo here 85`",
+      "Cette session à 85 % de la compaction : l'alerte jaune."
+    ],
+    [
+      "`/meter demo context 93 A`",
+      "Une session de démonstration demo-A à 93 %, affichée comme une autre session."
+    ],
+    [
+      "`/meter demo off`",
+      "Retour à vos vrais chiffres."
+    ]
+  ],
+  "term": "Dans le terminal, le mod fonctionne de la même façon. Les jauges sont dessinées en traits et `/meter` ouvre le panneau à côté de la conversation en mode plein écran (`/tui fullscreen`, au moins 110 colonnes), sinon au-dessus de la zone de saisie.",
+  "h6": "7. Modifier les réglages",
+  "p6": "Tapez `/config` dans Claude Code et cherchez les lignes ai-usage-meter. Une modification s'applique tout de suite.",
+  "set_h": [
+    "Réglage",
+    "Par défaut"
+  ],
+  "set": [
+    [
+      "Limites : première et deuxième alerte",
+      "80 % et 95 %"
+    ],
+    [
+      "Contexte : jaune et rouge",
+      "80 % et 90 % du point de compaction"
+    ],
+    [
+      "Message aux alertes de limite",
+      "Activé"
+    ],
+    [
+      "Message à la réinitialisation d'une limite",
+      "Activé"
+    ],
+    [
+      "Message après une compaction",
+      "Activé"
+    ],
+    [
+      "Clignoter au rouge",
+      "Activé"
+    ],
+    [
+      "Petit robot dans le bandeau",
+      "Activé"
+    ],
+    [
+      "Chiffres anciens après",
+      "60 minutes"
+    ],
+    [
+      "Couleurs : sous les alertes, première, deuxième",
+      "#3FB950, #F0883E, #F85149"
+    ],
+    [
+      "Utiliser les Settings de la barre quand elle est installée",
+      "Activé"
+    ]
+  ],
+  "which_t": "Quels réglages sont utilisés ?",
+  "which": "La dernière ligne du panneau /meter l'indique : « Change them in /config », ou « Change them in the AI Usage Meter strip's Settings » (chapitre 8).",
+  "h7": "8. L'utiliser avec la barre AI Usage Meter",
+  "p7": "La barre AI Usage Meter est un programme Windows séparé : une petite barre qui reste au-dessus de vos autres fenêtres. Le mod et la barre fonctionnent ensemble.",
+  "with": [
+    "Les deux écrivent les mêmes chiffres dans les mêmes fichiers : chacun voit toutes les sessions de ce PC.",
+    "Si la barre est installée, le mod utilise ses Settings pour les seuils, les couleurs et les messages. Désactivez Use the strip's Settings when it is installed dans /config pour utiliser les réglages du mod.",
+    "Le mod s'appelle ai-usage-meter et le module de la barre usage-meter. Ils fonctionnent côte à côte ; la démonstration de la barre reste /usage-demo."
+  ],
+  "h8": "10. Le désinstaller",
+  "steps8": [
+    "Tapez `claude plugin uninstall ai-usage-meter@ai-usage-meter`.",
+    "Tapez `claude plugin marketplace remove ai-usage-meter`.",
+    "Relancez Claude Code. Vous pouvez ensuite supprimer le dossier du mod."
+  ],
+  "p8": "Installé via `settings.json` ? Retirez alors plutôt le dossier, et le point-virgule qui le précède, de `CLAUDE_CODE_PLUGIN_DIRS`. Les chiffres du mod restent dans `%USERPROFILE%\\.claude` pour la barre ; les fichiers de session de plus de 7 jours sont supprimés.",
+  "h9": "Annexe : détails techniques",
+  "h9a": "Comment il fonctionne",
+  "how": [
+    "Le mod est un plugin Claude Code avec un module de hooks (`hooks/register.tsx`). Claude Code l'exécute dans chaque session.",
+    "Après chaque réponse, il lit les chiffres que Claude Code fournit : les limites de 5 heures et hebdomadaire, le remplissage du contexte et le coût. Il mesure le contexte par rapport au point de compaction automatique.",
+    "Il dessine le bandeau et le panneau /meter avec les éléments de Claude Code (`hooks/draw.tsx`) : des jauges arrondies dans l'application, des traits dans le terminal.",
+    "Toutes les 30 secondes, il lit les fichiers des autres sessions : comptes à rebours, chiffres anciens et autres sessions restent à jour.",
+    "Chaque écriture est protégée : il ne peut jamais casser une session Claude."
+  ],
+  "h9b": "Ce qu'il lit et enregistre",
+  "store_h": [
+    "Où",
+    "Quoi"
+  ],
+  "store": [
+    [
+      "`.claude\\usage-meter.json`",
+      "Pourcentages 5 heures et hebdomadaire, heures de réinitialisation, heure de la dernière mise à jour"
+    ],
+    [
+      "`.claude\\usage-meter-context\\<session>.json`",
+      "Par session : nom du dossier, remplissage, dernière activité, heure de compaction"
+    ],
+    [
+      "`.claude\\usage-meter-settings.json`",
+      "Lecture seule : les réglages de la barre, si elle est installée"
+    ],
+    [
+      "La mémoire des plugins de Claude Code",
+      "Si le bandeau est masqué, et quelles alertes de limite ont déjà été affichées"
+    ]
+  ],
+  "privacy": "Il ne lit ni identifiants ni mots de passe et ne fait aucun appel réseau. Le bouton Write session notes envoie un message ordinaire à Claude dans votre session : il compte dans vos limites comme tout message.",
+  "h9c": "Le vérifier",
+  "check": "Dans le dossier `MOD_Version`, `claude plugin validate .` vérifie le plugin comme Claude Code le charge, et `claude plugin test .` lance ses tests dans le terminal et dans l'application.",
+  "h9d": "Limites",
+  "limits": [
+    "Il voit uniquement les sessions Claude Code de ce PC (application et terminal), pas celles du cloud, de WSL ou d'autres ordinateurs.",
+    "Session et Week demandent un abonnement Claude avec limites d'utilisation ; avec une clé API, elles restent vides.",
+    "Les chiffres se mettent à jour quand une session démarre ou répond. L'usage du Chat compte dans les limites mais ne les met pas à jour."
+  ],
+  "history": "Version 1.7 : premier manuel du mod. Licence MIT, © 2026 Hans Tandt.",
+  "h_cs": "5. Fermer et ouvrir une session en sécurité",
+  "p_cs": "Deux boutons lancent deux prompts fournis avec le mod. Close session vérifie tout ce que la session a fait et l'enregistre dans CLAUDE.md, MEMORY.md et les notes de session. Start session lit ces fichiers dans la session suivante, ou les crée dans un nouveau projet, et reprend là où vous vous êtes arrêté.",
+  "fig3": "Figure 2. Close session dans le bandeau : d'abord la progression, puis le résultat.",
+  "alt3": "Deux bandeaux : une ligne orange « Closing session… step 3 of 6 · 50% » avec une jauge, et une ligne verte « Now it's safe to end this session ».",
+  "where_h": [
+    "Bouton",
+    "Où"
+  ],
+  "where": [
+    [
+      "Close session",
+      "Dans le bandeau au rouge, dans le panneau /meter, ou `/meter close-session`."
+    ],
+    [
+      "Start session",
+      "Dans le bandeau d'une nouvelle session avant votre premier message, dans le panneau /meter, ou `/meter start-session`."
+    ]
+  ],
+  "msg_h": [
+    "Le bandeau dit",
+    "Que faire"
+  ],
+  "msg": [
+    [
+      "Closing session… step 3 of 6 · 50%",
+      "Attendez : Claude fait la vérification."
+    ],
+    [
+      "✓ Now it's safe to end this session",
+      "Tout est enregistré. Fermez la session."
+    ],
+    [
+      "✓ Everything is ready to start this session",
+      "Claude a lu les fichiers. Commencez votre tâche."
+    ],
+    [
+      "It's NOT safe to close this session: <reason>",
+      "Claude a trouvé un problème. Lisez sa réponse, corrigez, puis relancez Close session."
+    ],
+    [
+      "Close session stopped at step 2 of 6",
+      "La réponse s'est arrêtée trop tôt. Vérifiez-la, ou relancez Close session."
+    ]
+  ],
+  "go_t": "Un seul clic fait tout",
+  "go": "Le bouton vaut votre « go » : Claude écrit les modifications sans s'arrêter pour demander. Dans un projet git, il ne fait pas de copies de sauvegarde des fichiers que git garde déjà.",
+  "hand_t": "Le passage de relais",
+  "hand": "Close session se termine par le premier message pour la session suivante. Le mod le garde, et Start session dans la session suivante du même dossier l'envoie avec le prompt. Claude reprend exactement là où vous vous êtes arrêté.",
+  "h3b": "Sans terminal",
+  "p3b": "Pas de commande `claude` dans votre terminal ? Indiquez alors à Claude Code où se trouve le dossier, dans `settings.json` :",
+  "steps3b": [
+    "Ouvrez `%USERPROFILE%\\.claude\\settings.json` dans un éditeur de texte.",
+    "Cherchez `CLAUDE_CODE_PLUGIN_DIRS` dans le bloc `env`. S'il n'y est pas, ajoutez-le.",
+    "Ajoutez le dossier du mod à sa valeur. Séparez les dossiers par un point-virgule (`;`).",
+    "Enregistrez le fichier et relancez Claude Code."
+  ],
+  "code3b": "Le bloc env avec le module de la barre et le mod. En JSON, chaque \\ s'écrit deux fois.",
+  "h_test": "9. Vérifier que tout fonctionne",
+  "p_test": "Dix minutes, sans consommer d'utilisation pour les alertes : les chiffres de démonstration montrent chaque couleur et chaque bouton. Utilisez un dossier de test, pas un vrai projet. Suivez les étapes dans cet ordre.",
+  "test_tip_t": "Utilisez un dossier de test",
+  "test_tip": "Close session et Start session écrivent CLAUDE.md, MEMORY.md et les notes de session. Essayez-les d'abord dans un dossier vide, par exemple `Documents\\Test`, et ouvrez-y une nouvelle session Claude Code.",
+  "test_h": [
+    "Faites ceci",
+    "Vous devez voir"
+  ],
+  "tests": [
+    [
+      "Claude Code et l'installation",
+      [
+        [
+          "Dans PowerShell : `claude --version`",
+          "2.1.287 ou plus récent"
+        ],
+        [
+          "`claude plugin list`",
+          "ai-usage-meter@ai-usage-meter, version 1.8.0, enabled. « userConfig options not yet set » est normal : chaque réglage a une valeur par défaut."
+        ]
+      ]
+    ],
+    [
+      "Le bandeau",
+      [
+        [
+          "Ouvrez une nouvelle session ; ne tapez rien encore",
+          "Session, Week et Compress, Details à gauche, et « New session: » avec Start session"
+        ],
+        [
+          "Regardez le robot à côté de Details, puis envoyez un message",
+          "Il cligne des yeux de temps en temps ; pendant que Claude travaille, ses yeux balaient"
+        ],
+        [
+          "Envoyez un message",
+          "La ligne « New session » disparaît"
+        ],
+        [
+          "Cliquez sur le `[-]` de Claude Code au bout droit du bandeau",
+          "Le bandeau se replie en `[+]`"
+        ],
+        [
+          "Cliquez sur `[+]` (ou appuyez sur `ctrl+x ctrl+a`)",
+          "Le bandeau est de retour"
+        ]
+      ]
+    ],
+    [
+      "Les alertes (démonstration)",
+      [
+        [
+          "`/meter demo here 85`",
+          "Compress orange ; « finish the task and update your session notes » avec Write session notes"
+        ],
+        [
+          "`/meter demo here 93`",
+          "Compress rouge ; « start a new session » clignote ; Close session et Compact"
+        ],
+        [
+          "`/meter demo 96`",
+          "Session rouge, Week 48 % ; un court message sur la limite de 5 heures"
+        ],
+        [
+          "`/meter demo context 92 A`",
+          "« other: demo-A 92% » dans le bandeau"
+        ],
+        [
+          "`/meter demo off`",
+          "Vos vrais chiffres à nouveau"
+        ]
+      ]
+    ],
+    [
+      "Le panneau de détails",
+      [
+        [
+          "Cliquez sur Details",
+          "Le panneau s'ouvre : limites, Compress, derniers échanges, boutons, autres sessions"
+        ],
+        [
+          "Cliquez de nouveau sur Details",
+          "Le panneau se ferme"
+        ]
+      ]
+    ],
+    [
+      "Les réglages",
+      [
+        [
+          "`/config`, les lignes ai-usage-meter",
+          "Les seuils, les messages, Blink at red, les couleurs"
+        ],
+        [
+          "Désactivez Blink at red, puis `/meter demo here 93`",
+          "Rouge sans clignotement (réactivez-le ensuite)"
+        ],
+        [
+          "Désactivez Petit robot dans le bandeau dans `/config`",
+          "Le robot disparaît (réactivez-le ensuite)"
+        ]
+      ]
+    ],
+    [
+      "Close session et Start session",
+      [
+        [
+          "Donnez une petite tâche à Claude, par exemple : crée hello.txt",
+          "Claude la fait"
+        ],
+        [
+          "Cliquez sur Close session (panneau, ou bandeau au rouge)",
+          "« Closing session… step 1 of 6 » jusqu'à 6, puis « ✓ Now it's safe to end this session »"
+        ],
+        [
+          "Regardez dans le dossier de test",
+          "CLAUDE.md, MEMORY.md et les notes de session, remplis"
+        ],
+        [
+          "Ouvrez-y une nouvelle session ; cliquez sur Start session avant de taper",
+          "« Preparing session… », puis « ✓ Everything is ready to start this session »"
+        ],
+        [
+          "Lisez la première réponse de Claude",
+          "Il reprend le passage de relais de Close session"
+        ]
+      ]
+    ],
+    [
+      "Sécurité",
+      [
+        [
+          "Cliquez sur Close session, puis appuyez sur Échap pour arrêter Claude",
+          "Orange : « Close session stopped at step … of 6 », jamais vert"
+        ],
+        [
+          "Cliquez deux fois rapidement sur Close session",
+          "Un message indique qu'il est déjà en cours"
+        ]
+      ]
+    ]
+  ],
+  "mp_t": "« error: unknown option '--marketplace' »",
+  "mp": "Votre `claude` est plus ancien que 2.1.287, ou PowerShell utilise encore l'ancien. Mettez-le à jour et ouvrez un nouveau PowerShell. Impossible de mettre à jour ? Installez alors avec deux commandes : `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`, puis `claude plugin install ai-usage-meter@ai-usage-meter`. Le bandeau lui-même demande quand même 2.1.287 ou plus récent."
+}

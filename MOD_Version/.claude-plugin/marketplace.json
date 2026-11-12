@@ -1,0 +1,12 @@
+{
+  "name": "ai-usage-meter",
+  "owner": { "name": "Hans Tandt" },
+  "description": "The AI Usage Meter mod for Claude Code (unofficial; not affiliated with Anthropic)",
+  "plugins": [
+    {
+      "name": "ai-usage-meter",
+      "source": "./",
+      "description": "Your Claude 5-hour, weekly and context figures inside Claude Code, with session-notes warnings and Close / Start session"
+    }
+  ]
+}

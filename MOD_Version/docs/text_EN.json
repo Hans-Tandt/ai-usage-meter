@@ -1,0 +1,433 @@
+{
+  "meta": {
+    "title": "AI Usage Meter mod",
+    "subtitle": "Your Claude limits and context, inside Claude Code",
+    "version": "Version 1.8.0",
+    "date": "8 November 2026",
+    "project": "AI Usage Meter mod",
+    "tocTitle": "Contents"
+  },
+  "h_use": "How to use this manual",
+  "use": "Chapters 1 to 10 are for everyone who uses Claude Code. The appendix is for developers: how the mod works and how to check it.",
+  "unofficial_t": "Unofficial project",
+  "unofficial": "The AI Usage Meter mod is an unofficial community project. It is not affiliated with, endorsed by or sponsored by Anthropic. \"Claude\" is a trademark of Anthropic.",
+  "h1": "1. See your limits inside Claude Code",
+  "p1": "The mod shows your Claude usage in a band just above the prompt, where you type. Claude Code makes room for it, so it never covers your work. It works in the desktop app's Code tab and in the terminal.",
+  "fig1": "Figure 1. The band above the prompt. At yellow and red it tells you what to do next, with a button.",
+  "alt1": "Three bands with Session, Week and Compress: green at 46 %, yellow at 84 % with a Write session notes button, red at 93 % with Write session notes and Compact.",
+  "see_h": [
+    "You see",
+    "What it means"
+  ],
+  "see": [
+    [
+      "Session",
+      "Your 5-hour limit: how much is used, and the time until it resets."
+    ],
+    [
+      "Week",
+      "Your weekly limit, the same way."
+    ],
+    [
+      "Compress",
+      "How full this session's context is, measured against the point where compaction starts."
+    ],
+    [
+      "~6 turns",
+      "About how many more turns like the last ones fit before compaction."
+    ],
+    [
+      "5h: 100% in 1h 20m",
+      "At your pace so far you reach the limit before it resets."
+    ],
+    [
+      "limits updated 1h 10m ago",
+      "The figures are old. Claude Code sends new ones with its next reply."
+    ],
+    [
+      "other: MyProject 92%",
+      "Another Claude Code session on this PC is at red."
+    ]
+  ],
+  "fold_t": "The band is gone and you see [+]",
+  "fold": "Claude Code itself folded it: a click on its `[-]` mark at the right end of the band, or `ctrl+x ctrl+a`. Click `[+]` or press `ctrl+x ctrl+a` again to get the band back. The mod cannot fold or unfold it.",
+  "robot_t": "The little robot",
+  "robot": "It blinks now and then, scans while Claude works, and its antenna shows the Compress colour. When Close session says it is safe, it cheers. In the terminal it is a short face like [o_o]. Switch it off in /config.",
+  "h2": "2. Why it helps",
+  "p2": "Claude remembers only what fits in its context window: everything Claude keeps in mind during one session. When the window is full, Claude Code compacts it. The older part of the conversation becomes a short summary, and the details are gone. Claude goes on, but may forget paths, rules and decisions.",
+  "p2b": "The mod warns you before that happens, so you can write down what matters and start a fresh session. It also shows how much of your 5-hour and weekly limits is left, so a limit never stops you by surprise.",
+  "h3": "3. Install it",
+  "p3": "The mod is a folder. Put it somewhere it can stay, for example `Documents\\AI Usage Meter Mod`: Claude Code reads the mod from that folder, so do not move or delete it later.",
+  "steps3": [
+    "Unzip the mod into that folder.",
+    "Open PowerShell.",
+    "Update Claude Code first: type `claude update`, then `claude --version`. It must show 2.1.287 or later. Still an older version? Close PowerShell, open a new one and check again.",
+    "Type the command below, with your own folder between the quotes, and press Enter.",
+    "Quit and restart the Claude desktop app, or start a new `claude` session in the terminal.",
+    "Send one message. After Claude's reply, the band appears above the prompt."
+  ],
+  "code3": "One command adds the mod and installs it for every session.",
+  "need_t": "What you need",
+  "need": "Claude Code 2.1.287 or later, and a Claude plan with usage limits (Pro or Max). Older versions do not know the install command below and cannot show the band, so update first (step 3).",
+  "try_t": "Try it for one session first",
+  "try": "In a terminal, type `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`. The mod then loads for that session only, and nothing is installed.",
+  "key_t": "\"Detected a custom API key\"",
+  "key": "If Windows has an `ANTHROPIC_API_KEY` variable, Claude Code asks whether to use it. Choose No: with an API key, Claude Code reports no 5-hour or weekly limits, so Session and Week stay empty, and every message is billed per token.",
+  "h4": "4. Write your session notes in time",
+  "steps4": [
+    "At yellow (80 %), a second line appears: finish the task and update your session notes.",
+    "Click Write session notes. Claude writes down what was done, the decisions, what is still open and the next steps.",
+    "At red (90 %), the line says start a new session. Start one, and let it read the notes. It blinks until the context drops back."
+  ],
+  "p4": "At red the status line under the prompt says the same, so you see it even with the band hidden.",
+  "new_t": "A new session beats Compact",
+  "new": "At red the band also offers Compact. Compaction keeps only a summary of the older conversation, not the details. When you can, write the notes and start a new session instead.",
+  "h5": "6. Open the details",
+  "fig2": "Figure 3. /meter shows both limits, this session's context, the last turns and your other sessions.",
+  "alt2": "The details pane: the Session and Week bars with reset times, the Compress bar at 84 %, a small chart of the last turns, three buttons and two other sessions.",
+  "cmd_h": [
+    "Type",
+    "To"
+  ],
+  "cmd": [
+    [
+      "`/meter`",
+      "Open the details pane. Or click Details in the band; click it again to close the pane."
+    ],
+    [
+      "`/meter close`",
+      "Close the pane."
+    ],
+    [
+      "`/meter band off`",
+      "Hide the band. `/meter band on` shows it again."
+    ]
+  ],
+  "p5": "Short messages (toasts) appear at each warning level, when a limit resets and when compaction has run. A limit warning shows once, even with several sessions open.",
+  "h5b": "See the warnings with demo figures",
+  "demo": [
+    [
+      "`/meter demo 85`",
+      "Session at 85 % and Week at 43 %."
+    ],
+    [
+      "`/meter demo here 85`",
+      "This session at 85 % of compaction: the yellow warning."
+    ],
+    [
+      "`/meter demo context 93 A`",
+      "A demo session called demo-A at 93 %, shown as another session."
+    ],
+    [
+      "`/meter demo off`",
+      "Back to your real figures."
+    ]
+  ],
+  "term": "In the terminal the mod works the same. The bars are drawn as lines, and `/meter` opens the pane beside the conversation in the fullscreen layout (`/tui fullscreen`, at least 110 columns), or above the prompt.",
+  "h6": "7. Change the settings",
+  "p6": "Type `/config` in Claude Code and look for the ai-usage-meter rows. A change applies at once.",
+  "set_h": [
+    "Setting",
+    "Default"
+  ],
+  "set": [
+    [
+      "Limits: first and second warning",
+      "80 % and 95 %"
+    ],
+    [
+      "Context: yellow and red",
+      "80 % and 90 % of the compaction point"
+    ],
+    [
+      "Message at the limit warnings",
+      "On"
+    ],
+    [
+      "Message when a limit resets",
+      "On"
+    ],
+    [
+      "Message when compaction has run",
+      "On"
+    ],
+    [
+      "Blink at red",
+      "On"
+    ],
+    [
+      "Little robot in the band",
+      "On"
+    ],
+    [
+      "Figures are old after",
+      "60 minutes"
+    ],
+    [
+      "Colours: below the warnings, first, second",
+      "#3FB950, #F0883E, #F85149"
+    ],
+    [
+      "Use the strip's Settings when it is installed",
+      "On"
+    ]
+  ],
+  "which_t": "Which settings are used?",
+  "which": "The last line of the /meter pane tells you: \"Change them in /config\", or \"Change them in the AI Usage Meter strip's Settings\" (chapter 8).",
+  "h7": "8. Use it with the AI Usage Meter strip",
+  "p7": "The AI Usage Meter strip is a separate Windows program: a small bar that stays on top of your other windows. The mod and the strip work together.",
+  "with": [
+    "Both write the same figures to the same files, so each shows every session on this PC.",
+    "With the strip installed, the mod uses the strip's Settings window for levels, colours and messages. Switch off Use the strip's Settings when it is installed in /config to use the mod's own settings.",
+    "The mod is called ai-usage-meter and the strip's add-on usage-meter. They run side by side; the strip's demo stays /usage-demo."
+  ],
+  "h8": "10. Remove it",
+  "steps8": [
+    "Type `claude plugin uninstall ai-usage-meter@ai-usage-meter`.",
+    "Type `claude plugin marketplace remove ai-usage-meter`.",
+    "Restart Claude Code. Now you can delete the mod's folder."
+  ],
+  "p8": "Installed through `settings.json`? Then remove the folder, and the semicolon before it, from `CLAUDE_CODE_PLUGIN_DIRS` instead. The mod's figures stay in `%USERPROFILE%\\.claude` for the strip; session files older than 7 days are deleted.",
+  "h9": "Appendix: technical details",
+  "h9a": "How it works",
+  "how": [
+    "The mod is a Claude Code plugin with a hooks module (`hooks/register.tsx`). Claude Code runs it inside every session.",
+    "After each reply it reads the figures Claude Code reports: the 5-hour and weekly limits, the context fill and the cost. It measures the context against the auto-compaction point.",
+    "It draws the band and the /meter pane with Claude Code's own elements (`hooks/draw.tsx`): rounded bars on the desktop, lines in the terminal.",
+    "Every 30 seconds it reads the other sessions' files, so countdowns, old figures and other sessions stay up to date.",
+    "Every write is wrapped, so it can never break a Claude session."
+  ],
+  "h9b": "What it reads and stores",
+  "store_h": [
+    "Where",
+    "What"
+  ],
+  "store": [
+    [
+      "`.claude\\usage-meter.json`",
+      "5-hour and weekly percentages, reset times, time of the last update"
+    ],
+    [
+      "`.claude\\usage-meter-context\\<session>.json`",
+      "Per session: folder name, fill, last activity, compaction time"
+    ],
+    [
+      "`.claude\\usage-meter-settings.json`",
+      "Read only: the strip's settings, when the strip is installed"
+    ],
+    [
+      "Claude Code's plugin store",
+      "Whether the band is hidden, and which limit warnings were already shown"
+    ]
+  ],
+  "privacy": "It reads no login or credentials and makes no network calls. The Write session notes button sends one ordinary message to Claude in your session, so it counts toward your limits like any message.",
+  "h9c": "Check it",
+  "check": "In the `MOD_Version` folder, `claude plugin validate .` checks the plugin the way Claude Code loads it, and `claude plugin test .` runs its tests on the terminal and desktop surfaces.",
+  "h9d": "Limits",
+  "limits": [
+    "It sees Claude Code sessions on this PC only (app and terminal), not cloud or WSL sessions or other computers.",
+    "Session and Week need a Claude plan with usage limits; with an API key they stay empty.",
+    "Figures refresh when a session starts or replies. Chat use counts toward the limits but does not update them."
+  ],
+  "history": "Version 1.7: first manual of the mod. MIT licence, © 2026 Hans Tandt.",
+  "h_cs": "5. Close and start a session safely",
+  "p_cs": "Two buttons run two prompts that come with the mod. Close session checks everything this session did and saves it in CLAUDE.md, MEMORY.md and the session notes. Start session reads those files in the next session, or creates them in a new project, and continues where you stopped.",
+  "fig3": "Figure 2. Close session in the band: first its progress, then the result.",
+  "alt3": "Two bands: an orange line \"Closing session… step 3 of 6 · 50%\" with a bar, and a green line \"Now it's safe to end this session\".",
+  "where_h": [
+    "Button",
+    "Where"
+  ],
+  "where": [
+    [
+      "Close session",
+      "In the band at red, in the /meter pane, or `/meter close-session`."
+    ],
+    [
+      "Start session",
+      "In the band of a new session before your first message, in the /meter pane, or `/meter start-session`."
+    ]
+  ],
+  "msg_h": [
+    "The band says",
+    "What to do"
+  ],
+  "msg": [
+    [
+      "Closing session… step 3 of 6 · 50%",
+      "Wait: Claude is working through the check."
+    ],
+    [
+      "✓ Now it's safe to end this session",
+      "Everything is saved. Close the session."
+    ],
+    [
+      "✓ Everything is ready to start this session",
+      "Claude has read the files. Start your task."
+    ],
+    [
+      "It's NOT safe to close this session: <reason>",
+      "Claude found a problem. Read its reply, fix it, and run Close session again."
+    ],
+    [
+      "Close session stopped at step 2 of 6",
+      "The reply ended early. Check it, or run Close session again."
+    ]
+  ],
+  "go_t": "One click does it all",
+  "go": "The button counts as your \"go\": Claude writes the changes without stopping to ask. In a git project it makes no backup copies of files that git already keeps.",
+  "hand_t": "The hand-over",
+  "hand": "Close session ends with the first message for the next session. The mod keeps it, and Start session in the next session of the same folder sends it along. Claude continues exactly where you stopped.",
+  "h3b": "Without the terminal",
+  "p3b": "No `claude` command in your terminal? Then tell Claude Code where the folder is, in `settings.json`:",
+  "steps3b": [
+    "Open `%USERPROFILE%\\.claude\\settings.json` in a text editor.",
+    "Find `CLAUDE_CODE_PLUGIN_DIRS` in the `env` block. If it is not there, add it.",
+    "Add the mod's folder to its value. Separate folders with a semicolon (`;`).",
+    "Save the file and restart Claude Code."
+  ],
+  "code3b": "The env block with the strip's add-on and the mod. In JSON every \\ is written twice.",
+  "h_test": "9. Check that everything works",
+  "p_test": "Ten minutes, no usage spent on the warnings: the demo figures show every colour and button. Use a test folder, not a real project. Do the steps in this order.",
+  "test_tip_t": "Use a test folder",
+  "test_tip": "Close session and Start session write CLAUDE.md, MEMORY.md and session notes. Try them first in an empty folder, for example `Documents\\Test`, and open a new Claude Code session there.",
+  "test_h": [
+    "Do this",
+    "You should see"
+  ],
+  "tests": [
+    [
+      "Claude Code and the install",
+      [
+        [
+          "In PowerShell: `claude --version`",
+          "2.1.287 or later"
+        ],
+        [
+          "`claude plugin list`",
+          "ai-usage-meter@ai-usage-meter, version 1.8.0, enabled. \"userConfig options not yet set\" is normal: every setting has a default."
+        ]
+      ]
+    ],
+    [
+      "The band",
+      [
+        [
+          "Open a new session; do not type yet",
+          "Session, Week and Compress, Details at the left, and \"New session:\" with Start session"
+        ],
+        [
+          "Look at the robot beside Details, then send a message",
+          "It blinks now and then; while Claude works, its eyes scan"
+        ],
+        [
+          "Send one message",
+          "The \"New session\" line disappears"
+        ],
+        [
+          "Click Claude Code's `[-]` at the right end of the band",
+          "The band folds away to `[+]`"
+        ],
+        [
+          "Click `[+]` (or press `ctrl+x ctrl+a`)",
+          "The band is back"
+        ]
+      ]
+    ],
+    [
+      "The warnings (demo)",
+      [
+        [
+          "`/meter demo here 85`",
+          "Compress orange; \"finish the task and update your session notes\" with Write session notes"
+        ],
+        [
+          "`/meter demo here 93`",
+          "Compress red; \"start a new session\" blinks; Close session and Compact"
+        ],
+        [
+          "`/meter demo 96`",
+          "Session red, Week 48 %; a short message about the 5-hour limit"
+        ],
+        [
+          "`/meter demo context 92 A`",
+          "\"other: demo-A 92%\" in the band"
+        ],
+        [
+          "`/meter demo off`",
+          "Your real figures again"
+        ]
+      ]
+    ],
+    [
+      "The details pane",
+      [
+        [
+          "Click Details",
+          "The pane opens: limits, Compress, the last turns, buttons, other sessions"
+        ],
+        [
+          "Click Details again",
+          "The pane closes"
+        ]
+      ]
+    ],
+    [
+      "The settings",
+      [
+        [
+          "`/config`, the ai-usage-meter rows",
+          "The levels, messages, Blink at red, colours"
+        ],
+        [
+          "Switch Blink at red off, then `/meter demo here 93`",
+          "Red without blinking (switch it on again afterwards)"
+        ],
+        [
+          "Switch Little robot in the band off in `/config`",
+          "The robot is gone (switch it on again afterwards)"
+        ]
+      ]
+    ],
+    [
+      "Close session and Start session",
+      [
+        [
+          "Ask Claude a small task, for example: create hello.txt",
+          "Claude does it"
+        ],
+        [
+          "Click Close session (pane, or band at red)",
+          "\"Closing session… step 1 of 6\" up to 6, then \"✓ Now it's safe to end this session\""
+        ],
+        [
+          "Look in the test folder",
+          "CLAUDE.md, MEMORY.md and the session notes, filled in"
+        ],
+        [
+          "Open a new session there; click Start session before typing",
+          "\"Preparing session…\", then \"✓ Everything is ready to start this session\""
+        ],
+        [
+          "Read Claude's first answer",
+          "It continues from the hand-over of Close session"
+        ]
+      ]
+    ],
+    [
+      "Safety",
+      [
+        [
+          "Click Close session, then press Esc to stop Claude",
+          "Orange: \"Close session stopped at step … of 6\", never green"
+        ],
+        [
+          "Click Close session twice quickly",
+          "A message that one is already running"
+        ]
+      ]
+    ]
+  ],
+  "mp_t": "\"error: unknown option '--marketplace'\"",
+  "mp": "Your `claude` is older than 2.1.287, or PowerShell still uses the old one. Update it and open a new PowerShell. Cannot update? Install with two commands instead: `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`, then `claude plugin install ai-usage-meter@ai-usage-meter`. The band itself still needs 2.1.287 or later."
+}
