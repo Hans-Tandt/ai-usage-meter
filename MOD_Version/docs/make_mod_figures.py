@@ -27,10 +27,11 @@ def symbol(size):
     return ImageFont.truetype(FONTS + "seguisym.ttf", size * S)
 
 
-# The band's little pixel robot, as hooks/robot.tsx draws it (a frame without blink or hop).
+# The band's little pixel robot, as hooks/robot.tsx draws it (a frame without blink or hop):
+# the Opus robot (a crown), at effort high (3 of 5 chest lights), size medium (3 screen pixels per pixel).
 ROBOT = [
-    ".....AA.....",
-    ".....ss.....",
+    "...k.AA.k...",
+    "...kkkkkk...",
     "..HHHHHHHH..",
     "..HVVVVVVH..",
     "..HVEVVEVH..",
@@ -43,8 +44,10 @@ ROBOT = [
     "...bb..bb...",
     "...ww..ww...",
 ]
-ROBOT_COLOURS = {"s": (138, 154, 166), "H": (111, 135, 150), "V": (27, 39, 48), "E": (93, 224, 230),
-                 "b": (92, 114, 128), "m": (159, 179, 191), "a": (111, 135, 150), "w": (61, 75, 84)}
+ROBOT_COLOURS = {"s": (138, 154, 166), "H": (201, 162, 39), "V": (27, 39, 48), "E": (93, 224, 230),
+                 "b": (47, 74, 122), "m": (224, 195, 90), "a": (62, 94, 150), "w": (61, 75, 84),
+                 "k": (224, 184, 60), "L": (93, 224, 230), "l": (36, 49, 58)}
+ROBOT_EFFORT = 3
 
 
 def robot_rows(state):
@@ -68,6 +71,8 @@ def robot_rows(state):
         for r, c in ((4, 3), (3, 4), (4, 5), (4, 6), (3, 7), (4, 8)):
             f[r][c] = "E"
         arms(6)
+    for i in range(5):
+        f[9][3 + i] = "L" if i < ROBOT_EFFORT else "l"
     return ["".join(r) for r in f]
 
 
@@ -78,14 +83,20 @@ class Pen:
         self.d, self.x, self.y = d, x, y
 
     def robot(self, state, antenna, gap=16):
-        px = 2  # as in the band: 24 x 28 screen pixels
-        top = self.y - 14
+        px = 3  # as in the band at Robot size 3: 36 x 42 screen pixels, the effort bar 6 below
+        top = self.y - 27
         for y, row in enumerate(robot_rows(state)):
             for x, ch in enumerate(row):
                 fill = antenna if ch == "A" else ROBOT_COLOURS.get(ch)
                 if fill:
                     x0, y0 = (self.x + x * px) * S, (top + (y + 1) * px) * S
                     self.d.rectangle([x0, y0, x0 + px * S - 1, y0 + px * S - 1], fill=fill)
+        # The effort bar under the robot: 5 marks, the first ROBOT_EFFORT lit
+        mark, step, bar_y = 2 * px, 2.5 * px, top + 14 * px + 4
+        for i in range(5):
+            x0 = (self.x + i * step) * S
+            self.d.rectangle([x0, bar_y * S, x0 + mark * S - 1, (bar_y + mark) * S - 1],
+                             fill=ROBOT_COLOURS["L"] if i < ROBOT_EFFORT else ROBOT_COLOURS["l"])
         self.x += 12 * px + gap
 
     def text(self, s, colour=DIM, size=14, bold=False, gap=6, sym=False):
@@ -125,20 +136,21 @@ def gauge(p, label, pct, colour, tail):
 
 def band(ctx, colour, warning=None, buttons=(), turns="~9 turns"):
     W = 860
-    H = 44 if not warning else 90
+    H = 62 if not warning else 108  # room for the robot at size 3 and its effort bar
     im = Image.new("RGB", (W * S, H * S), BG)
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, W * S - 1, H * S - 1], outline=EDGE, width=2 * S)
-    p = Pen(d, 14, 22)
+    p = Pen(d, 14, 31)
     p.button("Details", gap=16)  # a fixed place at the left, away from Claude Code's [-]
     p.robot({OK: "idle", WARN: "yellow", DANGER: "red"}[colour], colour)
     gauge(p, "Session", 34, OK, "↻3h 04m")
     gauge(p, "Week", 21, OK, "↻4d 5h")
     gauge(p, "Compress", ctx, colour, turns)
-    Pen(d, W - 34, 22).text("[-]", DIM)  # Claude Code's own mark: folds the band away
+    p.text("cache 42m", DIM, 13)  # the cache clock (1.9.0), one of the band's dim notes
+    Pen(d, W - 34, 31).text("[-]", DIM)  # Claude Code's own mark: folds the band away
     if warning:
         # The warning row sits one line lower, so the full-size buttons don't touch the gauges
-        p = Pen(d, 14, 66)
+        p = Pen(d, 14, 84)
         p.text(("■ " if colour == DANGER else "▲ ") + warning, colour, bold=True, gap=12)
         for i, b in enumerate(buttons):
             p.button(b, primary=i == 0)
@@ -166,7 +178,7 @@ def band_levels(t):
 
 
 def pane():
-    W, H = 470, 820
+    W, H = 470, 960
     im = Image.new("RGB", (W * S, H * S), BG)
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, W * S - 1, H * S - 1], outline=EDGE, width=2 * S)
@@ -207,12 +219,16 @@ def pane():
     line([("button", "Compact"), ("button", "Hide the band")], 32)
     line([("text", "Close session checks and updates CLAUDE.md, MEMORY.md and the", DIM, 13)], 18)
     line([("text", "session notes, then says when it is safe to close.", DIM, 13)], 34)
+    # The cache clock (1.9.0): minutes left, with Keep warm while it is still warm
+    line([("text", "Cache", WHITE, 14, True), ("text", "warm for 42m", DIM, 14), ("button", "Keep warm")], 24)
+    line([("text", "Keep warm asks one tiny question, which re-reads 134k tokens", DIM, 13)], 18)
+    line([("text", "from the cache: cheaper than new input, but it counts.", DIM, 13)], 34)
+    line([("text", "Haiku reader", WHITE, 14, True), ("button", "On"), ("text", "Haiku 19 % · 7 runs", DIM, 13), ("button", "Details")], 36)
     line([("text", "Other sessions on this PC", WHITE, 14, True)])
     line([("text", " 93%", DANGER, 14, True), ("text", "WebsiteRedesign", WHITE), ("text", "· 4m ago")])
     line([("text", " 37%", OK, 14, True), ("text", "MealPlanner", WHITE), ("text", "· 1h 12m ago")], 32)
-    line([("text", "Levels: limits 80/95%, context 80/90%.", DIM, 13)], 18)
-    line([("text", "Change them in the AI Usage Meter strip's Settings.", DIM, 13)], 18)
-    line([("text", "AI Usage Meter mod 1.8.0 · Hans Tandt · hanstandt.be", DIM, 13)])
+    line([("text", "Levels: limits 80/95%, context 80/90%.", DIM, 13), ("button", "Settings")], 36)
+    line([("text", "AI Usage Meter mod 1.9.0 · Hans Tandt · hanstandt.be", DIM, 13)])
     return im.crop((0, 0, W * S, (y + 6) * S))
 
 
@@ -226,18 +242,18 @@ ROUTINE = {
 
 
 def routine_band(text, colour, pct=None):
-    W, H = 860, 90
+    W, H = 860, 108
     im = Image.new("RGB", (W * S, H * S), BG)
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, W * S - 1, H * S - 1], outline=EDGE, width=2 * S)
-    p = Pen(d, 14, 22)
+    p = Pen(d, 14, 31)
     p.button("Details", gap=16)
     p.robot("happy" if text.startswith("✓") else "red", OK if text.startswith("✓") else DANGER)
     gauge(p, "Session", 34, OK, "↻3h 04m")
     gauge(p, "Week", 21, OK, "↻4d 5h")
     gauge(p, "Compress", 93, DANGER, "next turn")
-    Pen(d, W - 34, 22).text("[-]", DIM)
-    p = Pen(d, 14, 66)
+    Pen(d, W - 34, 31).text("[-]", DIM)
+    p = Pen(d, 14, 84)
     if pct is not None:
         p.bar(pct, colour, w=56)
     if text.startswith("✓"):  # Segoe UI Bold has no check mark

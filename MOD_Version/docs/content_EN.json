@@ -2,8 +2,8 @@
   "meta": {
     "title": "AI Usage Meter mod",
     "subtitle": "Your Claude limits and context, inside Claude Code",
-    "version": "Version 1.8.0",
-    "date": "8 November 2026",
+    "version": "Version 1.9.0",
+    "date": "14 November 2026",
     "project": "AI Usage Meter mod",
     "tocTitle": "Contents",
     "author": "Hans Tandt"
@@ -15,7 +15,7 @@
     },
     {
       "type": "p",
-      "text": "Chapters 1 to 10 are for everyone who uses Claude Code. The appendix is for developers: how the mod works and how to check it."
+      "text": "Chapters 1 to 11 are for everyone who uses Claude Code. The appendix is for developers: how the mod works and how to check it."
     },
     {
       "type": "callout",
@@ -34,7 +34,7 @@
     {
       "type": "figure",
       "path": "figures/band-levels_en.png",
-      "width": 560,
+      "width": 500,
       "caption": "Figure 1. The band above the prompt. At yellow and red it tells you what to do next, with a button.",
       "alt": "Three bands with Session, Week and Compress: green at 46 %, yellow at 84 % with a Write session notes button, red at 93 % with Write session notes and Compact."
     },
@@ -59,11 +59,11 @@
         ],
         [
           "Compress",
-          "How full this session's context is, measured against the point where compaction starts."
+          "How full this conversation is. When it is full, Claude Code shrinks it to a short summary (compaction) and details get lost, so save your notes before that."
         ],
         [
           "~6 turns",
-          "About how many more turns like the last ones fit before compaction."
+          "About how many more messages, with Claude's answers, fit before compaction, if they are as long as the last few."
         ],
         [
           "5h: 100% in 1h 20m",
@@ -72,6 +72,18 @@
         [
           "limits updated 1h 10m ago",
           "The figures are old. Claude Code sends new ones with its next reply."
+        ],
+        [
+          "cache 42m",
+          "How long the conversation stays cheap to continue: 42 minutes left (chapter 11)."
+        ],
+        [
+          "Haiku 19 %",
+          "With the Haiku reader on: the part of this session's work done by the cheaper Haiku (chapter 6)."
+        ],
+        [
+          "262k tokens: …",
+          "Only if you set a token number in the Settings: the conversation passed it (chapter 11)."
         ],
         [
           "other: MyProject 92%",
@@ -83,7 +95,7 @@
       "type": "callout",
       "variant": "note",
       "title": "The little robot",
-      "text": "It blinks now and then, scans while Claude works, and its antenna shows the Compress colour. When Close session says it is safe, it cheers. In the terminal it is a short face like [o_o]. Switch it off in /config."
+      "text": "It shows at a glance what Claude is doing. It blinks now and then, its eyes move while Claude works, and its antenna has the Compress colour (green, orange or red). It also shows which model is answering, because some cost far more than others: Opus, the strongest and most expensive, wears a crown; Sonnet has ears; Haiku, the cheapest, has a short antenna; Fable has two antenna points. The five marks under it show the effort: how hard Claude thinks before it answers, from low (1 mark) to max (5). More effort helps with difficult work, but uses more of your limits. When Close session says it is safe to close, the robot cheers. In the terminal it is a short face, such as {o_o} for Haiku. Size and options are in the Settings (chapter 7)."
     },
     {
       "type": "callout",
@@ -126,14 +138,18 @@
         "Type the command below, with your own folder between the quotes, and press Enter.",
         "Quit and restart the Claude desktop app, or start a new `claude` session in the terminal.",
         "Send one message. After Claude's reply, the band appears above the prompt."
-      ]
+      ],
+      "keepWithNext": true
+    },
+    {
+      "type": "p",
+      "text": "One command adds the mod and installs it for every session:"
     },
     {
       "type": "code",
       "lines": [
         "claude plugin install ai-usage-meter --marketplace \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\""
-      ],
-      "caption": "One command adds the mod and installs it for every session."
+      ]
     },
     {
       "type": "callout",
@@ -207,7 +223,7 @@
     },
     {
       "type": "p",
-      "text": "Two buttons run two prompts that come with the mod. Close session checks everything this session did and saves it in CLAUDE.md, MEMORY.md and the session notes. Start session reads those files in the next session, or creates them in a new project, and continues where you stopped."
+      "text": "Two buttons run two prompts that come with the mod. Close session checks everything this session did and saves it in CLAUDE.md, MEMORY.md and the session notes. Start session reads those files in the next session, or creates them in a new project, and continues where you stopped. Run Close session again later in the same session, and it updates the note it already wrote instead of adding a second one: the open steps stay word for word, and older notes are never shortened."
     },
     {
       "type": "table",
@@ -323,6 +339,12 @@
       "text": "Short messages (toasts) appear at each warning level, when a limit resets and when compaction has run. A limit warning shows once, even with several sessions open."
     },
     {
+      "type": "callout",
+      "variant": "note",
+      "title": "The Haiku reader (off by default)",
+      "text": "Most of Claude's work is reading files, and reading with Opus, the expensive model, adds up fast. With the reader on (On in the pane), the mod watches how much Opus reads for one answer. Above a limit (2,000 tokens, a few pages), it suggests that Opus lets a reader on the cheaper Haiku do the rest of the searching and reading. The reader sends back only where the answer is: the file, the line numbers and those exact lines. Opus reads those lines itself, and always reads a file itself before it changes it. The pane shows how much of this session's work Haiku did (\"Haiku 19 %\") and how often the reader ran; Details shows the tokens per model for this session and this week."
+    },
+    {
       "type": "h2",
       "text": "See the warnings with demo figures"
     },
@@ -365,7 +387,7 @@
     },
     {
       "type": "p",
-      "text": "Type `/config` in Claude Code and look for the ai-usage-meter rows. A change applies at once."
+      "text": "Open the /meter pane (click Details in the band) and click Settings at the bottom, or type /meter settings. Every setting has its own button: click On or Off to switch it, − or + to change a number, and a choice (such as the Haiku reader) to go to the next option. A change applies at once. Only the colours can't be changed there: open a terminal, type claude, then /config, and look for the ai-usage-meter rows. In the desktop app, /config opens the app's own Settings window, which doesn't have the mod's settings."
     },
     {
       "type": "table",
@@ -407,6 +429,46 @@
           "On"
         ],
         [
+          "Robot: a different robot for each model",
+          "On"
+        ],
+        [
+          "Robot: show the effort level",
+          "On"
+        ],
+        [
+          "Robot size",
+          "3 (medium)"
+        ],
+        [
+          "Haiku reader",
+          "off"
+        ],
+        [
+          "Haiku reader: from (tokens read in one turn)",
+          "2000"
+        ],
+        [
+          "Context: yellow from (tokens)",
+          "0 (off)"
+        ],
+        [
+          "Context: red from (tokens)",
+          "0 (off)"
+        ],
+        [
+          "Cache clock",
+          "On"
+        ],
+        [
+          "Cache clock: cache lifetime",
+          "60 minutes"
+        ],
+        [
+          "Search helpers (Explore) on Haiku",
+          "Off"
+        ],
+        [
           "Figures are old after",
           "60 minutes"
         ],
@@ -419,13 +481,13 @@
           "On"
         ]
       ],
-      "keepWhole": 12
+      "keepWhole": 22
     },
     {
       "type": "callout",
       "variant": "note",
       "title": "Which settings are used?",
-      "text": "The last line of the /meter pane tells you: \"Change them in /config\", or \"Change them in the AI Usage Meter strip's Settings\" (chapter 8)."
+      "text": "When the AI Usage Meter strip is installed, the bottom of the /meter pane says \"The AI Usage Meter strip's Settings decide them\" (chapter 8). Otherwise the mod's own settings apply."
     },
     {
       "type": "h1",
@@ -439,7 +501,7 @@
       "type": "bullets",
       "items": [
         "Both write the same figures to the same files, so each shows every session on this PC.",
-        "With the strip installed, the mod uses the strip's Settings window for levels, colours and messages. Switch off Use the strip's Settings when it is installed in /config to use the mod's own settings.",
+        "With the strip installed, the mod uses the strip's Settings window for levels, colours and messages. Switch off Use the strip's Settings when it is installed in the Settings (chapter 7) to use the mod's own settings.",
         "The mod is called ai-usage-meter and the strip's add-on usage-meter. They run side by side; the strip's demo stays /usage-demo."
       ]
     },
@@ -478,7 +540,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, version 1.8.0, enabled. \"userConfig options not yet set\" is normal: every setting has a default."
+          "ai-usage-meter@ai-usage-meter, version 1.9.0, enabled. \"userConfig options not yet set\" is normal: every setting has a default."
         ]
       ]
     },
@@ -504,6 +566,10 @@
         [
           "Look at the robot beside Details, then send a message",
           "It blinks now and then; while Claude works, its eyes scan"
+        ],
+        [
+          "Pick Haiku in the model menu under the prompt (terminal: `/model`), then send a message",
+          "The Haiku robot (short antenna); the bar under it shows the effort"
         ],
         [
           "Send one message",
@@ -597,16 +663,44 @@
       ],
       "rows": [
         [
-          "`/config`, the ai-usage-meter rows",
-          "The levels, messages, Blink at red, colours"
+          "Type `/meter settings` (or click Details, then Settings)",
+          "The settings at the bottom of the pane, each with a button"
         ],
         [
           "Switch Blink at red off, then `/meter demo here 93`",
           "Red without blinking (switch it on again afterwards)"
         ],
         [
-          "Switch Little robot in the band off in `/config`",
+          "Switch Little robot in the band off in the Settings",
           "The robot is gone (switch it on again afterwards)"
+        ],
+        [
+          "Set Robot size to 4",
+          "A larger robot"
+        ],
+        [
+          "Click − next to Cache clock: cache lifetime",
+          "5 min (set it back to 60 with + afterwards)"
+        ],
+        [
+          "Click On next to Haiku reader, then ask Claude to search the whole project",
+          "Reader runs counts up; the band shows Haiku's share"
+        ],
+        [
+          "Click Details next to it",
+          "Tokens per model, this session and this week"
+        ],
+        [
+          "Set Context: yellow from (tokens) to 50000, then /meter demo here 40",
+          "64k tokens: finish the task and update your session notes (set it back afterwards)"
+        ],
+        [
+          "After Claude's reply, look at the band",
+          "cache 59m, counting down; Keep warm in the pane"
+        ],
+        [
+          "Switch on Search helpers (Explore) on Haiku, ask for a big search",
+          "Reader Details: search helpers started on Haiku: 1 or more"
         ]
       ]
     },
@@ -636,6 +730,10 @@
         [
           "Look in the test folder",
           "CLAUDE.md, MEMORY.md and the session notes, filled in"
+        ],
+        [
+          "In the same session, do one more small task, then click Close session again",
+          "Still one note for this session, updated; its open steps kept word for word"
         ],
         [
           "Open a new session there; click Start session before typing",
@@ -687,6 +785,81 @@
     {
       "type": "p",
       "text": "Installed through `settings.json`? Then remove the folder, and the semicolon before it, from `CLAUDE_CODE_PLUGIN_DIRS` instead. The mod's figures stay in `%USERPROFILE%\\.claude` for the strip; session files older than 7 days are deleted."
+    },
+    {
+      "type": "h1",
+      "text": "11. Save tokens: how Claude uses them"
+    },
+    {
+      "type": "p",
+      "text": "Every Claude plan has two limits: one for 5 hours and one for the week. They fill up with tokens. A token is a small piece of text, a bit less than a word; one page of text is a few hundred tokens. Everything Claude reads and writes costs tokens. This chapter explains in plain words where they go, and what the mod's four tools do to save them. You don't need any of them: three of the four are off until you switch them on."
+    },
+    {
+      "type": "h2",
+      "text": "Where the tokens go"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Claude rereads the whole conversation for every message. It doesn't remember anything between two messages: each time you send one, it reads everything again from the start, your messages, its answers and every file it opened. So the longer the conversation, the more each new message costs. When the conversation gets too long, Claude Code replaces it with a short summary (compaction). That makes room, but details get lost; that is why the mod warns you to save your notes first.",
+        "Rereading is cheaper when the conversation was used recently. Claude Code keeps a ready copy of the conversation for a while (the cache), like a book left open on your desk. A message within that time rereads from the ready copy, which costs much less. The copy stays ready for 1 hour after the last message on a Claude plan (5 minutes with an API key). After that the book goes back on the shelf: the next message rereads everything at the full price.",
+        "Opus is the strongest model and the most expensive one. Haiku is fast and much cheaper: good at finding and reading, less good at judging.",
+        "For a big search Claude can send out a helper. The helper searches on its own, and only its short answer comes back into your conversation. Your conversation doesn't grow with everything the helper read."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "A warning at a number of tokens (off by default)"
+    },
+    {
+      "type": "p",
+      "text": "The band normally turns yellow at 80 % and red at 90 % of the point where compaction starts. In a very large conversation window (1 million tokens), 80 % only comes at about 775,000 tokens, while every message has been expensive for a long time. In the Settings (chapter 7) you can therefore also give a number of tokens, for example yellow from 250,000 and red from 350,000. The warning then comes at whichever is reached first, and says which, for example \"262k tokens: finish the task and update your session notes\". Leave it at 0 for a normal-sized window: then nothing changes."
+    },
+    {
+      "type": "h2",
+      "text": "The cache clock and Keep warm"
+    },
+    {
+      "type": "p",
+      "text": "After each reply, the band shows how long the ready copy of the conversation stays ready, for example \"cache 42m\": 42 minutes left. In the last 5 minutes it turns orange. After that it says \"cache cold\": your next message will cost the full price once, and then the copy is ready again."
+    },
+    {
+      "type": "p",
+      "text": "Keep warm, a button in the /meter pane, sets that clock back to the start. It sends Claude one tiny hidden question (\"reply with the word: ok\"). To answer it, Claude rereads the conversation from the ready copy, and that keeps the copy ready for another full period. The question and its answer don't appear in your conversation: you only see a short message that it worked. Keep warm never runs by itself: one click is one question."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Example: a lunch break",
+      "text": "You are in the middle of a long task and the band shows \"cache 8m\". You go to lunch for 45 minutes. Click Keep warm before you leave: the clock goes back to 60 minutes, and your first message after lunch still costs the low price. Without Keep warm, the copy would run out during lunch, and that first message would reread the whole conversation at the full price. Going home for the day? Then don't click it: you would pay for a question you never use."
+    },
+    {
+      "type": "h2",
+      "text": "Search helpers on Haiku (off by default)"
+    },
+    {
+      "type": "p",
+      "text": "When Claude has to search through many files, Claude Code sends out its search helper (called Explore). Normally that helper uses the same model as your conversation, often the expensive Opus. With \"Search helpers (Explore) on Haiku\" switched on in the Settings, it uses the cheaper Haiku instead. Searching and reading is what Haiku does well; Opus still does the thinking and makes the changes. Other helpers keep their model. Details next to the Haiku reader in the pane shows how many search helpers ran on Haiku."
+    },
+    {
+      "type": "h2",
+      "text": "Good to know"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "The mod can't tell you exactly how much you saved. It counts the tokens per model, but what the same work would have cost without these tools can only be guessed. To compare, look at the Session figure for the same kind of task, once with the tools on and once off.",
+        "Keep warm costs a little every time: Claude rereads the conversation from the ready copy. It is only worth it if you come back and carry on before the clock runs out. When the band already says \"cache cold\", Keep warm can't help, and the mod tells you so.",
+        "Haiku can miss details. Let it find and read, and let Opus check the result. Opus always reads a file itself before it changes it. For delicate work, switch the Haiku tools off.",
+        "The mod can't see how long the copy really stays ready: it uses the time set in the Settings (60 minutes). Set 5 minutes if you use an API key.",
+        "Every question the mod sends to a model (Keep warm, the reader's searches) counts toward your limits too."
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "A good start",
+      "text": "Yellow from 250,000 tokens, red from 350,000, the cache clock on, the reader and search helpers off. Switch those on for days with a lot of searching, and watch the Haiku share in the pane."
     },
     {
       "type": "h1",

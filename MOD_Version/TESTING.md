@@ -19,6 +19,7 @@ The same list, in English, French, Dutch and German, is chapter 9 of the manual 
 |---|---|
 | Open a new session; do not type yet | **Details** at the left, then Session, Week and Compress, and "New session:" with **Start session** |
 | Look at the robot beside **Details**, then send a message | It blinks now and then; while Claude works, its eyes scan |
+| Pick Haiku in the model menu under the prompt (terminal: `/model`), then send a message | The Haiku robot (short antenna); the bar under it shows the effort |
 | Send one message | The "New session" line disappears |
 | Click Claude Code's `[-]` at the right end of the band | The band folds away to `[+]` |
 | Click `[+]` (or press `ctrl+x ctrl+a`) | The band is back |
@@ -45,10 +46,17 @@ The same list, in English, French, Dutch and German, is chapter 9 of the manual 
 
 | Do this | You should see |
 |---|---|
-| `/config`, the ai-usage-meter rows | The levels, messages, Blink at red, colours |
+| Type `/meter settings` (or click **Details**, then **Settings**) | The settings at the bottom of the pane, each with a button |
+| Click **−** next to **Cache clock: cache lifetime** | 5 min (set it back to 60 with **+** afterwards) |
 | Switch **Blink at red** off, then `/meter demo here 93` | Red without blinking (switch it on again afterwards) |
 | Switch **Little robot in the band** off | The robot is gone (switch it on again afterwards) |
-| The last line of the pane | Where the levels come from: the strip's Settings, or `/config` |
+| Set **Robot size** to 4 | A larger robot |
+| Click **On** next to Haiku reader in the pane, then ask Claude to search the whole project | The runs count up; the band shows `Haiku … %` |
+| Click **Details** next to it | Tokens per model, this session and this week |
+| Set **Context: yellow from (tokens)** to 50000, then `/meter demo here 40` | `64k tokens: finish the task and update your session notes` (set it back afterwards) |
+| After Claude's reply, look at the band | `cache 59m`, counting down; **Keep warm** in the pane |
+| Switch on **Search helpers (Explore) on Haiku**, ask for a big search | Reader Details: search helpers started on Haiku: 1 or more |
+| The bottom of the pane | With the strip installed: "The AI Usage Meter strip's Settings decide them" |
 
 ## 5. Close session and Start session
 
@@ -57,6 +65,7 @@ The same list, in English, French, Dutch and German, is chapter 9 of the manual 
 | Ask Claude a small task, for example: create `hello.txt` | Claude does it |
 | Click **Close session** (pane, or band at red) | "Closing session… step 1 of 6" up to 6, then "✓ Now it's safe to end this session" |
 | Look in the test folder | `CLAUDE.md`, `MEMORY.md` and the session notes, filled in |
+| In the same session, do one more small task, then click **Close session** again | Still one note for this session, updated; its open steps kept word for word |
 | Open a new session there; click **Start session** before typing | "Preparing session…", then "✓ Everything is ready to start this session" |
 | Read Claude's first answer | It continues from the hand-over of Close session |
 

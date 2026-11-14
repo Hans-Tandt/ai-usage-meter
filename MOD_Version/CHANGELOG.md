@@ -1,7 +1,48 @@
 # What's new in the AI Usage Meter mod
 
 Newest version on top. How to update: unzip the new version over your mod folder, then quit and restart
-Claude Code. Your settings in `/config` stay.
+Claude Code. Your settings stay.
+
+## 1.9.0 · 14 November 2026
+
+**New**
+- **A robot for each model.** The robot beside **Details** now shows which model is working: Opus wears a
+  crown, Sonnet has ears, Haiku a short antenna and a rounder head, Fable two antenna points. Each also has
+  its own colours. In the terminal the brackets show the model: `[o_o]` Opus, `(o_o)` Sonnet, `{o_o}` Haiku,
+  `<o_o>` Fable. A switch of model (the menu under the prompt, or `/model` in the terminal) shows at the next request; work done by a helper agent doesn't change it.
+- **The effort level:** a bar of five marks under the robot, and five lights on its chest, from 1 (low) to
+  5 (max); you count them. While Claude works, the eyes scan faster at a higher level. A model without
+  effort levels shows no bar and no lights.
+- **Settings in the `/meter` pane:** click **Settings** at the bottom of the pane, or type `/meter settings`.
+  Every setting has a button there. In the desktop app `/config` opens the app's own Settings window, so
+  the mod's settings could not be reached there before.
+- **Robot size** in the settings: 2 (small), 3 (medium, now the default, half as big again as before) or 4 (large).
+- Three new settings: "Robot: a different robot for each model", "Robot: show the effort level"
+  and "Robot size".
+- **The Haiku reader** (off by default). Most of Claude's work is reading. With the reader on, Opus is asked,
+  once a turn has read more than 2,000 tokens, to give further searching and reading to a reader on Haiku.
+  Haiku reads in its own context and sends back only files, line numbers and the exact lines; Opus reads those
+  lines itself, and always before it changes a file. Mode `search` or `summary` and the limit are in
+  the settings; the On/Off switch is in the `/meter` pane.
+- **A token counter per model** in the `/meter` pane: one line with Haiku's share of this session's tokens
+  and the reader's runs; Details shows the tokens per model for this session and this week. Each session
+  writes only its own counts, so several sessions at once never overwrite each other. With the reader on,
+  the band shows `Haiku 19 %`.
+- **The cache clock** (on by default): after each reply the band shows how long the conversation's cache
+  stays warm, for example `cache 42m`, orange in the last 5 minutes, then `cache cold`. **Keep warm** in the
+  `/meter` pane asks Claude one tiny question, so the cache lasts another period; it never runs by itself.
+  The cache lifetime (60 minutes on a Claude plan, set 5 with an API key) is in the settings.
+- **A warning at a token number** (off by default): besides the % of the compaction point, the yellow and
+  red warnings can start at a number of tokens, for example 250,000 and 350,000, whichever comes first.
+  Useful with a very large context window.
+- **Search helpers on Haiku** (off by default): Claude Code's read-only search helper (Explore) runs on
+  Haiku instead of the session's model. Other helpers keep their model.
+- **Manual:** a new chapter 11, "Save tokens: how Claude uses them": tokens, the cache, models and helpers,
+  the four tools, and what to watch.
+
+**Changed**
+- **Close session** now updates a note this session already wrote instead of adding a second one, and keeps
+  its open steps word for word; older notes are never shortened.
 
 ## 1.8.0 · 8 November 2026
 

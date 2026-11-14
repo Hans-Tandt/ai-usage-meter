@@ -5,8 +5,8 @@ source/docs/out/*.png
 source/docs/__pycache__/
 
 # Private working notes: kept on this PC only, never published
-CLAUDE.md
-MEMORY.md
-Session_Notes.md
-RELEASE.md
-docs/
+/CLAUDE.md
+/MEMORY.md
+/Session_Notes.md
+/RELEASE.md
+/docs/

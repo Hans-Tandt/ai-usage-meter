@@ -1,6 +1,6 @@
 {
   "name": "ai-usage-meter",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "AI Usage Meter: your 5-hour, weekly and context figures in a band above the prompt and a /meter pane, with session-notes warnings; works with or without the AI Usage Meter strip (unofficial; not affiliated with Anthropic)",
   "author": { "name": "Hans Tandt" },
   "license": "MIT",
@@ -65,6 +65,67 @@
       "title": "Little robot in the band",
       "description": "A small pixel robot beside Details: it blinks, scans while Claude works, its antenna shows the Compress colour, and it cheers when Close session says it is safe. In the terminal it is a short text face.",
       "default": true
+    },
+    "robotPerModel": {
+      "type": "boolean",
+      "title": "Robot: a different robot for each model",
+      "description": "On: the robot shows the model in use: Opus (crown), Sonnet (ears), Haiku (short antenna), Fable (two antenna points). Off: always the same robot.",
+      "default": true
+    },
+    "robotEffort": {
+      "type": "boolean",
+      "title": "Robot: show the effort level",
+      "description": "On: five lights on the robot's chest show the effort (low = 1 light … max = 5), and its eyes scan faster at a higher level. A model without effort levels shows no lights.",
+      "default": true
+    },
+    "tokenYellow": {
+      "type": "number",
+      "title": "Context: yellow from (tokens)",
+      "description": "Also warn yellow (finish the task, update your notes) when the conversation holds this many tokens, whatever the %. With a 1M window the % levels come late; 250000 is a good start. 0 = off.",
+      "default": 0
+    },
+    "tokenRed": {
+      "type": "number",
+      "title": "Context: red from (tokens)",
+      "description": "Also warn red (start a new session) from this many tokens, for example 350000. 0 = off.",
+      "default": 0
+    },
+    "cacheClock": {
+      "type": "boolean",
+      "title": "Cache clock",
+      "description": "Show how long the conversation's cache stays warm after Claude's last reply, with a Keep warm button in the /meter pane.",
+      "default": true
+    },
+    "cacheMinutes": {
+      "type": "number",
+      "title": "Cache clock: cache lifetime (minutes)",
+      "description": "60 on a Claude plan (Pro, Max) in Claude Code; 5 with an API key.",
+      "default": 60
+    },
+    "exploreOnHaiku": {
+      "type": "boolean",
+      "title": "Search helpers (Explore) on Haiku",
+      "description": "Start Claude Code's read-only search helper on Haiku instead of the session's model. Other helpers keep their model. Off by default.",
+      "default": false
+    },
+    "readerMode": {
+      "type": "string",
+      "title": "Haiku reader",
+      "description": "off: Opus reads everything. search: when Opus reads a lot in one turn, it gives further reading to a reader on Haiku, which finds files and lines; Opus reads those lines itself. summary: the reader also gives a short summary (for questions, not for code changes). The pane's On/Off switch overrides this per PC.",
+      "options": ["off", "search", "summary"],
+      "default": "off"
+    },
+    "readerThreshold": {
+      "type": "number",
+      "title": "Haiku reader: from (tokens read in one turn)",
+      "description": "When Opus reads more than this in one turn, it is asked once to give further reading to the Haiku reader. At least 500.",
+      "default": 2000
+    },
+    "robotSize": {
+      "type": "number",
+      "title": "Robot size",
+      "description": "2 = small, 3 = medium, 4 = large (screen pixels per robot pixel). Bigger makes the band's top row taller.",
+      "default": 3
     },
     "staleMinutes": {
       "type": "number",

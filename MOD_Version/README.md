@@ -4,7 +4,7 @@ Your Claude 5-hour and weekly limits, and how full your session's context is, in
 
 > Unofficial community project. Not affiliated with, endorsed by or sponsored by Anthropic. "Claude" is a trademark of Anthropic.
 
-Version 1.8.0 · Made by Hans Tandt · MIT licence · [What's new](CHANGELOG.md)
+Version 1.9.0 · Made by Hans Tandt · MIT licence · [What's new](CHANGELOG.md)
 
 ![The band above the prompt at green, yellow and red](images/band-levels_en.png)
 
@@ -18,7 +18,9 @@ The manual (11–12 pages) is in [`docs/out`](docs/out), as PDF and Word: [Engli
 - **The session-notes warnings**: at yellow (80 % of compaction) a second line says `finish the task and update your session notes`, with a **Write session notes** button that asks Claude to write them. At red (90 %) it says `start a new session`, offers **Close session** and **Compact**, puts the same words in the status line under the prompt, and blinks until the context drops back. The warning row sits one line below the gauges, so its buttons never overlap them.
 - **The details pane** (`/meter`): both limits with reset time and pace, this session's context in tokens, a chart of what the last turns added, compactions and cost, the other live sessions on this PC, and the **Close session**, **Start session**, **Write session notes**, **Compact** and **Hide the band** buttons.
 - **Close session and Start session**: one click runs a full end-of-session or start-of-session routine (see below).
-- **A little pixel robot** beside **Details** (an original design): it blinks now and then, scans while Claude works, its antenna shows the Compress colour, and it cheers when Close session says it is safe. In the terminal it is a short face like `[o_o]`. Switch it off in `/config`.
+- **The Haiku reader** (off by default): when Opus reads a lot in one turn, it gives further searching and reading to a reader on Haiku, which sends back only files, line numbers and the exact lines; Opus still reads those lines itself before it changes anything. The `/meter` pane has its On/Off switch and a token counter per model (this session and this week); mode and limit are under **Settings** in the pane.
+- **Token savers**: a cache clock in the band (`cache 42m`, then `cache cold`) with **Keep warm** in the pane; optional warnings at a token number (for example yellow from 250,000) as well as at the % of compaction; and optionally Claude Code's search helper (Explore) on Haiku. Chapter 11 of the manual explains how Claude uses tokens and what each tool can and cannot save.
+- **A little pixel robot** beside **Details** (an original design): it blinks now and then, scans while Claude works, its antenna shows the Compress colour, and it cheers when Close session says it is safe. Each model has its own robot (Opus a crown, Sonnet ears, Haiku a short antenna, Fable two antenna points), and a bar of five marks under it (and five chest lights) shows the effort level. In the terminal it is a short face: `[o_o]` Opus, `(o_o)` Sonnet, `{o_o}` Haiku, `<o_o>` Fable. Its size and options are under **Settings** in the pane.
 - **Short messages (toasts)**: at each limit level (once per window, for all sessions together), when a limit resets, at the yellow and red context levels, and after compaction.
 
 ![The /meter details pane](images/pane.png)
@@ -41,19 +43,22 @@ On the desktop the bars are drawn as rounded bars; in the terminal as lines. In 
 
 ## Settings
 
-Type `/config` in Claude Code and look for the ai-usage-meter rows:
+Open the `/meter` pane (click **Details** in the band) and click **Settings** at the bottom, or type `/meter settings`. Each setting has its own button: **On**/**Off**, **−** and **+** for a number, or a click to go to the next choice. A change applies at once. In the desktop app, `/config` opens the app's own Settings window, which doesn't have the mod's settings; in a terminal, `/config` also lists them (the ai-usage-meter rows), and that is where the colours are changed.
 
 | Setting | Default |
 | --- | --- |
 | Limits: first and second warning | 80 % and 95 % |
 | Context: yellow and red | 80 % and 90 % of the compaction point |
+| Context: yellow and red from a number of tokens | 0 (off) |
+| Cache clock, and the cache lifetime | on, 60 minutes (set 5 with an API key) |
+| Search helpers (Explore) on Haiku | off |
 | Messages at the limit warnings, on a reset, after compaction | on |
 | Blink at red | on |
 | Figures are old after | 60 minutes |
 | Colours | `#3FB950`, `#F0883E`, `#F85149` |
 | Use the strip's Settings when it is installed | on |
 
-When the AI Usage Meter strip (the Windows program, on [hanstandt.be](https://hanstandt.be/projects/ai-usage-meter/)) is installed, its Settings window decides the levels, colours and messages, so both show the same; switch *Use the strip's Settings when it is installed* off to use the values in `/config` instead. The `/meter` pane says which settings are in use.
+When the AI Usage Meter strip (the Windows program, on [hanstandt.be](https://hanstandt.be/projects/ai-usage-meter/)) is installed, its Settings window decides the levels, colours and messages, so both show the same; switch *Use the strip's Settings when it is installed* off (under **Settings** in the pane) to use the mod's own values instead. The `/meter` pane says which settings are in use.
 
 ## Install
 

@@ -2,8 +2,8 @@
   "meta": {
     "title": "AI Usage Meter-mod",
     "subtitle": "Je Claude-limieten en context, in Claude Code",
-    "version": "Versie 1.8.0",
-    "date": "8 november 2026",
+    "version": "Versie 1.9.0",
+    "date": "14 november 2026",
     "project": "AI Usage Meter-mod",
     "tocTitle": "Inhoud",
     "author": "Hans Tandt"
@@ -15,7 +15,7 @@
     },
     {
       "type": "p",
-      "text": "Hoofdstuk 1 tot 10 zijn voor iedereen die Claude Code gebruikt. De bijlage is voor ontwikkelaars: hoe de mod werkt en hoe je hem controleert."
+      "text": "Hoofdstuk 1 tot 11 zijn voor iedereen die Claude Code gebruikt. De bijlage is voor ontwikkelaars: hoe de mod werkt en hoe je hem controleert."
     },
     {
       "type": "callout",
@@ -34,7 +34,7 @@
     {
       "type": "figure",
       "path": "figures/band-levels_nl.png",
-      "width": 560,
+      "width": 500,
       "caption": "Figuur 1. De band boven het invoerveld. Bij geel en rood zegt hij wat je moet doen, met een knop.",
       "alt": "Drie banden met Session, Week en Compress: groen op 46 %, geel op 84 % met een knop Write session notes, rood op 93 % met Write session notes en Compact."
     },
@@ -59,11 +59,11 @@
         ],
         [
           "Compress",
-          "Hoe vol de context van deze sessie is, gemeten tegen het punt waarop comprimeren begint."
+          "Hoe vol dit gesprek is. Is het vol, dan maakt Claude Code er een korte samenvatting van (comprimeren) en gaan details verloren: bewaar je notities daarvoor."
         ],
         [
           "~6 turns",
-          "Ongeveer hoeveel beurten zoals de laatste er nog bij passen voor het comprimeren."
+          "Ongeveer hoeveel berichten, met de antwoorden van Claude, er nog bij passen voor het comprimeren, als ze even lang zijn als de laatste."
         ],
         [
           "5h: 100% in 1h 20m",
@@ -72,6 +72,18 @@
         [
           "limits updated 1h 10m ago",
           "De cijfers zijn oud. Claude Code stuurt nieuwe met zijn volgende antwoord."
+        ],
+        [
+          "cache 42m",
+          "Hoe lang het gesprek nog goedkoop verder kan: nog 42 minuten (hoofdstuk 11)."
+        ],
+        [
+          "Haiku 19 %",
+          "Met de Haiku-lezer aan: het deel van het werk van deze sessie dat het goedkopere Haiku deed (hoofdstuk 6)."
+        ],
+        [
+          "262k tokens: …",
+          "Alleen als je een aantal tokens instelde bij Settings: het gesprek ging erover (hoofdstuk 11)."
         ],
         [
           "other: MyProject 92%",
@@ -83,7 +95,7 @@
       "type": "callout",
       "variant": "note",
       "title": "Het robotje",
-      "text": "Het knippert af en toe met de ogen, kijkt rond terwijl Claude werkt, en zijn antenne heeft de kleur van Compress. Zegt Close session dat het veilig is, dan juicht het. In de terminal is het een kort gezichtje zoals [o_o]. Zet het uit in /config."
+      "text": "Het toont in één oogopslag wat Claude doet. Het knippert af en toe met de ogen, de ogen bewegen terwijl Claude werkt, en de antenne heeft de kleur van Compress (groen, oranje of rood). Het toont ook welk model antwoordt, want sommige kosten veel meer dan andere: Opus, het sterkste en duurste, draagt een kroon; Sonnet heeft oren; Haiku, het goedkoopste, heeft een korte antenne; Fable heeft twee antennepunten. De vijf streepjes eronder tonen de inspanning (effort): hoe hard Claude nadenkt voor het antwoordt, van laag (1 streepje) tot maximaal (5). Meer inspanning helpt bij moeilijk werk, maar gebruikt meer van je limieten. Als Close session zegt dat je mag afsluiten, juicht het robotje. In de terminal is het een kort gezichtje, zoals {o_o} voor Haiku. Grootte en opties bij Settings (hoofdstuk 7)."
     },
     {
       "type": "callout",
@@ -126,14 +138,18 @@
         "Typ de opdracht hieronder, met je eigen map tussen de aanhalingstekens, en druk op Enter.",
         "Sluit de Claude-app en start hem opnieuw, of start een nieuwe `claude`-sessie in de terminal.",
         "Stuur één bericht. Na het antwoord van Claude verschijnt de band boven het invoerveld."
-      ]
+      ],
+      "keepWithNext": true
+    },
+    {
+      "type": "p",
+      "text": "Eén opdracht voegt de mod toe en installeert hem voor elke sessie:"
     },
     {
       "type": "code",
       "lines": [
         "claude plugin install ai-usage-meter --marketplace \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\""
-      ],
-      "caption": "Eén opdracht voegt de mod toe en installeert hem voor elke sessie."
+      ]
     },
     {
       "type": "callout",
@@ -207,7 +223,7 @@
     },
     {
       "type": "p",
-      "text": "Twee knoppen voeren twee prompts uit die bij de mod horen. Close session controleert alles wat deze sessie deed en bewaart het in CLAUDE.md, MEMORY.md en de sessienotities. Start session leest die bestanden in de volgende sessie, of maakt ze aan in een nieuw project, en gaat verder waar je stopte."
+      "text": "Twee knoppen voeren twee prompts uit die bij de mod horen. Close session controleert alles wat deze sessie deed en bewaart het in CLAUDE.md, MEMORY.md en de sessienotities. Start session leest die bestanden in de volgende sessie, of maakt ze aan in een nieuw project, en gaat verder waar je stopte. Voer je Close session later in dezelfde sessie nog eens uit, dan werkt het de notitie bij die het al schreef, in plaats van een tweede toe te voegen: de open stappen blijven woord voor woord staan, en oudere notities worden nooit ingekort."
     },
     {
       "type": "table",
@@ -323,6 +339,12 @@
       "text": "Korte meldingen verschijnen bij elk waarschuwingsniveau, als een limiet gereset is en als er gecomprimeerd is. Een limietwaarschuwing verschijnt één keer, ook met meerdere sessies open."
     },
     {
+      "type": "callout",
+      "variant": "note",
+      "title": "De Haiku-lezer (standaard uit)",
+      "text": "Het meeste werk van Claude is bestanden lezen, en lezen met Opus, het dure model, tikt snel aan. Met de lezer aan (On in het paneel) let de mod op hoeveel Opus leest voor één antwoord. Boven een grens (2.000 tokens, een paar bladzijden) stelt hij Opus voor om een lezer op het goedkopere Haiku de rest van het zoek- en leeswerk te laten doen. De lezer stuurt alleen terug waar het antwoord staat: het bestand, de regelnummers en precies die regels. Opus leest die regels zelf, en leest een bestand altijd zelf voor het dat wijzigt. Het paneel toont welk deel van het werk van deze sessie Haiku deed (\"Haiku 19 %\") en hoe vaak de lezer liep; Details toont de tokens per model, voor deze sessie en deze week."
+    },
+    {
       "type": "h2",
       "text": "Zie de waarschuwingen met democijfers"
     },
@@ -365,7 +387,7 @@
     },
     {
       "type": "p",
-      "text": "Typ `/config` in Claude Code en zoek de regels van ai-usage-meter. Een wijziging geldt meteen."
+      "text": "Open het paneel /meter (klik op Details in de band) en klik onderaan op Settings, of typ /meter settings. Elke instelling heeft een eigen knop: klik op On of Off om ze aan of uit te zetten, op − of + om een getal te veranderen, en op een keuze (zoals de Haiku-lezer) om naar de volgende optie te gaan. Een wijziging geldt meteen. Het paneel toont de Engelse namen van de instellingen. Alleen de kleuren verander je daar niet: open een terminal, typ claude, dan /config, en zoek de regels van ai-usage-meter. In de desktop-app opent /config het eigen instellingenvenster van de app, en daar staan de instellingen van de mod niet in."
     },
     {
       "type": "table",
@@ -379,53 +401,93 @@
       ],
       "rows": [
         [
-          "Limieten: eerste en tweede waarschuwing",
+          "Limits: first and second warning",
           "80 % en 95 %"
         ],
         [
-          "Context: geel en rood",
+          "Context: yellow and red",
           "80 % en 90 % van het comprimeerpunt"
         ],
         [
-          "Melding bij de limietwaarschuwingen",
+          "Message at the limit warnings",
           "Aan"
         ],
         [
-          "Melding als een limiet gereset is",
+          "Message when a limit resets",
           "Aan"
         ],
         [
-          "Melding na het comprimeren",
+          "Message when compaction has run",
           "Aan"
         ],
         [
-          "Knipperen bij rood",
+          "Blink at red",
           "Aan"
         ],
         [
-          "Robotje in de band",
+          "Little robot in the band",
           "Aan"
         ],
         [
-          "Cijfers zijn oud na",
+          "Robot: a different robot for each model",
+          "Aan"
+        ],
+        [
+          "Robot: show the effort level",
+          "Aan"
+        ],
+        [
+          "Robot size",
+          "3 (middel)"
+        ],
+        [
+          "Haiku reader",
+          "off"
+        ],
+        [
+          "Haiku reader: from (tokens read in one turn)",
+          "2000"
+        ],
+        [
+          "Context: yellow from (tokens)",
+          "0 (uit)"
+        ],
+        [
+          "Context: red from (tokens)",
+          "0 (uit)"
+        ],
+        [
+          "Cache clock",
+          "Aan"
+        ],
+        [
+          "Cache clock: cache lifetime",
           "60 minuten"
         ],
         [
-          "Kleuren: onder de waarschuwingen, eerste, tweede",
+          "Search helpers (Explore) on Haiku",
+          "Uit"
+        ],
+        [
+          "Figures are old after",
+          "60 minuten"
+        ],
+        [
+          "Colours: below the warnings, first, second",
           "#3FB950, #F0883E, #F85149"
         ],
         [
-          "De Settings van de balk gebruiken als die geïnstalleerd is",
+          "Use the strip's Settings when it is installed",
           "Aan"
         ]
       ],
-      "keepWhole": 12
+      "keepWhole": 22
     },
     {
       "type": "callout",
       "variant": "note",
       "title": "Welke instellingen gelden?",
-      "text": "De laatste regel van het paneel /meter zegt het: \"Change them in /config\", of \"Change them in the AI Usage Meter strip's Settings\" (hoofdstuk 8)."
+      "text": "Is de AI Usage Meter-balk geïnstalleerd, dan staat onderaan in het paneel /meter \"The AI Usage Meter strip's Settings decide them\" (hoofdstuk 8). Anders gelden de instellingen van de mod zelf."
     },
     {
       "type": "h1",
@@ -439,7 +501,7 @@
       "type": "bullets",
       "items": [
         "Beide schrijven dezelfde cijfers naar dezelfde bestanden, zodat elk alle sessies op deze pc ziet.",
-        "Met de balk geïnstalleerd gebruikt de mod de Settings van de balk voor niveaus, kleuren en meldingen. Zet Use the strip's Settings when it is installed uit in /config om de instellingen van de mod te gebruiken.",
+        "Met de balk geïnstalleerd gebruikt de mod de Settings van de balk voor niveaus, kleuren en meldingen. Zet Use the strip's Settings when it is installed uit bij Settings in het paneel /meter om de instellingen van de mod te gebruiken.",
         "De mod heet ai-usage-meter en de add-on van de balk usage-meter. Ze werken naast elkaar; de demo van de balk blijft /usage-demo."
       ]
     },
@@ -478,7 +540,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, versie 1.8.0, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
+          "ai-usage-meter@ai-usage-meter, versie 1.9.0, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
         ]
       ]
     },
@@ -504,6 +566,10 @@
         [
           "Kijk naar het robotje naast Details en stuur dan een bericht",
           "Het knippert af en toe; terwijl Claude werkt, kijken de ogen rond"
+        ],
+        [
+          "Kies Haiku in het modellenmenu onder het invoerveld (terminal: `/model`) en stuur een bericht",
+          "Het Haiku-robotje (korte antenne); het balkje eronder toont de inspanning"
         ],
         [
           "Stuur één bericht",
@@ -597,16 +663,44 @@
       ],
       "rows": [
         [
-          "`/config`, de regels van ai-usage-meter",
-          "De niveaus, de meldingen, Blink at red, de kleuren"
+          "Typ `/meter settings` (of klik op Details, dan Settings)",
+          "De instellingen onderaan het paneel, elk met een knop"
         ],
         [
           "Zet Blink at red uit, dan `/meter demo here 93`",
           "Rood zonder knipperen (zet het daarna weer aan)"
         ],
         [
-          "Zet Robotje in de band uit in `/config`",
+          "Zet Little robot in the band uit bij Settings",
           "Het robotje is weg (zet het daarna weer aan)"
+        ],
+        [
+          "Zet Grootte van het robotje op 4",
+          "Een groter robotje"
+        ],
+        [
+          "Klik op − naast Cache clock: cache lifetime",
+          "5 min (zet daarna terug op 60 met +)"
+        ],
+        [
+          "Klik op On naast Haiku reader en vraag Claude het hele project te doorzoeken",
+          "Het aantal keren telt op; de band toont het aandeel van Haiku"
+        ],
+        [
+          "Klik op Details ernaast",
+          "Tokens per model, voor deze sessie en deze week"
+        ],
+        [
+          "Zet Context: geel vanaf op 50000, dan /meter demo here 40",
+          "64k tokens: finish the task and update your session notes (zet het daarna terug)"
+        ],
+        [
+          "Kijk na het antwoord van Claude naar de band",
+          "cache 59m, die aftelt; Keep warm in het paneel"
+        ],
+        [
+          "Zet Zoekhulpen (Explore) op Haiku aan, vraag een grote zoekopdracht",
+          "Details van de lezer: zoekhulpen op Haiku gestart: 1 of meer"
         ]
       ]
     },
@@ -636,6 +730,10 @@
         [
           "Kijk in de testmap",
           "CLAUDE.md, MEMORY.md en de sessienotities, ingevuld"
+        ],
+        [
+          "Doe in dezelfde sessie nog een kleine taak en klik dan opnieuw op Close session",
+          "Nog altijd één notitie voor deze sessie, bijgewerkt; de open stappen woord voor woord behouden"
         ],
         [
           "Open daar een nieuwe sessie; klik op Start session voor je typt",
@@ -690,6 +788,81 @@
     },
     {
       "type": "h1",
+      "text": "11. Tokens besparen: hoe Claude ze gebruikt"
+    },
+    {
+      "type": "p",
+      "text": "Elk Claude-abonnement heeft twee limieten: een per 5 uur en een per week. Die lopen vol met tokens. Een token is een klein stukje tekst, iets minder dan een woord; een bladzijde tekst is een paar honderd tokens. Alles wat Claude leest en schrijft, kost tokens. Dit hoofdstuk legt in gewone woorden uit waar ze naartoe gaan, en wat de vier hulpmiddelen van de mod doen om ze te sparen. Je hebt er geen enkele nodig: drie van de vier staan uit tot je ze aanzet."
+    },
+    {
+      "type": "h2",
+      "text": "Waar de tokens naartoe gaan"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Claude leest bij elk bericht het hele gesprek opnieuw. Het onthoudt niets tussen twee berichten: telkens als je iets stuurt, leest het alles opnieuw vanaf het begin, jouw berichten, zijn antwoorden en elk bestand dat het opende. Hoe langer het gesprek, hoe meer elk nieuw bericht dus kost. Wordt het gesprek te lang, dan vervangt Claude Code het door een korte samenvatting (comprimeren). Dat maakt ruimte, maar details gaan verloren; daarom waarschuwt de mod je om eerst je notities te bewaren.",
+        "Opnieuw lezen is goedkoper als het gesprek kort geleden nog gebruikt werd. Claude Code houdt een tijdje een klaarliggende kopie van het gesprek bij (de cache), zoals een boek dat open op je bureau blijft liggen. Een bericht binnen die tijd leest uit die kopie, en dat kost veel minder. De kopie blijft 1 uur na het laatste bericht klaarliggen met een Claude-abonnement (5 minuten met een API-sleutel). Daarna gaat het boek terug in de kast: het volgende bericht leest alles opnieuw tegen de volle prijs.",
+        "Opus is het sterkste en het duurste model. Haiku is snel en veel goedkoper: goed in zoeken en lezen, minder goed in beoordelen.",
+        "Voor een grote zoekopdracht kan Claude een hulp uitsturen. De hulp zoekt op zijn eentje, en alleen zijn korte antwoord komt terug in je gesprek. Je gesprek groeit dus niet met alles wat de hulp las."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Een waarschuwing bij een aantal tokens (standaard uit)"
+    },
+    {
+      "type": "p",
+      "text": "De band wordt normaal geel bij 80 % en rood bij 90 % van het punt waar het comprimeren begint. In een heel groot gespreksvenster (1 miljoen tokens) komt 80 % pas rond 775.000 tokens, terwijl elk bericht al lang duur is. Bij Settings (hoofdstuk 7) kun je daarom ook een aantal tokens opgeven, bijvoorbeeld geel vanaf 250.000 en rood vanaf 350.000. De waarschuwing komt dan bij wat het eerst bereikt is, en zegt welke, bijvoorbeeld \"262k tokens: finish the task and update your session notes\". Laat het op 0 bij een venster van gewone grootte: dan verandert er niets."
+    },
+    {
+      "type": "h2",
+      "text": "De cacheklok en Keep warm"
+    },
+    {
+      "type": "p",
+      "text": "Na elk antwoord toont de band hoe lang de klaarliggende kopie van het gesprek nog klaarligt, bijvoorbeeld \"cache 42m\": nog 42 minuten. In de laatste 5 minuten wordt het oranje. Daarna staat er \"cache cold\": je volgende bericht kost één keer de volle prijs, en daarna ligt de kopie weer klaar."
+    },
+    {
+      "type": "p",
+      "text": "Keep warm, een knop in het paneel /meter, zet die klok terug naar het begin. Het stuurt Claude één piepkleine, verborgen vraag (\"antwoord met het woord: ok\"). Om die te beantwoorden, leest Claude het gesprek uit de klaarliggende kopie, en daardoor blijft de kopie nog een volle periode klaarliggen. De vraag en het antwoord komen niet in je gesprek: je ziet alleen een kort bericht dat het gelukt is. Keep warm gebeurt nooit vanzelf: één klik is één vraag."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Voorbeeld: middagpauze",
+      "text": "Je zit midden in een lange taak en de band toont \"cache 8m\". Je gaat 45 minuten lunchen. Klik op Keep warm voor je vertrekt: de klok springt terug naar 60 minuten, en je eerste bericht na de lunch kost nog altijd de lage prijs. Zonder Keep warm zou de kopie tijdens de lunch verlopen, en dan leest dat eerste bericht het hele gesprek opnieuw tegen de volle prijs. Ga je naar huis voor vandaag? Klik dan niet: je zou betalen voor een vraag die je nooit gebruikt."
+    },
+    {
+      "type": "h2",
+      "text": "Zoekhulpen op Haiku (standaard uit)"
+    },
+    {
+      "type": "p",
+      "text": "Als Claude in veel bestanden moet zoeken, stuurt Claude Code zijn zoekhulp uit (Explore). Normaal gebruikt die hulp hetzelfde model als je gesprek, vaak het dure Opus. Met \"Search helpers (Explore) on Haiku\" aan bij Settings gebruikt hij het goedkopere Haiku. Zoeken en lezen is precies waar Haiku goed in is; Opus blijft nadenken en de wijzigingen maken. Andere hulpen houden hun model. Details naast de Haiku-lezer in het paneel toont hoeveel zoekhulpen op Haiku liepen."
+    },
+    {
+      "type": "h2",
+      "text": "Goed om te weten"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "De mod kan niet precies zeggen hoeveel je bespaarde. Hij telt de tokens per model, maar wat hetzelfde werk zonder deze hulpmiddelen zou hebben gekost, is alleen te schatten. Vergelijk daarvoor het Session-cijfer bij hetzelfde soort taak, één keer met en één keer zonder.",
+        "Keep warm kost elke keer een beetje: Claude leest het gesprek uit de klaarliggende kopie. Het loont alleen als je terugkomt en verdergaat voor de klok afloopt. Staat er al \"cache cold\" in de band, dan helpt Keep warm niet meer, en de mod zegt dat ook.",
+        "Haiku kan details missen. Laat het zoeken en lezen, en laat Opus het resultaat nakijken. Opus leest een bestand altijd zelf voor het dat wijzigt. Zet de Haiku-hulpmiddelen uit voor nauwkeurig werk.",
+        "De mod ziet niet hoe lang de kopie echt klaarligt: hij gebruikt de tijd uit Settings (60 minuten). Zet 5 minuten als je een API-sleutel gebruikt.",
+        "Elke vraag die de mod aan een model stuurt (Keep warm, de zoekopdrachten van de lezer), telt ook mee voor je limieten."
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Een goed begin",
+      "text": "Geel vanaf 250.000 tokens, rood vanaf 350.000, de cacheklok aan, de lezer en de zoekhulpen uit. Zet die aan op dagen met veel zoekwerk, en kijk naar het aandeel van Haiku in het paneel."
+    },
+    {
+      "type": "h1",
       "text": "Bijlage: technische details"
     },
     {
@@ -741,7 +914,7 @@
     },
     {
       "type": "p",
-      "text": "Hij leest geen login of wachtwoorden en maakt geen netwerkverbindingen. De knop Write session notes stuurt één gewoon bericht naar Claude in je sessie, dus het telt mee voor je limieten zoals elk bericht."
+      "text": "Hij leest geen login of wachtwoorden en maakt geen netwerkverbindingen. De knop Write session notes stuurt één gewoon bericht naar Claude; dat telt mee voor je limieten."
     },
     {
       "type": "h2",
@@ -758,9 +931,9 @@
     {
       "type": "bullets",
       "items": [
-        "Hij ziet alleen Claude Code-sessies op deze pc (app en terminal), geen cloud- of WSL-sessies of andere computers.",
+        "Hij ziet alleen Claude Code-sessies op deze pc, geen cloud- of WSL-sessies.",
         "Session en Week hebben een Claude-abonnement met gebruikslimieten nodig; met een API-sleutel blijven ze leeg.",
-        "De cijfers vernieuwen als een sessie start of antwoordt. Gebruik in Chat telt mee voor de limieten, maar werkt ze niet bij."
+        "De cijfers vernieuwen als een sessie start of antwoordt. Gebruik in Chat telt mee, maar werkt de cijfers niet bij."
       ]
     },
     {

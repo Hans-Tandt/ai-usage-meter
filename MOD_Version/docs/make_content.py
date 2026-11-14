@@ -27,7 +27,7 @@ def blocks(lang, t):
         {"type": "callout", "variant": "note", "title": t["unofficial_t"], "text": t["unofficial"]},
         {"type": "h1", "text": t["h1"]},
         {"type": "p", "text": t["p1"]},
-        {"type": "figure", "path": f"figures/band-levels_{low}.png", "width": 560, "caption": t["fig1"], "alt": t["alt1"]},
+        {"type": "figure", "path": f"figures/band-levels_{low}.png", "width": 500, "caption": t["fig1"], "alt": t["alt1"]},
         {"type": "table", "header": t["see_h"], "widths": [2, 3], "rows": t["see"]},
         {"type": "callout", "variant": "note", "title": t["robot_t"], "text": t["robot"]},
         {"type": "callout", "variant": "tip", "title": t["fold_t"], "text": t["fold"]},
@@ -38,8 +38,9 @@ def blocks(lang, t):
         {"type": "p", "text": t["p3"]},
         # The version comes before the steps: the install command fails on older versions.
         {"type": "callout", "variant": "note", "title": t["need_t"], "text": t["need"]},
-        {"type": "numbers", "items": t["steps3"]},
-        {"type": "code", "lines": INSTALL, "caption": t["code3"]},
+        {"type": "numbers", "items": t["steps3"], "keepWithNext": True},  # step 4 points to the command below
+        {"type": "p", "text": t["code3"].rstrip(".") + ":"},  # a lead-in: kept with the command
+        {"type": "code", "lines": INSTALL},
         {"type": "callout", "variant": "trap", "title": t["mp_t"], "text": t["mp"]},
         {"type": "callout", "variant": "tip", "title": t["try_t"], "text": t["try"]},
         {"type": "callout", "variant": "trap", "title": t["key_t"], "text": t["key"]},
@@ -62,12 +63,13 @@ def blocks(lang, t):
         {"type": "figure", "path": "figures/pane.png", "width": 330, "caption": t["fig2"], "alt": t["alt2"]},
         {"type": "table", "header": t["cmd_h"], "widths": [2, 3], "rows": t["cmd"]},
         {"type": "p", "text": t["p5"]},
+        {"type": "callout", "variant": "note", "title": t["reader_t"], "text": t["reader"]},
         {"type": "h2", "text": t["h5b"]},
         {"type": "table", "header": t["cmd_h"], "widths": [2, 3], "rows": t["demo"]},
         {"type": "p", "text": t["term"]},
         {"type": "h1", "text": t["h6"]},
         {"type": "p", "text": t["p6"]},
-        {"type": "table", "header": t["set_h"], "widths": [3, 2], "rows": t["set"], "keepWhole": 12},  # never cut in two
+        {"type": "table", "header": t["set_h"], "widths": [3, 2], "rows": t["set"], "keepWhole": 22},  # never cut in two
         {"type": "callout", "variant": "note", "title": t["which_t"], "text": t["which"]},
         {"type": "h1", "text": t["h7"]},
         {"type": "p", "text": t["p7"]},
@@ -82,6 +84,22 @@ def blocks(lang, t):
         {"type": "h1", "text": t["h8"]},
         {"type": "numbers", "items": t["steps8"]},
         {"type": "p", "text": t["p8"]},
+        # Chapter 11: how tokens, the cache, models and helpers work, and the mod's four tools for them.
+        {"type": "h1", "text": t["save_h"]},
+        {"type": "p", "text": t["save_intro"]},
+        {"type": "h2", "text": t["save_h_how"]},
+        {"type": "bullets", "items": t["save_how"]},
+        {"type": "h2", "text": t["save_h_tok"]},
+        {"type": "p", "text": t["save_tok"]},
+        {"type": "h2", "text": t["save_h_cache"]},
+        {"type": "p", "text": t["save_cache"]},
+        {"type": "p", "text": t["save_warm"]},
+        {"type": "callout", "variant": "tip", "title": t["save_ex_t"], "text": t["save_ex"]},  # Keep warm, in an everyday case
+        {"type": "h2", "text": t["save_h_help"]},
+        {"type": "p", "text": t["save_help"]},
+        {"type": "h2", "text": t["save_h_care"]},
+        {"type": "bullets", "items": t["save_care"]},
+        {"type": "callout", "variant": "tip", "title": t["save_tip_t"], "text": t["save_tip"]},
         {"type": "h1", "text": t["h9"]},
         {"type": "h2", "text": t["h9a"]},
         {"type": "bullets", "items": t["how"]},

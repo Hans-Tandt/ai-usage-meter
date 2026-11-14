@@ -1,5 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
+import type { Engine } from 'claude-code/testing'
 
 // The band and the pane, drawn from the /meter demo figures (no usage spent, no files needed).
 
@@ -98,7 +99,7 @@ test('the pane shows the limits, the context and the buttons', async ($, on) => 
     expect(await ui.find({ type: 'Text', text: /Session \(5-hour limit\)/ })).toBeTruthy()
     expect(await ui.find({ type: 'Text', text: /finish the task and update your session notes/ })).toBeTruthy()
     expect(await ui.find({ type: 'Button', key: 'compact' })).toBeTruthy()
-    expect(await ui.find({ type: 'Text', text: /AI Usage Meter mod 1\.8\.0 · Hans Tandt · hanstandt\.be/ })).toBeTruthy()
+    expect(await ui.find({ type: 'Text', text: /AI Usage Meter mod 1\.9\.0 · Hans Tandt · hanstandt\.be/ })).toBeTruthy()
     await ui.unmount()
   }
 })
@@ -125,7 +126,8 @@ test('without the strip, the levels come from /config', { options: { warn1: 70, 
 
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   expect(await ui.find({ type: 'Text', text: /limits 70\/90%, context 75\/85%/ })).toBeTruthy()
-  expect(await ui.find({ type: 'Text', text: /Change them in \/config/ })).toBeTruthy()
+  expect(await ui.find({ type: 'Text', text: /strip's Settings decide/ })).toBeFalsy() // the mod's own settings apply
+  expect(await ui.find({ type: 'Button', key: 'settings' })).toBeTruthy()
   // 78 % is past the yellow level set in /config (75 %), not the default 80 %
   expect(await ui.find({ type: 'Text', text: /finish the task and update your session notes/ })).toBeTruthy()
   await ui.unmount()
@@ -144,7 +146,7 @@ test('a leftover AIUsageMeter.exe without its settings file does not count as th
 
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   expect(await ui.find({ type: 'Text', text: /limits 70\/90%/ })).toBeTruthy()
-  expect(await ui.find({ type: 'Text', text: /Change them in \/config/ })).toBeTruthy()
+  expect(await ui.find({ type: 'Text', text: /strip's Settings decide/ })).toBeFalsy()
   await ui.unmount()
 })
 
@@ -221,6 +223,7 @@ test('Close session reports progress, then "safe to end"; Start session uses the
   await pane.unmount()
   expect(sent[0]).toContain('Project folder: D:/Dev/MyProject.')
   expect(sent[0]).toContain('counts as my "go"')
+  expect(sent[0]).toContain('Keep every open step it lists, word for word')
   expect(sent[0]).toContain('"You are safe to close this session now"')
   expect(sent[0]).toContain("!!! It's NOT safe to close this session, risk of losing data !!! – <reason>")
 
@@ -343,4 +346,244 @@ test('with the robot off in /config, the band has no robot', { options: { robot:
   // The bars on the terminal are line characters, not an empty picture
   expect(await band.find({ type: 'Text', text: /━/ })).toBeTruthy()
   await band.unmount()
+})
+
+// A model request of the main conversation (or of a subagent), answered at once by the engine.
+function stepper($: Engine, on: On, clock: ReturnType<typeof engine>) {
+  on('turn.step', async function* () {
+    return { turnId: 't', index: 0, answer: '', toolUses: [], stopReason: 'end_turn', usage: null }
+  })
+  return async (model: string, effort?: 'low' | 'medium' | 'high' | 'xhigh' | 'max' | number, agentId?: string) => {
+    for await (const _ of $.turn.step({ turnId: 't', index: 0, model, effort, messageCount: 1, agentId })) void _
+    await clock.advance(350)
+  }
+}
+
+const bandFace = async ($: Engine, re: RegExp) => {
+  const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  const found = await band.find({ type: 'Text', text: re })
+  await band.unmount()
+  return found
+}
+
+test('the robot shows the model and the effort; a subagent does not change it', async ($, on) => {
+  const clock = engine(on)
+  const step = stepper($, on, clock)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+
+  await step('claude-haiku-5-5', 'high')
+  expect(await bandFace($, /\{[o-]_[o-]\} +▮▮▮▯▯/)).toBeTruthy()
+  const desk = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  const pic = (await desk.find({ type: 'Svg' })) as { props?: { alt?: string; width?: number } } | undefined
+  expect(pic?.props?.alt).toBe('robot (Haiku), effort high')
+  expect(pic?.props?.width).toBe(36) // Robot size 3 (medium) by default
+  // The effort bar under the robot, as wide as the robot
+  const box = (await desk.find({ type: 'Box', key: 'robot' })) as { children?: { props?: { alt?: string; width?: number } }[] } | undefined
+  const bar = box?.children?.[1]
+  expect(bar?.props?.alt).toBe('effort high: 3 of 5')
+  expect(bar?.props?.width).toBe(36)
+  await desk.unmount()
+  // The pane names the model and effort exactly as Claude Code reports them
+  const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await pane.find({ type: 'Text', text: /Model: claude-haiku-5-5 · effort high/ })).toBeTruthy()
+  await pane.unmount()
+
+  // A token budget instead of a level: no lights
+  await step('claude-opus-5-5', 20000)
+  expect(await bandFace($, /^ ?\[[o-]_[o-]\] ?$/)).toBeTruthy()
+
+  // A subagent's request leaves the robot as it is
+  await step('claude-sonnet-5-5', 'low', 'agent-1')
+  expect(await bandFace($, /\[[o-]_[o-]\]/)).toBeTruthy()
+  expect(await bandFace($, /\(/)).toBeFalsy()
+})
+
+test('with per-model and effort off, and size 4, the robot is the plain one, larger', { options: { robotPerModel: false, robotEffort: false, robotSize: 4 } }, async ($, on) => {
+  const clock = engine(on)
+  const step = stepper($, on, clock)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+  await step('claude-haiku-5-5', 'max')
+  expect(await bandFace($, /^ ?\[[o-]_[o-]\] ?$/)).toBeTruthy()
+  const desk = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  const pic = (await desk.find({ type: 'Svg' })) as { props?: { alt?: string; width?: number } } | undefined
+  expect(pic?.props?.alt).toBe('robot')
+  expect(pic?.props?.width).toBe(48)
+  await desk.unmount()
+})
+
+// Model requests that report their tokens, answered at once by the engine.
+function usageStepper($: Engine, on: On, clock: ReturnType<typeof engine>) {
+  let usage: { model: string; input_tokens: number; output_tokens: number; cache_read_input_tokens: number; cache_creation_input_tokens: number } | null = null
+  on('turn.step', async function* () {
+    return { turnId: 't', index: 0, answer: '', toolUses: [], stopReason: 'end_turn', usage }
+  })
+  return async (model: string, tokens: number, agentId?: string) => {
+    usage = { model, input_tokens: tokens - 100, output_tokens: 100, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 }
+    for await (const _ of $.turn.step({ turnId: 't', index: 0, model, effort: 'high', messageCount: 1, agentId })) void _
+    await clock.advance(50)
+  }
+}
+
+test('the token counter adds up tokens per model; the pane shows Haiku\'s share and opens its details', { options: { readerMode: 'search' } }, async ($, on) => {
+  const clock = engine(on)
+  const step = usageStepper($, on, clock)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+  await step('claude-opus-5-5', 8000)
+  await step('claude-haiku-5-5', 2000, 'agent-1') // a helper on Haiku counts too
+
+  const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await pane.find({ type: 'Text', text: /Haiku 20 % · 0 runs/ })).toBeTruthy()
+  expect(await pane.find({ type: 'Button', key: 'reader' })).toBeTruthy()
+  await pane.press({ key: 'readerInfo' })
+  expect(await pane.find({ type: 'Text', text: /^Opus +8k/ })).toBeTruthy()
+  expect(await pane.find({ type: 'Text', text: /Mode: search only/ })).toBeTruthy()
+  await pane.unmount()
+
+  // The band names Haiku's share while the reader is on
+  const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await band.find({ type: 'Text', text: /Haiku 20 %/ })).toBeTruthy()
+  await band.unmount()
+})
+
+test('over the limit, Opus is told once per turn to use the reader; switched off, never', { options: { readerMode: 'search', readerThreshold: 1000 } }, async ($, on) => {
+  engine(on)
+  on('tool.call', (_, e) => ({ result: { file: e.tool }, text: 'x'.repeat(2400) })) // about 600 tokens each
+  on('turn.start', (_, e) => ({ turnId: e.turnId }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const readFile = async () => (await $.tool.call({ tool: 'Read', file_path: 'a.txt' })) as { context?: readonly string[] }
+
+  await $.turn.start({ text: 'look', turnId: 't1' })
+  expect((await readFile()).context ?? []).toHaveLength(0) // 600: under the limit
+  const told = (await readFile()).context ?? [] // 1,200: over it
+  expect(told.join(' ')).toContain('ai-usage-meter:reader')
+  expect((await readFile()).context ?? []).toHaveLength(0) // once per turn
+  // A helper agent's reading doesn't count
+  expect(((await $.tool.call({ tool: 'Read', file_path: 'b.txt', agentId: 'agent-1' })) as { context?: readonly string[] }).context ?? []).toHaveLength(0)
+
+  // Switched off in the pane: no more notes, even in a new turn
+  const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  await pane.press({ key: 'reader' })
+  await pane.unmount()
+  await $.turn.start({ text: 'again', turnId: 't2' })
+  await readFile()
+  expect((await readFile()).context ?? []).toHaveLength(0)
+})
+
+test('a token number warns before the % does', { options: { tokenYellow: 50000, tokenRed: 100000 } }, async ($, on) => {
+  engine(on)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo here 40', ...TYPED }) // 40 % = 64k tokens
+  let band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await band.find({ type: 'Text', text: /64k tokens: finish the task and update your session notes/ })).toBeTruthy()
+  await band.unmount()
+  await $.command.run({ command: 'meter', args: 'demo here 70', ...TYPED }) // 112k tokens
+  band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await band.find({ type: 'Text', text: /112k tokens: start a new session/ })).toBeTruthy()
+  await band.unmount()
+})
+
+test('without token levels, 40 % gives no warning', async ($, on) => {
+  engine(on)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo here 40', ...TYPED })
+  const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await band.find({ type: 'Text', text: /finish the task/ })).toBeFalsy()
+  await band.unmount()
+})
+
+test('the cache clock counts down from the last reply; Keep warm starts it again', async ($, on) => {
+  const sent: string[] = []
+  const clock = routineEngine(on, sent)
+  const forks: string[] = []
+  on('model.fork', (_, e) => {
+    forks.push(e.prompt)
+    return { value: { isAnswered: true, text: 'ok', usage: { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 1000, cache_creation_input_tokens: 0 } } } as never
+  })
+  // Minute by minute: the robot's 300 ms timer makes one long jump too many steps
+  const wait = async (ms: number) => {
+    for (let t = 0; t < ms; t += 60000) await clock.advance(Math.min(60000, ms - t))
+  }
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+  await $.turn.complete(turnEnd('Done.'))
+  await wait(30000)
+  let band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await band.find({ type: 'Text', text: /cache (59|60)m|cache 1h/ })).toBeTruthy()
+  await band.unmount()
+
+  await wait(57 * 60000) // 2 to 3 minutes left: Keep warm
+  const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  await pane.press({ key: 'warm' })
+  await pane.unmount()
+  expect(forks).toHaveLength(1)
+  await wait(30000)
+  band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await band.find({ type: 'Text', text: /cache (59|60)m|cache 1h/ })).toBeTruthy()
+  await band.unmount()
+
+  await wait(61 * 60000)
+  band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await band.find({ type: 'Text', text: /cache cold/ })).toBeTruthy()
+  await band.unmount()
+})
+
+test('with "Explore on Haiku", only the Explore helper starts on Haiku', { options: { exploreOnHaiku: true } }, async ($, on) => {
+  engine(on)
+  on('agent.spawn', (_, e) => ({ model: e.model ?? 'claude-opus-5-5', agentId: 'a1' }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const spawn = (subagentType: string) => $.agent.spawn({ prompt: 'x', subagentType } as never) as Promise<{ model?: string }>
+  const explore = await spawn('Explore')
+  const other = await spawn('general-purpose')
+  expect(explore.model).toBe('haiku')
+  expect(other.model).toBe('claude-opus-5-5')
+})
+
+test('the pane lists the mod settings and changes them, for the desktop app where /config is the app window', async ($, on) => {
+  engine(on)
+  const ROWS = [
+    { key: 'ai-usage-meter.cacheClock', label: 'Cache clock', kind: 'boolean', value: true },
+    { key: 'ai-usage-meter.cacheMinutes', label: 'Cache clock: cache lifetime (minutes)', kind: 'number', value: 60 },
+    { key: 'ai-usage-meter.readerMode', label: 'Haiku reader', kind: 'choice', value: 'off', options: ['off', 'search', 'summary'] },
+    { key: 'ai-usage-meter.colorOk', label: 'Colour: below the warnings', kind: 'text', value: '#3FB950' },
+    { key: 'theme', label: 'Theme', kind: 'choice', value: 'dark', options: ['dark', 'light'] }, // not the mod's
+  ].map(r => ({ ...r, isLocked: false, provider: { plugin: r.key.startsWith('ai-usage-meter') ? 'ai-usage-meter' : 'engine', tier: 'core' } }))
+  const set: [string, unknown][] = []
+  on('config.list', () => ({ value: ROWS }) as never)
+  on('config.set', (_, e) => {
+    set.push([e.key, e.value])
+    return { value: e.value } as never
+  })
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+
+  const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await pane.find({ type: 'Text', text: /^Cache clock$/ })).toBeFalsy() // closed until Settings is clicked
+  await pane.press({ key: 'settings' })
+  expect(await pane.find({ type: 'Text', text: /^Cache clock$/ })).toBeTruthy()
+  expect(await pane.find({ type: 'Text', text: /^Theme$/ })).toBeFalsy() // only the mod's own rows
+  await pane.press({ key: 'set:cacheClock' })
+  await pane.press({ key: 'dec:cacheMinutes' })
+  await pane.press({ key: 'set:readerMode' })
+  expect(await pane.find({ type: 'Button', key: 'set:colorOk' })).toBeFalsy() // colours: no button
+  await pane.unmount()
+  expect(set).toEqual([
+    ['ai-usage-meter.cacheClock', false],
+    ['ai-usage-meter.cacheMinutes', 5],
+    ['ai-usage-meter.readerMode', 'search'],
+  ])
+})
+
+test('/meter settings opens the pane with the settings shown', async ($, on) => {
+  const calls: string[] = []
+  engine(on, calls)
+  on('config.list', () => ({ value: [{ key: 'ai-usage-meter.blink', label: 'Blink at red', kind: 'boolean', value: true, isLocked: false, provider: { plugin: 'ai-usage-meter', tier: 'core' } }] }) as never)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'settings', ...TYPED })
+  expect(calls).toContain('open')
+  const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await pane.find({ type: 'Text', text: /^Blink at red$/ })).toBeTruthy()
+  await pane.unmount()
 })

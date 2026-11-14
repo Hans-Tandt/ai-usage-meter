@@ -1,12 +1,13 @@
 import type { Elements } from 'claude-code'
 
-import type { ContextInfo, MeterSettings, OtherSession, Routine, Window } from '../types'
-import { robot, type RobotState } from './robot'
+import type { ContextInfo, MeterSettings, OtherSession, Routine, SettingRow, Window } from '../types'
+import { robot, type RobotModel, type RobotState } from './robot'
+import { haikuShare, totalTokens, type ModelTokens } from './reader'
 
 // What the band and the pane draw. Pure functions of plain data: every surface (terminal, desktop) gets the same tree.
 
 // Shown on the last line of the pane. Raise it together with the version in plugin.json.
-export const VERSION = '1.8.0'
+export const VERSION = '1.9.0'
 
 // Svg is there on the desktop app, VS Code and mobile; the terminal draws the bars with line characters.
 export type Kit = Pick<Elements['desktop'], 'Box' | 'Text' | 'Button'> & { Svg?: Elements['desktop']['Svg'] }
@@ -25,7 +26,20 @@ export type View = {
   blinkOff: boolean
   routine: Routine | null
   prompted: boolean
-  robot: { state: RobotState; n: number } | null // null: switched off in /config
+  robot: { state: RobotState; n: number; model: RobotModel; effort: number; px: number } | null // null: switched off in /config
+  modelName: string | null // the model and effort as Claude Code reports them (for the pane)
+  cache: { on: boolean; minutes: number; lastAt: number; warming: boolean } // the cache clock
+  reader: {
+    on: boolean
+    open: boolean // its details are open in the pane
+    mode: 'search' | 'summary'
+    threshold: number
+    session: ModelTokens // tokens per model family, this session
+    runs: number
+    week: { tokens: ModelTokens; runs: number } | null // all sessions, this weekly window
+    helpersMoved: number // Explore helpers started on Haiku
+  }
+  config: { open: boolean; rows: SettingRow[] } // the pane's Settings section: the mod's own /config rows
 }
 
 export type Actions = {
@@ -35,6 +49,11 @@ export type Actions = {
   open: () => void
   close: () => void
   start: () => void
+  reader: () => void
+  readerInfo: () => void
+  warm: () => void
+  settings: () => void // opens or closes the Settings section
+  setting: (key: string, value: boolean | string | number) => void // changes one of the mod's settings
 }
 
 export const DEFAULTS: MeterSettings = {
@@ -43,6 +62,8 @@ export const DEFAULTS: MeterSettings = {
   warn2: 95,
   sessLevel1: 80,
   sessLevel2: 90,
+  tokenYellow: 0,
+  tokenRed: 0,
   notify: true,
   notifyReset: true,
   notifyCompaction: true,
@@ -62,8 +83,16 @@ export function limitLevel(s: MeterSettings, pct: number) {
   return pct >= s.warn2 ? 2 : pct >= s.warn1 ? 1 : 0
 }
 
-export function contextLevel(s: MeterSettings, pct: number) {
-  return pct >= s.sessLevel2 ? 2 : pct >= s.sessLevel1 ? 1 : 0
+// The context level: from the % of the compaction point, or from a token number when one is set (a 1M
+// window reaches 80 % only near 775,000 tokens); the higher of the two.
+export function contextLevel(s: MeterSettings, pct: number, used?: number) {
+  const byPct = pct >= s.sessLevel2 ? 2 : pct >= s.sessLevel1 ? 1 : 0
+  return Math.max(byPct, tokenLevel(s, used))
+}
+
+export function tokenLevel(s: MeterSettings, used?: number) {
+  if (used === undefined) return 0
+  return s.tokenRed > 0 && used >= s.tokenRed ? 2 : s.tokenYellow > 0 && used >= s.tokenYellow ? 1 : 0
 }
 
 function color(s: MeterSettings, level: number) {
@@ -128,6 +157,89 @@ function day(t: number, now: number) {
 
 function tokens(n: number) {
   return n >= 1000000 ? `${(n / 1000000).toFixed(2)}M` : n >= 1000 ? `${Math.round(n / 1000)}k` : String(n)
+}
+
+// How long the conversation's cache stays warm: from the last reply, the cache period (1 hour on a Claude
+// plan, 5 minutes with an API key). undefined before the first reply or with the clock off.
+export function cacheLeft(v: View) {
+  if (!v.cache.on || !v.cache.lastAt) return undefined
+  return v.cache.minutes * 60000 - (v.now - v.cache.lastAt)
+}
+
+// The cache clock in the pane: one line, with Keep warm while it is still warm.
+function cacheSection(kit: Kit, v: View, act: Actions) {
+  const { Box, Text, Button } = kit
+  const left = cacheLeft(v)
+  if (left === undefined) return null
+  const s = v.settings
+  const ctx = v.context?.tokens
+  const size = ctx ? `${tokens(ctx)} tokens` : 'the conversation'
+  return (
+    <Box key="cache" flexDirection="column" marginBottom={1}>
+      <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
+        <Text bold>Cache</Text>
+        {left > 0 ? (
+          <Text color={left < 5 * 60000 ? s.colorWarn : undefined}>warm for {duration(left)}</Text>
+        ) : (
+          <Text dimColor>cold</Text>
+        )}
+        {left > 0 && <Button key="warm" label={v.cache.warming ? 'Warming…' : 'Keep warm'} onPress={act.warm} />}
+      </Box>
+      <Text dimColor>
+        {left > 0
+          ? `Keep warm asks one tiny question, which re-reads ${size} from the cache: cheaper than new input, but it counts.`
+          : `Your next message re-reads ${size} at full price, once; after that it is cached again.`}
+      </Text>
+    </Box>
+  )
+}
+
+// The Haiku reader in the pane: one line (switch, Haiku's share of this session's tokens, Details); the
+// details (tokens per model this session and this week, runs, mode) open with a click.
+function readerSection(kit: Kit, v: View, act: Actions) {
+  const { Box, Text, Button } = kit
+  const r = v.reader
+  const week = r.week?.tokens
+  const share = totalTokens(r.session) > 0 ? `Haiku ${haikuShare(r.session)} % · ${r.runs} runs` : 'no tokens counted yet'
+  const families = (['opus', 'sonnet', 'haiku', 'fable', 'other'] as const).filter(m => r.session[m] > 0 || (week?.[m] ?? 0) > 0)
+  const NAMES = { opus: 'Opus', sonnet: 'Sonnet', haiku: 'Haiku', fable: 'Fable', other: 'Other' }
+  const row = (label: string, a: string, b: string) => (
+    <Text>
+      {label.padEnd(13)}
+      {a.padStart(9)}
+      {b.padStart(11)}
+    </Text>
+  )
+  return (
+    <Box key="reader" flexDirection="column" marginBottom={1}>
+      <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
+        <Text bold>Haiku reader</Text>
+        <Button key="reader" label={r.on ? 'On' : 'Off'} onPress={act.reader} />
+        <Text dimColor>{share}</Text>
+        <Button key="readerInfo" label={r.open ? 'Hide' : 'Details'} onPress={act.readerInfo} />
+      </Box>
+      {r.open && (
+        <Box flexDirection="column" marginTop={1}>
+          {row('Tokens', 'session', 'this week')}
+          {families.map(m => row(NAMES[m], tokens(r.session[m]), week ? tokens(week[m]) : '–'))}
+          {row('Haiku share', `${haikuShare(r.session)} %`, week ? `${haikuShare(week)} %` : '–')}
+          {row('Reader runs', String(r.runs), r.week ? String(r.week.runs) : '–')}
+          {r.helpersMoved > 0 && <Text dimColor>Search helpers (Explore) started on Haiku: {r.helpersMoved}</Text>}
+          <Text dimColor>
+            {r.mode === 'summary'
+              ? 'Mode: search and summarize. Haiku finds the lines and adds a short summary.'
+              : 'Mode: search only. Haiku finds files and lines; Opus reads those lines itself.'}{' '}
+            When Opus reads more than {tokens(r.threshold)} tokens in one turn, it is asked to use the reader. Mode and
+            limit are under Settings at the bottom of this pane.
+          </Text>
+          <Text dimColor>
+            Haiku's share is of tokens, not of your limits: a Haiku token costs less. Claude Code's own helpers may also
+            run on Haiku.
+          </Text>
+        </Box>
+      )}
+    </Box>
+  )
 }
 
 const TRACK = '#8B949E'
@@ -196,9 +308,11 @@ function spark(kit: Kit, turns: number[], fill: string) {
 export function contextMessage(v: View) {
   const c = v.context
   if (!c || c.toCompact === undefined) return undefined
-  const level = contextLevel(v.settings, c.toCompact)
-  if (level === 2) return { level, text: `${c.toCompact}% to compaction: start a new session` }
-  if (level === 1) return { level, text: `${c.toCompact}% to compaction: finish the task and update your session notes` }
+  const level = contextLevel(v.settings, c.toCompact, c.tokens)
+  // Say what set it off: the token number, or the % of the compaction point
+  const what = tokenLevel(v.settings, c.tokens) === level && c.tokens !== undefined ? `${tokens(c.tokens)} tokens` : `${c.toCompact}% to compaction`
+  if (level === 2) return { level, text: `${what}: start a new session` }
+  if (level === 1) return { level, text: `${what}: finish the task and update your session notes` }
   return undefined
 }
 
@@ -294,6 +408,10 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
     if (t !== undefined) notes.push({ key: `pace-${name}`, level: 1, text: `${name}: 100% in ${duration(t)}` })
   }
   if (stale) notes.push({ key: 'stale', level: 0, text: `limits updated ${duration(v.now - v.limitsAt)} ago` })
+  if (v.reader.on && totalTokens(v.reader.session) > 0) notes.push({ key: 'haiku', level: 0, text: `Haiku ${haikuShare(v.reader.session)} %` })
+  // The cache clock: minutes left, orange in the last 5; "cache cold" once it ran out
+  const cacheMs = cacheLeft(v)
+  if (cacheMs !== undefined) notes.push(cacheMs > 0 ? { key: 'cache', level: cacheMs < 5 * 60000 ? 1 : 0, text: `cache ${duration(cacheMs)}` } : { key: 'cache', level: 0, text: 'cache cold' })
   const other = redOther(v)
   if (other) notes.push({ key: 'other', level: 2, text: `other: ${other.folder} ${other.toCompact}%` })
   const warning = contextMessage(v)
@@ -311,7 +429,14 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
         </Box>
         {v.robot && (
           <Box flexShrink={0} marginRight={2}>
-            {robot(kit, v.robot.state, v.robot.n, v.robot.state === 'happy' ? s.colorOk : color(s, contextLevel(s, ctxPct ?? 0)), s.blink)}
+            {robot(
+              kit,
+              v.robot.state,
+              v.robot.n,
+              v.robot.state === 'happy' ? s.colorOk : color(s, contextLevel(s, ctxPct ?? 0, c?.tokens)),
+              { model: v.robot.model, effort: v.robot.effort, blink: s.blink },
+              v.robot.px,
+            )}
           </Box>
         )}
         <Box flexDirection="row" flexWrap="wrap" flexGrow={1} flexShrink={1}>
@@ -322,7 +447,7 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
             'Compress',
             'C',
             ctxPct,
-            contextLevel(s, ctxPct ?? 0),
+            contextLevel(s, ctxPct ?? 0, c?.tokens),
             wide && left !== undefined && left <= 30
               ? left === 0
                 ? 'next turn'
@@ -373,6 +498,83 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
 
 // ---------- the pane: /meter ----------
 
+// The values the − and + buttons step through, per setting; a number not in the list moves to the nearest one.
+const STEPS: Record<string, readonly number[]> = {
+  warn1: [50, 60, 70, 75, 80, 85, 90, 95, 99],
+  warn2: [60, 70, 80, 85, 90, 95, 99, 100],
+  sessLevel1: [50, 60, 70, 75, 80, 85, 90],
+  sessLevel2: [60, 70, 80, 85, 90, 95],
+  tokenYellow: [0, 100000, 150000, 200000, 250000, 300000, 400000, 500000, 750000],
+  tokenRed: [0, 150000, 200000, 250000, 300000, 350000, 400000, 500000, 750000, 900000],
+  cacheMinutes: [5, 60],
+  readerThreshold: [1000, 2000, 5000, 10000],
+  robotSize: [2, 3, 4],
+  staleMinutes: [15, 30, 60, 120, 240],
+}
+
+export function stepSetting(field: string, value: number, dir: 1 | -1): number {
+  const list = STEPS[field]
+  if (!list) return Math.max(0, value + dir)
+  if (dir > 0) return list.find(x => x > value) ?? list[list.length - 1] ?? value
+  return [...list].reverse().find(x => x < value) ?? list[0] ?? value
+}
+
+function settingValue(field: string, value: SettingRow['value']) {
+  if (typeof value === 'boolean') return value ? 'On' : 'Off'
+  if (typeof value !== 'number') return String(value)
+  if (field === 'tokenYellow' || field === 'tokenRed') return value === 0 ? 'off' : `${tokens(value)} tokens`
+  if (field === 'readerThreshold') return `${tokens(value)} tokens`
+  if (field === 'cacheMinutes' || field === 'staleMinutes') return `${value} min`
+  if (field === 'robotSize') return ({ 2: 'small', 3: 'medium', 4: 'large' } as Record<number, string>)[value] ?? String(value)
+  return field.startsWith('warn') || field.startsWith('sessLevel') ? `${value} %` : String(value)
+}
+
+// The pane's Settings section: the mod's own settings with buttons, so they can be changed in the desktop app,
+// where /config opens the app's Settings window instead of Claude Code's menu.
+function settingsSection(kit: Kit, v: View, act: Actions) {
+  const { Box, Text, Button } = kit
+  const rows = v.config.rows
+  return (
+    <Box key="settingsSection" flexDirection="column" marginTop={1}>
+      <Text bold>Settings</Text>
+      {rows.length === 0 && <Text dimColor>The settings could not be read here. In a terminal: claude, then /config.</Text>}
+      {rows.map(r => {
+        const shown = settingValue(r.field, r.value)
+        let controls
+        if (r.isLocked) controls = <Text dimColor>{shown} (set by your organization)</Text>
+        else if (r.kind === 'boolean')
+          controls = <Button key={`set:${r.field}`} label={shown} onPress={() => act.setting(r.key, !r.value)} />
+        else if (r.kind === 'choice' && r.options && r.options.length > 0) {
+          const opts = r.options
+          const next = opts[(opts.indexOf(String(r.value)) + 1) % opts.length] ?? String(r.value)
+          controls = <Button key={`set:${r.field}`} label={shown} onPress={() => act.setting(r.key, next)} />
+        } else if (r.kind === 'number' && typeof r.value === 'number') {
+          const n = r.value
+          controls = (
+            <Box flexDirection="row" alignItems="center" gap={1}>
+              <Button key={`dec:${r.field}`} label="−" onPress={() => act.setting(r.key, stepSetting(r.field, n, -1))} />
+              <Text>{shown}</Text>
+              <Button key={`inc:${r.field}`} label="+" onPress={() => act.setting(r.key, stepSetting(r.field, n, 1))} />
+            </Box>
+          )
+        } else controls = <Text dimColor>{shown}</Text>
+        return (
+          <Box key={`row:${r.field}`} flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
+            <Text>{r.label}</Text>
+            {controls}
+          </Box>
+        )
+      })}
+      <Text dimColor>
+        A change applies at once. The colours are changed in a terminal: type claude, then /config.
+        {v.settings.source === 'strip'
+          ? " The AI Usage Meter strip is installed: its Settings window decides the levels, colours and messages, unless you switch off \"Use the strip's Settings\"."
+          : ''}
+      </Text>
+    </Box>
+  )
+}
+
 export function pane(kit: Kit, v: View, columns: number, act: Actions) {
   const { Box, Text, Button } = kit
   const s = v.settings
@@ -420,7 +622,7 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
   const left = turnsLeft(c, v.turns)
   const warning = contextMessage(v)
   const routineRow = routineLine(v)
-  const level = contextLevel(s, c?.toCompact ?? 0)
+  const level = contextLevel(s, c?.toCompact ?? 0, c?.tokens)
   const others = [...v.others].sort((a, b) => b.lastSeen - a.lastSeen)
 
   return (
@@ -514,6 +716,9 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
         </Text>
       </Box>
 
+      {cacheSection(kit, v, act)}
+      {readerSection(kit, v, act)}
+
       <Text bold>Other sessions on this PC</Text>
       {others.length === 0 && <Text dimColor>None live.</Text>}
       {others.slice(0, 8).map(o => {
@@ -529,12 +734,15 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
         )
       })}
 
-      <Box marginTop={1}>
+      <Box marginTop={1} flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
         <Text dimColor>
-          Levels: limits {s.warn1}/{s.warn2}%, context {s.sessLevel1}/{s.sessLevel2}%.{' '}
-          {s.source === 'strip' ? "Change them in the AI Usage Meter strip's Settings." : 'Change them in /config.'}
+          Levels: limits {s.warn1}/{s.warn2}%, context {s.sessLevel1}/{s.sessLevel2}%.
+          {s.source === 'strip' ? " The AI Usage Meter strip's Settings decide them." : ''}
         </Text>
+        <Button key="settings" label={v.config.open ? 'Hide settings' : 'Settings'} onPress={act.settings} />
       </Box>
+      {v.config.open && settingsSection(kit, v, act)}
+      {v.modelName && <Text dimColor>Model: {v.modelName}</Text>}
       <Text dimColor>AI Usage Meter mod {VERSION} · Hans Tandt · hanstandt.be</Text>
     </Box>
   )

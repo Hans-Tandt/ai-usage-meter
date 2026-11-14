@@ -45,6 +45,14 @@ const BACKUPS =
   '- Backups (STEP 5): in a git repository where a file has no uncommitted changes, git already keeps the ' +
   'old version: make no backup file for it, and say so. Otherwise make the backup as the prompt says.'
 
+// A session that already wrote a note (a pause note with steps still to do) must not lose it to the
+// close: one entry per session, and every open step carried on until it is done.
+export const SAME_SESSION_NOTE =
+  '- Session notes (STEP 5): if the latest entry was written in this same session (for example a pause note ' +
+  'with steps still to do), do not add a second entry beside it: update that entry. Keep every open step it ' +
+  'lists, word for word, unless it is done now, and say which ones you closed. Never delete or shorten an ' +
+  'older entry.'
+
 export function closePrompt(template: string, folder: string) {
   return [
     // Older prompt copies have a <project folder> to fill in; since v1.1 the folder line below answers it
@@ -54,6 +62,7 @@ export function closePrompt(template: string, folder: string) {
     `- Project folder: ${folder}.`,
     '- This message counts as my "go": do not stop to wait for it. Do STEP 1 to STEP 6 in one go.',
     BACKUPS,
+    SAME_SESSION_NOTE,
     `- After each STEP, call the tool ${PROGRESS_TOOL_FULL} with {"task": "close", "step": <1-6>, "total": 6, "note": "<a few words>"}.`,
     `- In STEP 6, put the exact first message for the next session between a line ${HANDOVER_OPEN} and a line ${HANDOVER_CLOSE}.`,
     `- After that, the very last line of your reply is "${CLOSE_YES}" or "${CLOSE_NO} – <reason>", exactly as STEP 6 says.`,
