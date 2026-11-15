@@ -10,11 +10,11 @@ HERE = Path(__file__).parent
 NBSP = "\u00a0"
 
 # The one-command install, tested 2026-10-26 in an empty Claude configuration (install, load, uninstall).
-INSTALL = ['claude plugin install ai-usage-meter --marketplace "C:\\Users\\<you>\\Documents\\AI Usage Meter Mod"']
+INSTALL = ['claude plugin install ai-usage-meter --marketplace "C:\\Users\\<you>\\Documents\\Session Pilot"']
 
 SETTINGS_JSON = [
     '"env": {',
-    '  "CLAUDE_CODE_PLUGIN_DIRS": "C:\\\\Users\\\\<you>\\\\AppData\\\\Local\\\\AIUsageMeter\\\\plugin;C:\\\\Users\\\\<you>\\\\Documents\\\\AI Usage Meter Mod"',
+    '  "CLAUDE_CODE_PLUGIN_DIRS": "C:\\\\Users\\\\<you>\\\\AppData\\\\Local\\\\AIUsageMeter\\\\plugin;C:\\\\Users\\\\<you>\\\\Documents\\\\Session Pilot"',
     '}',
 ]
 
@@ -42,6 +42,7 @@ def blocks(lang, t):
         {"type": "p", "text": t["code3"].rstrip(".") + ":"},  # a lead-in: kept with the command
         {"type": "code", "lines": INSTALL},
         {"type": "callout", "variant": "trap", "title": t["mp_t"], "text": t["mp"]},
+        {"type": "callout", "variant": "note", "title": t["upd_t"], "text": t["upd"]},  # the new name: update over the old folder
         {"type": "callout", "variant": "tip", "title": t["try_t"], "text": t["try"]},
         {"type": "callout", "variant": "trap", "title": t["key_t"], "text": t["key"]},
         {"type": "h2", "text": t["h3b"]},
@@ -55,6 +56,7 @@ def blocks(lang, t):
         {"type": "h1", "text": t["h_cs"]},
         {"type": "p", "text": t["p_cs"]},
         {"type": "table", "header": t["where_h"], "widths": [2, 5], "rows": t["where"]},
+        {"type": "callout", "variant": "tip", "title": t["start_t"], "text": t["start"]},  # desktop: the band comes after the first message
         {"type": "figure", "path": f"figures/band-routine_{low}.png", "width": 560, "caption": t["fig3"], "alt": t["alt3"]},
         {"type": "table", "header": t["msg_h"], "widths": [3, 4], "rows": t["msg"]},
         {"type": "callout", "variant": "note", "title": t["go_t"], "text": t["go"]},
@@ -100,6 +102,16 @@ def blocks(lang, t):
         {"type": "h2", "text": t["save_h_care"]},
         {"type": "bullets", "items": t["save_care"]},
         {"type": "callout", "variant": "tip", "title": t["save_tip_t"], "text": t["save_tip"]},
+        # Chapter 12: the HTML companion (hooks/html.ts)
+        {"type": "h1", "text": t["html_h"]},
+        {"type": "p", "text": t["html_intro"]},
+        {"type": "h2", "text": t["html_h_how"]},
+        {"type": "numbers", "items": t["html_how"]},
+        {"type": "h2", "text": t["html_h_when"]},
+        {"type": "bullets", "items": t["html_when"]},
+        {"type": "h2", "text": t["html_h_set"]},
+        {"type": "p", "text": t["html_set"]},
+        {"type": "callout", "variant": "tip", "title": t["html_tip_t"], "text": t["html_tip"]},
         {"type": "h1", "text": t["h9"]},
         {"type": "h2", "text": t["h9a"]},
         {"type": "bullets", "items": t["how"]},

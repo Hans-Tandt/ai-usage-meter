@@ -7,7 +7,7 @@ import { haikuShare, totalTokens, type ModelTokens } from './reader'
 // What the band and the pane draw. Pure functions of plain data: every surface (terminal, desktop) gets the same tree.
 
 // Shown on the last line of the pane. Raise it together with the version in plugin.json.
-export const VERSION = '1.9.0'
+export const VERSION = '2.0.0'
 
 // Svg is there on the desktop app, VS Code and mobile; the terminal draws the bars with line characters.
 export type Kit = Pick<Elements['desktop'], 'Box' | 'Text' | 'Button'> & { Svg?: Elements['desktop']['Svg'] }
@@ -40,6 +40,7 @@ export type View = {
     helpersMoved: number // Explore helpers started on Haiku
   }
   config: { open: boolean; rows: SettingRow[] } // the pane's Settings section: the mod's own /config rows
+  html: { offer: { name: string; update: boolean } | null } // an HTML version on offer (hooks/html.ts)
 }
 
 export type Actions = {
@@ -54,6 +55,8 @@ export type Actions = {
   warm: () => void
   settings: () => void // opens or closes the Settings section
   setting: (key: string, value: boolean | string | number) => void // changes one of the mod's settings
+  htmlYes: () => void // make the HTML version on offer
+  htmlNo: () => void // not now
 }
 
 export const DEFAULTS: MeterSettings = {
@@ -486,6 +489,15 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
           {warning.level === 2 && <Button key="compact" label="Compact" onPress={act.compact} />}
         </Box>
       )}
+      {!warning && !v.routine && v.html.offer && (
+        <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1} marginTop={1}>
+          <Text dimColor>
+            {v.html.offer.update ? 'Update the HTML version of' : 'An HTML version of'} {v.html.offer.name}?
+          </Text>
+          <Button key="htmlYes" label={v.html.offer.update ? 'Update it' : 'Make it'} variant="primary" onPress={act.htmlYes} />
+          <Button key="htmlNo" label="No" onPress={act.htmlNo} />
+        </Box>
+      )}
       {!warning && !v.routine && !v.prompted && (
         <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1} marginTop={1}>
           <Text dimColor>New session:</Text>
@@ -743,7 +755,7 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
       </Box>
       {v.config.open && settingsSection(kit, v, act)}
       {v.modelName && <Text dimColor>Model: {v.modelName}</Text>}
-      <Text dimColor>AI Usage Meter mod {VERSION} · Hans Tandt · hanstandt.be</Text>
+      <Text dimColor>Session Pilot {VERSION} · Hans Tandt · hanstandt.be</Text>
     </Box>
   )
 }

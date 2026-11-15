@@ -19,6 +19,7 @@ import {
   startPrompt,
 } from './routine'
 import type { RoutineTask } from './routine'
+import { baseName, htmlMode, htmlPathFor, htmlPrompt, htmlWorth, isAccept, isMarkdownCandidate, offerText } from './html'
 import {
   NO_TOKENS,
   READER_AGENT,
@@ -34,7 +35,7 @@ import {
   roughTokens,
 } from './reader'
 
-// The AI Usage Meter mod: Session · Week · Compress in a band above the prompt, details in a pane (/meter),
+// Session Pilot (formerly the AI Usage Meter mod): Session · Week · Compress in a band above the prompt, details in a pane (/meter),
 // toasts at the warning levels, and the session-notes warnings.
 // It works on its own, and beside the AI Usage Meter strip (the separate Windows program, ../source):
 // - it writes the same files as the strip's own add-on: <home>/.claude/usage-meter.json and, per session,
@@ -74,6 +75,11 @@ const helpersMoved = atom({ plugin: 'ai-usage-meter', key: 'helpersMoved' } as c
 const cacheCfg = atom({ plugin: 'ai-usage-meter', key: 'cacheCfg' } as const, { on: true, minutes: 60 })
 const settingsOpen = atom({ plugin: 'ai-usage-meter', key: 'settingsOpen' } as const, false)
 const configRows = atom({ plugin: 'ai-usage-meter', key: 'configRows' } as const, [])
+const htmlCandidate = atom({ plugin: 'ai-usage-meter', key: 'htmlCandidate' } as const, null)
+const htmlOffer = atom({ plugin: 'ai-usage-meter', key: 'htmlOffer' } as const, null)
+const htmlOffered = atom({ plugin: 'ai-usage-meter', key: 'htmlOffered' } as const, [])
+const htmlRefusals = atom({ plugin: 'ai-usage-meter', key: 'htmlRefusals' } as const, 0)
+const htmlPaused = atom({ plugin: 'ai-usage-meter', key: 'htmlPaused' } as const, false)
 
 // ---------- the mod's settings in the pane ----------
 // In the desktop app /config opens the app's own Settings window, not Claude Code's /config menu, so the
@@ -102,11 +108,79 @@ async function refreshConfig($: EngineInterface) {
 async function changeSetting($: EngineInterface, key: string, value: boolean | string | number) {
   try {
     const r = await $.config.set({ key, value })
-    if ('deny' in r && r.deny) $.ui.toast(`AI Usage Meter: this setting can't be changed here (${r.deny}).`)
+    if ('deny' in r && r.deny) $.ui.toast(`Session Pilot: this setting can't be changed here (${r.deny}).`)
   } catch {
-    $.ui.toast("AI Usage Meter: this setting can't be changed here.")
+    $.ui.toast("Session Pilot: this setting can't be changed here.")
   }
   await refreshConfig($)
+}
+
+// ---------- the HTML companion (hooks/html.ts) ----------
+
+// Write and Edit of the main conversation (not a helper agent's): a Markdown file worth a look after the turn.
+async function noteMarkdown($: EngineInterface, e: { agentId?: string }, done: boolean) {
+  try {
+    const path = (e as unknown as { file_path?: unknown }).file_path
+    if (done && !e.agentId && typeof path === 'string' && isMarkdownCandidate(path)) await update($, htmlCandidate, () => path)
+  } catch {}
+}
+
+async function acceptedKey($: EngineInterface) {
+  return `html:accepted:${(await $.session.cwd()).toLowerCase()}`
+}
+
+// After a main turn that wrote a Markdown file: offer its HTML version (ask), or make it (on).
+async function considerHtml($: EngineInterface, o: PluginOptions) {
+  try {
+    const path = await read($, htmlCandidate)
+    if (!path) return
+    await update($, htmlCandidate, () => null)
+    const mode = htmlMode(o.htmlCompanion)
+    if (mode === 'off' || (await read($, htmlPaused))) return
+    const r = await read($, routine)
+    if (r && (r.status === 'queued' || r.status === 'running')) return
+    const name = baseName(path)
+    const accepted = (((await $.store.get(await acceptedKey($))) as number | undefined) ?? 0) > 0
+    if (!htmlWorth(name, await $.fs.read(path), accepted)) return
+    const updating = await $.fs.exists(htmlPathFor(path))
+    if (mode === 'on') {
+      $.clock.after(50, () => void sendHtml($, path, updating))
+      return
+    }
+    if ((await read($, htmlOffered)).includes(path)) return // once per file and session, unless accepted
+    const offer = { path, name, update: updating, text: offerText(name, updating) }
+    await update($, htmlOffer, () => offer)
+    await update($, htmlOffered, list => [...list, path])
+    // The prompt box takes a suggestion only once the turn is over.
+    $.clock.after(300, () => void $.prompt.suggest({ text: offer.text }).catch(() => {}))
+  } catch {}
+}
+
+// Yes: Claude gets the HTML rules with the file's path. The mod's own hooks don't see this prompt.
+async function sendHtml($: EngineInterface, path: string, updating: boolean) {
+  try {
+    await htmlAccepted($, path)
+    await $.prompt.submit({ text: htmlPrompt(path, updating) })
+  } catch {}
+}
+
+async function htmlAccepted($: EngineInterface, path: string) {
+  await update($, htmlOffer, () => null)
+  await update($, htmlRefusals, () => 0)
+  await update($, htmlOffered, list => list.filter(p => p !== path)) // a later change may be offered again
+  const key = await acceptedKey($)
+  await $.store.set(key, (((await $.store.get(key)) as number | undefined) ?? 0) + 1)
+}
+
+// No (the band's No, or another message instead of the offer): two in a row pause the offers.
+async function htmlRefused($: EngineInterface) {
+  await update($, htmlOffer, () => null)
+  const n = (await read($, htmlRefusals)) + 1
+  await update($, htmlRefusals, () => n)
+  if (n >= 2 && !(await read($, htmlPaused))) {
+    await update($, htmlPaused, () => true)
+    $.ui.toast('Session Pilot: no more HTML offers in this session. /meter html ask turns them on again.')
+  }
 }
 
 // Keep warm: one tiny question on top of the conversation, through its own cache, so the cache lives on.
@@ -118,7 +192,7 @@ async function keepWarm($: EngineInterface) {
     const at = await read($, lastReplyAt)
     const nowMs = await $.clock.now()
     if (!at || nowMs - at >= cfg.minutes * 60000) {
-      $.ui.toast('AI Usage Meter: the cache is already cold; Keep warm only helps before it runs out.')
+      $.ui.toast('Session Pilot: the cache is already cold; Keep warm only helps before it runs out.')
       return
     }
     await update($, warming, () => true)
@@ -126,12 +200,12 @@ async function keepWarm($: EngineInterface) {
     if (r.isAnswered) {
       const warmedAt = await $.clock.now()
       await update($, lastReplyAt, () => warmedAt)
-      $.ui.toast('AI Usage Meter: cache kept warm for another period.')
+      $.ui.toast('Session Pilot: cache kept warm for another period.')
     } else {
-      $.ui.toast(`AI Usage Meter: Keep warm did not work (${r.reason}).`)
+      $.ui.toast(`Session Pilot: Keep warm did not work (${r.reason}).`)
     }
   } catch {
-    $.ui.toast('AI Usage Meter: Keep warm did not work.')
+    $.ui.toast('Session Pilot: Keep warm did not work.')
   } finally {
     await update($, warming, () => false).catch(() => {})
   }
@@ -271,7 +345,7 @@ async function startRobot($: EngineInterface, o: PluginOptions, restart = false)
 }
 
 async function openPane($: EngineInterface) {
-  const opened = await $.ui.open({ id: PANE, title: 'AI Usage Meter' })
+  const opened = await $.ui.open({ id: PANE, title: 'Session Pilot' })
   if (opened.isPlaced) await update($, paneOpen, () => true)
   return opened
 }
@@ -297,7 +371,7 @@ async function handoverKey($: EngineInterface) {
 async function runRoutine($: EngineInterface, task: RoutineTask) {
   const now = await read($, routine)
   if (now && (now.status === 'queued' || now.status === 'running')) {
-    $.ui.toast('AI Usage Meter: a Close session or Start session is already running.')
+    $.ui.toast('Session Pilot: a Close session or Start session is already running.')
     return
   }
   let template: string | undefined
@@ -305,7 +379,7 @@ async function runRoutine($: EngineInterface, task: RoutineTask) {
     template = extractPrompt(await $.fs.read(`${$.plugin.root}/${PROMPT_FILES[task]}`), HEADINGS[task])
   } catch {}
   if (!template) {
-    $.ui.toast(`AI Usage Meter: the prompt file ${PROMPT_FILES[task]} is missing or has no prompt block.`)
+    $.ui.toast(`Session Pilot: the prompt file ${PROMPT_FILES[task]} is missing or has no prompt block.`)
     return
   }
   const folder = await $.session.cwd()
@@ -324,7 +398,7 @@ async function runRoutine($: EngineInterface, task: RoutineTask) {
   } catch {
     await update($, working, () => false)
     await update($, routine, () => null)
-    $.ui.toast('AI Usage Meter: Claude Code did not take the prompt. Try again when Claude is idle.')
+    $.ui.toast('Session Pilot: Claude Code did not take the prompt. Try again when Claude is idle.')
   }
 }
 
@@ -348,8 +422,8 @@ async function finishRoutine($: EngineInterface, answer: string) {
   const what = r.task === 'close' ? 'Close session' : 'Start session'
   $.ui.toast(
     next.status === 'done'
-      ? `AI Usage Meter: ${r.task === 'close' ? "now it's safe to end this session" : 'everything is ready to start this session'}.`
-      : `AI Usage Meter: ${what}: ${next.reason ?? 'not finished'}. Check Claude's reply.`,
+      ? `Session Pilot: ${r.task === 'close' ? "now it's safe to end this session" : 'everything is ready to start this session'}.`
+      : `Session Pilot: ${what}: ${next.reason ?? 'not finished'}. Check Claude's reply.`,
     { timeoutMs: 10000 },
   )
 }
@@ -592,7 +666,7 @@ async function checkLimits($: EngineInterface, list: Window[]) {
       if (period !== '' && last !== period) {
         await $.store.set(`reset:${w.kind}`, period)
         if (last && s.notifyReset && Date.parse(period) > Date.parse(last) + 30 * 60000 && w.percentUsed < s.warn1) {
-          $.ui.toast(`AI Usage Meter: the ${name.toLowerCase()} has reset (${Math.round(w.percentUsed)}% used).`)
+          $.ui.toast(`Session Pilot: the ${name.toLowerCase()} has reset (${Math.round(w.percentUsed)}% used).`)
         }
       }
 
@@ -604,8 +678,8 @@ async function checkLimits($: EngineInterface, list: Window[]) {
         if (s.notify) {
           $.ui.toast(
             level === 2
-              ? `AI Usage Meter: ${name} at ${Math.round(w.percentUsed)}%. Finish what you are doing.`
-              : `AI Usage Meter: ${name} at ${Math.round(w.percentUsed)}%.`,
+              ? `Session Pilot: ${name} at ${Math.round(w.percentUsed)}%. Finish what you are doing.`
+              : `Session Pilot: ${name} at ${Math.round(w.percentUsed)}%.`,
             { timeoutMs: 8000 },
           )
         }
@@ -623,13 +697,13 @@ async function checkContext($: EngineInterface) {
     const level = contextLevel(s, c.toCompact, c.tokens)
     const shown = await read($, ctxLevel)
     if (level < shown && c.toCompact < s.sessLevel1 - 5 && tokenLevel(s, c.tokens) === 0) await update($, ctxLevel, () => 0)
-    if (level === 2) $.ui.status(`AI Usage Meter: ${contextMessage({ ...(await view($)), context: c })?.text ?? 'start a new session'}`)
+    if (level === 2) $.ui.status(`Session Pilot: ${contextMessage({ ...(await view($)), context: c })?.text ?? 'start a new session'}`)
     else $.ui.status(undefined)
     await syncBlink($)
     if (level <= shown) return
     await update($, ctxLevel, () => level)
     const m = contextMessage({ ...(await view($)), context: c })
-    if (m) $.ui.toast(`AI Usage Meter: ${m.text}.`, { timeoutMs: 10000 })
+    if (m) $.ui.toast(`Session Pilot: ${m.text}.`, { timeoutMs: 10000 })
   } catch {}
 }
 
@@ -663,6 +737,7 @@ async function view($: EngineInterface): Promise<View> {
       helpersMoved: await read($, helpersMoved),
     },
     config: { open: await read($, settingsOpen), rows: await read($, configRows) },
+    html: { offer: await read($, htmlOffer).then(o => (o ? { name: o.name, update: o.update } : null)) },
   }
 }
 
@@ -685,7 +760,7 @@ function actions($: EngineInterface): Actions {
     hide: () => {
       void update($, bandHidden, () => true)
       void $.store.set('bandHidden', true)
-      $.ui.toast('AI Usage Meter: band hidden. /meter band on shows it again.')
+      $.ui.toast('Session Pilot: band hidden. /meter band on shows it again.')
     },
     open: () => void togglePane($).catch(() => {}),
     // The pane's reader switch; the choice is kept for the next sessions too.
@@ -700,6 +775,11 @@ function actions($: EngineInterface): Actions {
         .then(open => update($, settingsOpen, () => !open).then(() => (open ? undefined : refreshConfig($))))
         .catch(() => {}),
     setting: (key, value) => void changeSetting($, key, value),
+    htmlYes: () =>
+      void read($, htmlOffer)
+        .then(o => (o ? sendHtml($, o.path, o.update) : undefined))
+        .catch(() => {}),
+    htmlNo: () => void htmlRefused($).catch(() => {}),
   }
 }
 
@@ -769,16 +849,16 @@ export const register: Register = (on, options) => {
     await $.command.register({
       name: 'meter',
       description:
-        'AI Usage Meter: open the details pane; /meter settings, /meter close-session, /meter start-session, /meter close, /meter band on|off, /meter demo 85|here 85|off',
-      argumentHint: '[settings | close-session | start-session | close | band on | band off | demo …]',
+        'Session Pilot: open the details pane; /meter start (Start session), /meter settings, /meter html [on|ask|off], /meter close-session, /meter start-session, /meter close, /meter band on|off, /meter demo 85|here 85|off',
+      argumentHint: '[start | settings | html [on|ask|off] | close-session | start-session | close | band on | band off | demo …]',
     })
     // Claude reports the steps of Close session / Start session with this tool; the band shows them in %.
     try {
       await $.tool.register({
         name: PROGRESS_TOOL,
         description:
-          'AI Usage Meter: report the progress of the Close session or Start session routine, after each step. ' +
-          'Use it only when a message from the AI Usage Meter mod asks for it.',
+          'Session Pilot: report the progress of the Close session or Start session routine, after each step. ' +
+          'Use it only when a message from Session Pilot asks for it.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -826,23 +906,39 @@ export const register: Register = (on, options) => {
     const args = e.args.trim().toLowerCase()
     const words = args.split(/\s+/).filter(a => a.length > 0)
     if (words[0] === 'demo') return demo($, words.slice(1))
-    if (args === 'close-session' || args === 'start-session') {
+    // `/meter start` is the short form: in the desktop app the band only shows after the first message, so a new
+    // session is started by typing it as that first message (Claude then gets the Start session prompt, nothing else).
+    if (args === 'close-session' || args === 'start-session' || args === 'start') {
       const task = args === 'close-session' ? 'close' : 'start'
       // A prompt can't be queued while this command is still being handled: send it just after.
       $.clock.after(50, () => void runRoutine($, task))
-      return { text: `AI Usage Meter: ${task === 'close' ? 'Close session' : 'Start session'} sent. The band shows its progress.` }
+      return { text: `Session Pilot: ${task === 'close' ? 'Close session' : 'Start session'} sent. The band shows its progress.` }
     }
     if (args === 'close') {
       await $.ui.close({ id: PANE })
       await update($, paneOpen, () => false)
-      return { text: 'AI Usage Meter pane closed.' }
+      return { text: 'Session Pilot pane closed.' }
+    }
+    if (words[0] === 'html') {
+      const m = words[1]
+      if (m === 'on' || m === 'ask' || m === 'off') {
+        await update($, htmlPaused, () => false)
+        await update($, htmlRefusals, () => 0)
+        const row = (await read($, configRows)).find(r => r.field === 'htmlCompanion')
+        await changeSetting($, row?.key ?? 'ai-usage-meter.htmlCompanion', m)
+        return { text: `Session Pilot: HTML companion ${m === 'ask' ? 'asks first' : m}.` }
+      }
+      const o = await read($, htmlOffer)
+      if (!o) return { text: 'Session Pilot: no Markdown document on offer for an HTML version. /meter html on|ask|off sets the mode.' }
+      $.clock.after(50, () => void sendHtml($, o.path, o.update))
+      return { text: `Session Pilot: making the HTML version of ${o.name}.` }
     }
     if (args === 'settings') {
       await update($, settingsOpen, () => true)
       await refreshConfig($)
       await scan($)
       if (!(await read($, paneOpen))) await openPane($)
-      return { text: 'AI Usage Meter: the settings are at the bottom of the pane.' }
+      return { text: 'Session Pilot: the settings are at the bottom of the pane.' }
     }
     if (args === 'band off' || args === 'band on') {
       const hidden = args === 'band off'
@@ -852,7 +948,7 @@ export const register: Register = (on, options) => {
     }
     await scan($)
     const opened = await openPane($)
-    return { text: opened.isPlaced ? 'AI Usage Meter pane opened.' : 'AI Usage Meter: widen the window to see the pane.' }
+    return { text: opened.isPlaced ? 'Session Pilot pane opened.' : 'Session Pilot: widen the window to see the pane.' }
   })
 
   on('session.measure', async ($, e, next) => {
@@ -909,6 +1005,18 @@ export const register: Register = (on, options) => {
     }
   })
 
+  // The HTML companion: note a Markdown file the main conversation wrote; after the turn, it may be offered.
+  on('tool.call', { tool: 'Write' }, async ($, e, next) => {
+    const r = await next(e)
+    await noteMarkdown($, e, r.deny === undefined)
+    return r
+  })
+  on('tool.call', { tool: 'Edit' }, async ($, e, next) => {
+    const r = await next(e)
+    await noteMarkdown($, e, r.deny === undefined)
+    return r
+  })
+
   // Count the reader's runs.
   // Helper agents: count the reader's runs, and with "Explore helpers on Haiku" on, start Claude Code's
   // read-only search helper (Explore) on Haiku instead of the session's model. A model the helper already
@@ -943,6 +1051,7 @@ export const register: Register = (on, options) => {
         await saveTokens($)
         const repliedAt = await $.clock.now()
         await update($, lastReplyAt, () => repliedAt) // the cache clock starts again
+        await considerHtml($, options)
       }
     } catch {}
     return next(e)
@@ -960,7 +1069,7 @@ export const register: Register = (on, options) => {
       await update($, routine, (): Routine => ({ ...r, status: 'running', step, total, note }))
     }
     // Claude Code accepts only text (or a list) as `result`, never an object.
-    const shown = `Progress ${step} of ${total} shown in the AI Usage Meter band.`
+    const shown = `Progress ${step} of ${total} shown in the Session Pilot band.`
     return { result: shown, text: shown }
   })
 
@@ -977,6 +1086,17 @@ export const register: Register = (on, options) => {
       } else if (!e.isMeta) {
         if (!(await read($, prompted))) await update($, prompted, () => true)
         if (r && r.status !== 'queued' && r.status !== 'running') await update($, routine, () => null)
+      }
+    } catch {}
+    // A pending HTML offer: the offer's words (Tab, Enter), "yes" or "html" accept it; anything else refuses it.
+    try {
+      const o = await read($, htmlOffer)
+      if (o && !e.isMeta && !e.command && !e.text.includes(MARK)) {
+        if (isAccept(e.text, o.text)) {
+          await htmlAccepted($, o.path)
+          return next({ ...e, text: htmlPrompt(o.path, o.update) })
+        }
+        await htmlRefused($)
       }
     } catch {}
     return next(e)
@@ -1001,7 +1121,7 @@ export const register: Register = (on, options) => {
       await update($, turns, () => [])
       if ((await read($, settings)).notifyCompaction) {
         $.ui.toast(
-          'AI Usage Meter: compaction ran. Older parts of this conversation are now a summary: check that paths, rules and decisions are still right.',
+          'Session Pilot: compaction ran. Older parts of this conversation are now a summary: check that paths, rules and decisions are still right.',
           { timeoutMs: 10000 },
         )
       }
@@ -1021,7 +1141,8 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.props.hasSurvey || (await read($, bandHidden))) return next(e)
     const v = await view($)
-    if (v.limits.length === 0 && !v.context) return next(e)
+    // No figures yet: still show the band before the first message, for its Start session button.
+    if (v.limits.length === 0 && !v.context && v.prompted) return next(e)
     return band(kitFor($, e), v, e.props.bodyColumns, actions($))
   })
 

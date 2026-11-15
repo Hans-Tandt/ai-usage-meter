@@ -1,7 +1,28 @@
-# What's new in the AI Usage Meter mod
+# What's new in Session Pilot (formerly the AI Usage Meter mod)
 
 Newest version on top. How to update: unzip the new version over your mod folder, then quit and restart
 Claude Code. Your settings stay.
+
+## 2.0.0 · 15 November 2026
+
+**New name: Session Pilot.** The mod does much more than measure now, so it has a new name. It is the same
+mod: the command stays `/meter`, the plugin stays `ai-usage-meter`, and your settings stay. To update, unzip
+the new version and copy everything inside its `Session Pilot` folder over your old `AI Usage Meter Mod`
+folder, then restart Claude Code. The AI Usage Meter strip (the Windows program) keeps its name.
+
+**New**
+- **`/meter start`**: the short way to run Start session. In the desktop app the band of a new session only
+  appears after your first message, so type `/meter start` as that first message: Claude gets only the
+  Start session prompt and doesn't start on anything else first. `/meter start-session` still works.
+- **The HTML companion** (asks by default): after Claude writes a long Markdown document worth re-reading,
+  the mod offers an HTML version (band: **Make it** / **No**; prompt box: Tab, Enter). On a yes Claude writes
+  a self-contained page next to the Markdown, with a table of contents and diagrams drawn inside the file
+  (works offline). Claude gets no extra instructions until you say yes. Setting *HTML companion*
+  (ask, on, off) and `/meter html`. Manual: new chapter 12.
+
+**Changed**
+- Before the first message the band now shows its **Start session** button even when no figures have
+  come in yet (in the terminal, a brand-new session).
 
 ## 1.9.0 · 14 November 2026
 

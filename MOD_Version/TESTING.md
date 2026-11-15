@@ -55,6 +55,8 @@ The same list, in English, French, Dutch and German, is chapter 9 of the manual 
 | Click **Details** next to it | Tokens per model, this session and this week |
 | Set **Context: yellow from (tokens)** to 50000, then `/meter demo here 40` | `64k tokens: finish the task and update your session notes` (set it back afterwards) |
 | After Claude's reply, look at the band | `cache 59m`, counting down; **Keep warm** in the pane |
+| Ask Claude to write a plan of about two pages in `Plan.md` | "An HTML version of Plan.md?" with **Make it** and **No** in the band |
+| Click **Make it** | `Plan.html` next to `Plan.md`, with a table of contents; `Plan.md` unchanged |
 | Switch on **Search helpers (Explore) on Haiku**, ask for a big search | Reader Details: search helpers started on Haiku: 1 or more |
 | The bottom of the pane | With the strip installed: "The AI Usage Meter strip's Settings decide them" |
 
@@ -67,6 +69,7 @@ The same list, in English, French, Dutch and German, is chapter 9 of the manual 
 | Look in the test folder | `CLAUDE.md`, `MEMORY.md` and the session notes, filled in |
 | In the same session, do one more small task, then click **Close session** again | Still one note for this session, updated; its open steps kept word for word |
 | Open a new session there; click **Start session** before typing | "Preparing session…", then "✓ Everything is ready to start this session" |
+| In the desktop app: open a new session and type `/meter start` as the first message | "Preparing session…", then "✓ Everything is ready to start this session"; Claude did nothing else first |
 | Read Claude's first answer | It continues from the hand-over of Close session |
 
 ## 6. Safety

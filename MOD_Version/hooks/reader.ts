@@ -70,7 +70,7 @@ export function readerNudge(mode: ReaderMode, readSoFar: number) {
       ? 'it answers with file, line numbers, exact quotes and a short summary you may use for questions and overviews'
       : 'it answers with file, line numbers and exact quotes; then read only those lines yourself'
   return (
-    `AI Usage Meter: this turn has read about ${readSoFar.toLocaleString('en')} tokens. For further searching and ` +
+    `Session Pilot: this turn has read about ${readSoFar.toLocaleString('en')} tokens. For further searching and ` +
     `reading, use the agent ${READER_AGENT} (Haiku): ${use}. Always read a file yourself before you change it.`
   )
 }

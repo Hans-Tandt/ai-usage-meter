@@ -22,7 +22,7 @@ const PANE = {
   component: 'Pane',
   requestId: 'ai-usage-meter',
   props: {
-    title: 'AI Usage Meter',
+    title: 'Session Pilot',
     isFocused: false,
     bodyColumns: 60,
     placement: 'dock',
@@ -99,7 +99,7 @@ test('the pane shows the limits, the context and the buttons', async ($, on) => 
     expect(await ui.find({ type: 'Text', text: /Session \(5-hour limit\)/ })).toBeTruthy()
     expect(await ui.find({ type: 'Text', text: /finish the task and update your session notes/ })).toBeTruthy()
     expect(await ui.find({ type: 'Button', key: 'compact' })).toBeTruthy()
-    expect(await ui.find({ type: 'Text', text: /AI Usage Meter mod 1\.9\.0 · Hans Tandt · hanstandt\.be/ })).toBeTruthy()
+    expect(await ui.find({ type: 'Text', text: /Session Pilot 2\.0\.0 · Hans Tandt · hanstandt\.be/ })).toBeTruthy()
     await ui.unmount()
   }
 })
@@ -494,7 +494,7 @@ test('without token levels, 40 % gives no warning', async ($, on) => {
   await band.unmount()
 })
 
-test('the cache clock counts down from the last reply; Keep warm starts it again', async ($, on) => {
+test('the cache clock counts down from the last reply; Keep warm starts it again', { timeoutMs: 20000 }, async ($, on) => { // two simulated hours, minute by minute
   const sent: string[] = []
   const clock = routineEngine(on, sent)
   const forks: string[] = []
@@ -586,4 +586,126 @@ test('/meter settings opens the pane with the settings shown', async ($, on) => 
   const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
   expect(await pane.find({ type: 'Text', text: /^Blink at red$/ })).toBeTruthy()
   await pane.unmount()
+})
+
+test('before the first message the band shows Start session, even without figures; /meter start runs it', async ($, on) => {
+  const sent: string[] = []
+  const clock = routineEngine(on, sent) // USAGE has no rate limits: a brand-new session, no figures yet
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await band.find({ type: 'Button', key: 'start' })).toBeTruthy()
+  await band.unmount()
+
+  await $.command.run({ command: 'meter', args: 'start', ...TYPED })
+  expect(sent).toHaveLength(0) // sent just after the command, not while it is handled
+  await clock.advance(100)
+  expect(sent).toHaveLength(1)
+  expect(sent[0]).toContain('Before anything else') // the Start session prompt (Prompt 0)
+})
+
+// ---------- the HTML companion ----------
+
+const PLAN_MD = ['# Migration plan', '', '## Steps', ...Array.from({ length: 8 }, (_, i) => `${i + 1}. Step ${i + 1}: move part ${i + 1} → the new server, then check it.`), '', ...Array.from({ length: 60 }, (_, i) => `Line ${i} of the background and the decisions behind this plan.`)].join('\n')
+
+function htmlEngine(on: On, files: Record<string, string>, sent: string[], suggested: string[]) {
+  const clock = engine(on)
+  const at = (path: string) => path.replace(/\\/g, '/') // the engine hands over Windows paths with backslashes
+  on('fs.read', (_, e) => {
+    const f = files[at(e.path)]
+    if (f === undefined) throw new Error('no file')
+    return { value: f }
+  })
+  on('fs.exists', (_, e) => ({ value: at(e.path) in files }))
+  on('prompt.submit', (_, e) => {
+    sent.push(e.text)
+    return { text: e.text }
+  })
+  on('prompt.suggest', (_, e) => {
+    suggested.push(e.text)
+    return { isShown: true } as never
+  })
+  on('tool.call', () => ({ result: 'ok', text: 'ok' }))
+  on('turn.complete', () => ({ text: '' }))
+  on('config.set', (_, e) => ({ value: e.value }) as never)
+  return clock
+}
+
+test('after a long plan is written, the HTML version is offered; taking the offer sends the HTML rules', async ($, on) => {
+  const sent: string[] = []
+  const suggested: string[] = []
+  const clock = htmlEngine(on, { 'D:/Dev/MyProject/Plan.md': PLAN_MD }, sent, suggested)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+
+  await $.tool.call({ tool: 'Write', file_path: 'D:/Dev/MyProject/Plan.md', content: PLAN_MD })
+  await $.turn.complete(turnEnd('Plan written.'))
+  await clock.advance(400)
+  expect(suggested).toEqual(['Make the HTML version of Plan.md'])
+  const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await band.find({ type: 'Button', key: 'htmlYes' })).toBeTruthy()
+  await band.unmount()
+
+  await $.prompt.submit({ text: 'Make the HTML version of Plan.md' } as never) // Tab, then Enter
+  expect(sent[0]).toContain('D:/Dev/MyProject/Plan.html')
+  expect(sent[0]).toContain('Companion HTML view')
+  expect(sent[0]).toContain('inline SVG')
+  const band2 = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await band2.find({ type: 'Button', key: 'htmlYes' })).toBeFalsy() // the offer is gone
+  await band2.unmount()
+})
+
+test('no offer for short files, the project notes, a helper agent, or with the companion off', { options: { htmlCompanion: 'off' } }, async ($, on) => {
+  const sent: string[] = []
+  const suggested: string[] = []
+  const clock = htmlEngine(on, { 'D:/Dev/MyProject/Plan.md': PLAN_MD }, sent, suggested)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.tool.call({ tool: 'Write', file_path: 'D:/Dev/MyProject/Plan.md', content: PLAN_MD })
+  await $.turn.complete(turnEnd('Done.'))
+  await clock.advance(400)
+  expect(suggested).toHaveLength(0)
+})
+
+test('the notes, short texts and helper agents get no offer', async ($, on) => {
+  const sent: string[] = []
+  const suggested: string[] = []
+  const files = { 'D:/Dev/P/Session_Notes.md': PLAN_MD, 'D:/Dev/P/MEMORY.md': PLAN_MD, 'D:/Dev/P/Short.md': '# Plan\n\n1. one\n2. two\n', 'D:/Dev/P/Big.md': PLAN_MD }
+  const clock = htmlEngine(on, files, sent, suggested)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  for (const f of ['Session_Notes.md', 'MEMORY.md', 'Short.md']) {
+    await $.tool.call({ tool: 'Write', file_path: `D:/Dev/P/${f}`, content: 'x' })
+    await $.turn.complete(turnEnd('Done.'))
+    await clock.advance(400)
+  }
+  await $.tool.call({ tool: 'Write', file_path: 'D:/Dev/P/Big.md', content: 'x', agentId: 'agent-1' }) // a helper's write
+  await $.turn.complete(turnEnd('Done.'))
+  await clock.advance(400)
+  expect(suggested).toHaveLength(0)
+})
+
+test('two offers in a row not taken pause the offers; /meter html ask turns them on again', async ($, on) => {
+  const sent: string[] = []
+  const suggested: string[] = []
+  const files = { 'D:/Dev/P/Plan.md': PLAN_MD, 'D:/Dev/P/Spec.md': PLAN_MD, 'D:/Dev/P/Design.md': PLAN_MD }
+  const clock = htmlEngine(on, files, sent, suggested)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const write = async (f: string) => {
+    await $.tool.call({ tool: 'Write', file_path: `D:/Dev/P/${f}`, content: 'x' })
+    await $.turn.complete(turnEnd('Done.'))
+    await clock.advance(400)
+  }
+  await write('Plan.md')
+  await $.prompt.submit({ text: 'Now fix the tests' } as never) // not taken: 1
+  await write('Spec.md')
+  const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  await band.press({ key: 'htmlNo' }) // 2: paused
+  await band.unmount()
+  await write('Design.md')
+  expect(suggested).toEqual(['Make the HTML version of Plan.md', 'Make the HTML version of Spec.md'])
+  expect(sent).toEqual(['Now fix the tests'])
+
+  await $.command.run({ command: 'meter', args: 'html ask', ...TYPED }) // offers on again
+  await $.tool.call({ tool: 'Edit', file_path: 'D:/Dev/P/Design.md', old_string: 'a', new_string: 'b' })
+  await $.turn.complete(turnEnd('Done.'))
+  await clock.advance(400)
+  expect(suggested[2]).toBe('Make the HTML version of Design.md')
 })

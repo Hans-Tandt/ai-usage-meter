@@ -15,7 +15,7 @@ export const PROGRESS_TOOL = 'session_progress'
 export const PROGRESS_TOOL_FULL = `mcp__ai-usage-meter__${PROGRESS_TOOL}`
 
 // Marks a prompt the mod sent, so its turn can be recognised.
-export const MARK = '--- Added by the AI Usage Meter mod ---'
+export const MARK = '--- Added by Session Pilot ---'
 
 // The last line of Close session, word for word as STEP 6 of the End Session prompt gives it.
 export const CLOSE_YES = 'You are safe to close this session now'

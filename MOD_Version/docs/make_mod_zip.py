@@ -1,5 +1,5 @@
-# Builds the mod's download zip for the website: dist\AIUsageMeter-Mod-<version>.zip, with only the files a
-# user needs, under the folder "AI Usage Meter Mod". Step 5 of RELEASE.md.
+# Builds the mod's download zip for the website: dist\SessionPilot-<version>.zip, with only the files a
+# user needs, under the folder "Session Pilot". Step 5 of RELEASE.md.
 # Usage (from the project folder): py MOD_Version\docs\make_mod_zip.py
 # It stops when the version number is not the same everywhere, or a file is missing; it never publishes.
 import hashlib
@@ -11,7 +11,7 @@ from pathlib import Path
 
 MOD = Path(__file__).resolve().parent.parent
 DIST = MOD.parent / "dist"
-TOP = "AI Usage Meter Mod"
+TOP = "Session Pilot"
 
 # What the user gets: no tests, no type stubs of Claude Code, no manual sources.
 FILES = [
@@ -33,7 +33,7 @@ def version_everywhere():
         "hooks/draw.tsx VERSION": re.search(r"VERSION = '([\d.]+)'", (MOD / "hooks/draw.tsx").read_text(encoding="utf-8")),
         "README.md": re.search(r"^Version ([\d.]+) ·", (MOD / "README.md").read_text(encoding="utf-8"), re.M),
         "CHANGELOG.md (newest)": re.search(r"^## ([\d.]+) ", (MOD / "CHANGELOG.md").read_text(encoding="utf-8"), re.M),
-        "docs/make_mod_figures.py": re.search(r"AI Usage Meter mod ([\d.]+) ·", (MOD / "docs/make_mod_figures.py").read_text(encoding="utf-8")),
+        "docs/make_mod_figures.py": re.search(r"Session Pilot ([\d.]+) ·", (MOD / "docs/make_mod_figures.py").read_text(encoding="utf-8")),
     }
     for lang in ("EN", "FR", "NL", "DE"):
         text = json.loads((MOD / f"docs/text_{lang}.json").read_text(encoding="utf-8"))
@@ -57,7 +57,7 @@ def main():
         print("missing:", *missing, sep="\n  ")
         sys.exit(1)
     DIST.mkdir(exist_ok=True)
-    out = DIST / f"AIUsageMeter-Mod-{version}.zip"
+    out = DIST / f"SessionPilot-{version}.zip"
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         for f in files:
             z.write(f, f"{TOP}/{f.relative_to(MOD).as_posix()}")

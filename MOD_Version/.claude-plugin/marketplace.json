@@ -1,7 +1,9 @@
 {
   "name": "ai-usage-meter",
-  "owner": { "name": "Hans Tandt" },
-  "description": "The AI Usage Meter mod for Claude Code (unofficial; not affiliated with Anthropic)",
+  "owner": {
+    "name": "Hans Tandt"
+  },
+  "description": "Session Pilot (formerly the AI Usage Meter mod) for Claude Code (unofficial; not affiliated with Anthropic)",
   "plugins": [
     {
       "name": "ai-usage-meter",

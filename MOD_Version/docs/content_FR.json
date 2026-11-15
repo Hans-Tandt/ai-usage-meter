@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Mod AI Usage Meter",
-    "subtitle": "Vos limites Claude et votre contexte, dans Claude Code",
-    "version": "Version 1.9.0",
-    "date": "14 novembre 2026",
-    "project": "Mod AI Usage Meter",
+    "title": "Session Pilot",
+    "subtitle": "Vos sessions, limites et tokens, dans Claude Code",
+    "version": "Version 2.0.0",
+    "date": "15 novembre 2026",
+    "project": "Session Pilot",
     "tocTitle": "Table des matières",
     "author": "Hans Tandt"
   },
@@ -15,13 +15,13 @@
     },
     {
       "type": "p",
-      "text": "Les chapitres 1 à 11 s'adressent à tous ceux qui utilisent Claude Code. L'annexe s'adresse aux développeurs : le fonctionnement du mod et comment le vérifier."
+      "text": "Les chapitres 1 à 12 s'adressent à tous ceux qui utilisent Claude Code. L'annexe s'adresse aux développeurs : le fonctionnement du mod et comment le vérifier."
     },
     {
       "type": "callout",
       "variant": "note",
       "title": "Projet non officiel",
-      "text": "Le mod AI Usage Meter est un projet communautaire non officiel. Il n'est ni affilié à Anthropic, ni approuvé ou sponsorisé par Anthropic. « Claude » est une marque d'Anthropic."
+      "text": "Session Pilot (anciennement le mod AI Usage Meter) est un projet communautaire non officiel. Il n'est ni affilié à Anthropic, ni approuvé ou sponsorisé par Anthropic. « Claude » est une marque d'Anthropic."
     },
     {
       "type": "h1",
@@ -121,7 +121,7 @@
     },
     {
       "type": "p",
-      "text": "Le mod est un dossier. Placez-le à un endroit où il peut rester, par exemple `Documents\\AI Usage Meter Mod` : Claude Code lit le mod dans ce dossier, ne le déplacez donc pas et ne le supprimez pas ensuite."
+      "text": "Le mod est un dossier. Placez-le à un endroit où il peut rester, par exemple `Documents\\Session Pilot` : Claude Code lit le mod dans ce dossier, ne le déplacez donc pas et ne le supprimez pas ensuite."
     },
     {
       "type": "callout",
@@ -148,20 +148,26 @@
     {
       "type": "code",
       "lines": [
-        "claude plugin install ai-usage-meter --marketplace \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\""
+        "claude plugin install ai-usage-meter --marketplace \"C:\\Users\\<you>\\Documents\\Session Pilot\""
       ]
     },
     {
       "type": "callout",
       "variant": "trap",
       "title": "« error: unknown option '--marketplace' »",
-      "text": "Votre `claude` est plus ancien que 2.1.287, ou PowerShell utilise encore l'ancien. Mettez-le à jour et ouvrez un nouveau PowerShell. Impossible de mettre à jour ? Installez alors avec deux commandes : `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`, puis `claude plugin install ai-usage-meter@ai-usage-meter`. Le bandeau lui-même demande quand même 2.1.287 ou plus récent."
+      "text": "Votre `claude` est plus ancien que 2.1.287, ou PowerShell utilise encore l'ancien. Mettez-le à jour et ouvrez un nouveau PowerShell. Impossible de mettre à jour ? Installez alors avec deux commandes : `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\Session Pilot\"`, puis `claude plugin install ai-usage-meter@ai-usage-meter`. Le bandeau lui-même demande quand même 2.1.287 ou plus récent."
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Vous aviez le mod AI Usage Meter ?",
+      "text": "Session Pilot est le même mod sous un nouveau nom : vos réglages restent. Décompressez la nouvelle version, copiez tout ce qui se trouve dans son dossier Session Pilot sur votre ancien dossier AI Usage Meter Mod (en remplaçant les fichiers), et redémarrez Claude Code. Laissez l'ancien dossier où il est : Claude Code y lit le mod."
     },
     {
       "type": "callout",
       "variant": "tip",
       "title": "Essayez d'abord pour une session",
-      "text": "Dans un terminal, tapez `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`. Le mod se charge alors pour cette session seulement, et rien n'est installé."
+      "text": "Dans un terminal, tapez `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\Session Pilot\"`. Le mod se charge alors pour cette session seulement, et rien n'est installé."
     },
     {
       "type": "callout",
@@ -190,7 +196,7 @@
       "type": "code",
       "lines": [
         "\"env\": {",
-        "  \"CLAUDE_CODE_PLUGIN_DIRS\": \"C:\\\\Users\\\\<you>\\\\AppData\\\\Local\\\\AIUsageMeter\\\\plugin;C:\\\\Users\\\\<you>\\\\Documents\\\\AI Usage Meter Mod\"",
+        "  \"CLAUDE_CODE_PLUGIN_DIRS\": \"C:\\\\Users\\\\<you>\\\\AppData\\\\Local\\\\AIUsageMeter\\\\plugin;C:\\\\Users\\\\<you>\\\\Documents\\\\Session Pilot\"",
         "}"
       ],
       "caption": "Le bloc env avec le module de la barre et le mod. En JSON, chaque \\ s'écrit deux fois."
@@ -242,9 +248,15 @@
         ],
         [
           "Start session",
-          "Dans le bandeau d'une nouvelle session avant votre premier message, dans le panneau /meter, ou `/meter start-session`."
+          "Dans le bandeau d'une nouvelle session avant votre premier message, dans le panneau /meter, ou `/meter start`."
         ]
       ]
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Dans l'application de bureau : tapez /meter start",
+      "text": "Dans l'application de bureau, le bandeau d'une nouvelle session n'apparaît qu'après votre premier message. Ne tapez donc pas d'abord une question : tapez /meter start comme tout premier message et appuyez sur Entrée. Cela fait la même chose que le bouton Start session : Claude reçoit seulement le prompt Start session et ne commence rien d'autre."
     },
     {
       "type": "figure",
@@ -469,6 +481,10 @@
           "Désactivé"
         ],
         [
+          "HTML companion",
+          "ask"
+        ],
+        [
           "Figures are old after",
           "60 minutes"
         ],
@@ -540,7 +556,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, version 1.9.0, enabled. « userConfig options not yet set » est normal : chaque réglage a une valeur par défaut."
+          "ai-usage-meter@ai-usage-meter, version 2.0.0, enabled. « userConfig options not yet set » est normal : chaque réglage a une valeur par défaut."
         ]
       ]
     },
@@ -701,6 +717,14 @@
         [
           "Activez Assistants de recherche (Explore) sur Haiku, demandez une grande recherche",
           "Details du lecteur : assistants démarrés sur Haiku : 1 ou plus"
+        ],
+        [
+          "Demandez à Claude un plan d'environ deux pages dans Plan.md",
+          "« An HTML version of Plan.md? » avec Make it et No dans le bandeau"
+        ],
+        [
+          "Cliquez sur Make it",
+          "Plan.html à côté de Plan.md, avec une table des matières ; Plan.md inchangé"
         ]
       ]
     },
@@ -738,6 +762,10 @@
         [
           "Ouvrez-y une nouvelle session ; cliquez sur Start session avant de taper",
           "« Preparing session… », puis « ✓ Everything is ready to start this session »"
+        ],
+        [
+          "Dans l'application de bureau : ouvrez une nouvelle session et tapez /meter start comme premier message",
+          "« Preparing session… », puis « ✓ Everything is ready to start this session » ; Claude n'a rien fait d'autre avant"
         ],
         [
           "Lisez la première réponse de Claude",
@@ -860,6 +888,56 @@
       "variant": "tip",
       "title": "Un bon départ",
       "text": "Jaune à partir de 250 000 tokens, rouge à partir de 350 000, l'horloge du cache activée, le lecteur et les assistants désactivés. Activez-les les jours avec beaucoup de recherches, et regardez la part de Haiku dans le panneau."
+    },
+    {
+      "type": "h1",
+      "text": "12. Des versions HTML de vos documents"
+    },
+    {
+      "type": "p",
+      "text": "Un long document Markdown, comme un plan ou une comparaison, est difficile à lire d'un seul bloc. Le mod peut proposer une version HTML lisible : une page web avec une table des matières et des schémas simples, que vous ouvrez dans votre navigateur. Elle coûte des tokens en plus, car Claude réécrit tout le document avec une mise en page ; le mod n'en fait donc jamais sans votre oui. Le fichier Markdown reste l'original : la version HTML est une copie de lecture à côté."
+    },
+    {
+      "type": "h2",
+      "text": "Comment ça marche"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Claude écrit un long document Markdown qui mérite d'être relu : un plan, une spécification, une comparaison, une conception ou un processus.",
+        "Quand Claude a fini, le bandeau demande « An HTML version of Plan.md? » avec Make it et No. La zone de saisie montre aussi la suggestion grise « Make the HTML version of Plan.md ».",
+        "Pour dire oui : cliquez sur Make it, ou appuyez sur Tab puis sur Entrée. Taper yes fonctionne aussi.",
+        "Claude écrit Plan.html à côté de Plan.md. Double-cliquez dessus dans l'Explorateur de fichiers pour l'ouvrir dans votre navigateur.",
+        "Vous avez modifié le Markdown plus tard ? Le mod propose alors de mettre à jour la version HTML."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Quand il demande, et quand pas"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Seulement pour un long document (plus d'un écran environ) qui est aussi un plan, une spécification, une comparaison ou autre document de ce genre, ou qui décrit des étapes, un processus ou un calendrier. Dans un dossier où vous avez déjà dit oui, il demande un peu plus tôt.",
+        "Jamais pour CLAUDE.md, MEMORY.md, les notes de session, les journaux de modifications ou les listes de tâches : ceux-là restent en Markdown.",
+        "Une fois par document et par session.",
+        "Envoyer un autre message à la place, ou cliquer sur No, compte comme « pas maintenant ». Après deux fois de suite, il ne demande plus pour le reste de la session ; /meter html ask réactive les questions.",
+        "Les schémas sont dessinés dans le fichier HTML lui-même : la page fonctionne sans internet et vous pouvez l'envoyer comme un seul fichier."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "L'activer ou le désactiver"
+    },
+    {
+      "type": "p",
+      "text": "Dans les Settings du panneau /meter, HTML companion a trois choix : ask (par défaut : le mod vous demande), on (le mod fait la version HTML tout seul, sans demander) et off (jamais). Vous pouvez aussi taper /meter html ask, /meter html on ou /meter html off. /meter html seul fait la version HTML du document proposé."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Seulement si vous allez le relire",
+      "text": "Dites oui pour les documents que vous relirez ou partagerez, comme un plan ou une comparaison. Pour une note rapide, cliquez sur No : le Markdown suffit, et vous économisez les tokens."
     },
     {
       "type": "h1",

@@ -1,16 +1,16 @@
-# AI Usage Meter mod for Claude Code
+# Session Pilot for Claude Code
 
-Your Claude 5-hour and weekly limits, and how full your session's context is, inside Claude Code itself: in a band above the prompt, in a details pane, and in short messages. Claude Code makes room for it, so it never covers your work. It works in the desktop app's Code tab and in the terminal.
+*Formerly the AI Usage Meter mod.* It guides your Claude Code sessions: your 5-hour and weekly limits, how full your session's context is, safe Close session and Start session, token savers and readable HTML versions of long documents, inside Claude Code itself: in a band above the prompt, in a details pane, and in short messages. Claude Code makes room for it, so it never covers your work. It works in the desktop app's Code tab and in the terminal.
 
 > Unofficial community project. Not affiliated with, endorsed by or sponsored by Anthropic. "Claude" is a trademark of Anthropic.
 
-Version 1.9.0 · Made by Hans Tandt · MIT licence · [What's new](CHANGELOG.md)
+Version 2.0.0 · Made by Hans Tandt · MIT licence · [What's new](CHANGELOG.md)
 
 ![The band above the prompt at green, yellow and red](images/band-levels_en.png)
 
 ## Manual
 
-The manual (11–12 pages) is in [`docs/out`](docs/out), as PDF and Word: [English](docs/out/AI_Usage_Meter_Mod_Manual_EN.pdf) · [Français](docs/out/AI_Usage_Meter_Mod_Manual_FR.pdf) · [Nederlands](docs/out/AI_Usage_Meter_Mod_Manual_NL.pdf) · [Deutsch](docs/out/AI_Usage_Meter_Mod_Manual_DE.pdf). Its text is in `docs/text_XX.json`; `py docs/make_content.py` turns it into `docs/content_XX.json`, which the general-report-builder skill builds into the PDF and Word files.
+The manual (17–18 pages) is in [`docs/out`](docs/out), as PDF and Word: [English](docs/out/Session_Pilot_Manual_EN.pdf) · [Français](docs/out/Session_Pilot_Manual_FR.pdf) · [Nederlands](docs/out/Session_Pilot_Manual_NL.pdf) · [Deutsch](docs/out/Session_Pilot_Manual_DE.pdf). Its text is in `docs/text_XX.json`; `py docs/make_content.py` turns it into `docs/content_XX.json`, which the general-report-builder skill builds into the PDF and Word files.
 
 ## What it shows
 
@@ -20,6 +20,7 @@ The manual (11–12 pages) is in [`docs/out`](docs/out), as PDF and Word: [Engli
 - **Close session and Start session**: one click runs a full end-of-session or start-of-session routine (see below).
 - **The Haiku reader** (off by default): when Opus reads a lot in one turn, it gives further searching and reading to a reader on Haiku, which sends back only files, line numbers and the exact lines; Opus still reads those lines itself before it changes anything. The `/meter` pane has its On/Off switch and a token counter per model (this session and this week); mode and limit are under **Settings** in the pane.
 - **Token savers**: a cache clock in the band (`cache 42m`, then `cache cold`) with **Keep warm** in the pane; optional warnings at a token number (for example yellow from 250,000) as well as at the % of compaction; and optionally Claude Code's search helper (Explore) on Haiku. Chapter 11 of the manual explains how Claude uses tokens and what each tool can and cannot save.
+- **The HTML companion** (asks by default): after Claude writes a long Markdown document worth re-reading (a plan, a spec, a comparison), the band asks *An HTML version of Plan.md?* and the prompt box suggests it (Tab, Enter). On a yes Claude writes `Plan.html` next to it: one self-contained page with a table of contents and diagrams drawn inside the file, so it works offline. The Markdown stays the original. Never for `CLAUDE.md`, `MEMORY.md`, session notes or task lists; two offers not taken pause it for the session.
 - **A little pixel robot** beside **Details** (an original design): it blinks now and then, scans while Claude works, its antenna shows the Compress colour, and it cheers when Close session says it is safe. Each model has its own robot (Opus a crown, Sonnet ears, Haiku a short antenna, Fable two antenna points), and a bar of five marks under it (and five chest lights) shows the effort level. In the terminal it is a short face: `[o_o]` Opus, `(o_o)` Sonnet, `{o_o}` Haiku, `<o_o>` Fable. Its size and options are under **Settings** in the pane.
 - **Short messages (toasts)**: at each limit level (once per window, for all sessions together), when a limit resets, at the yellow and red context levels, and after compaction.
 
@@ -33,8 +34,10 @@ On the desktop the bars are drawn as rounded bars; in the terminal as lines. In 
 | --- | --- |
 | `/meter` | Open the details pane (or click **Details** in the band; click it again to close the pane) |
 | `/meter close-session` | Run Close session |
-| `/meter start-session` | Run Start session |
+| `/meter start` | Run Start session (also `/meter start-session`). In the desktop app, type it as the first message of a new session: the band only appears after that first message |
 | `/meter close` | Close the pane |
+| `/meter settings` | Open the pane with the mod's settings at the bottom |
+| `/meter html` | Make the HTML version on offer; `/meter html ask`, `on` or `off` sets the HTML companion |
 | `/meter band off` / `/meter band on` | Hide or show the band |
 | `/meter demo 85` | Demo figures for Session and Week |
 | `/meter demo here 85` | Put this session at 85 % of compaction, to see the warnings |
@@ -52,6 +55,7 @@ Open the `/meter` pane (click **Details** in the band) and click **Settings** at
 | Context: yellow and red from a number of tokens | 0 (off) |
 | Cache clock, and the cache lifetime | on, 60 minutes (set 5 with an API key) |
 | Search helpers (Explore) on Haiku | off |
+| HTML companion | ask (on: make it without asking; off: never) |
 | Messages at the limit warnings, on a reset, after compaction | on |
 | Blink at red | on |
 | Figures are old after | 60 minutes |
@@ -64,7 +68,7 @@ When the AI Usage Meter strip (the Windows program, on [hanstandt.be](https://ha
 
 **You need Claude Code 2.1.287 or later** and a plan with usage limits (Pro or Max). Older versions don't know the install command below and can't show the band.
 
-1. Put the mod's folder somewhere it can stay, for example `Documents\AI Usage Meter Mod`. Claude Code reads the mod from that folder: don't move or delete it later.
+1. Put the mod's folder somewhere it can stay, for example `Documents\Session Pilot`. Claude Code reads the mod from that folder: don't move or delete it later.
 2. Open PowerShell and update Claude Code first:
 
    ```bash
@@ -82,13 +86,13 @@ When the AI Usage Meter strip (the Windows program, on [hanstandt.be](https://ha
 3. Install the mod, with your own folder:
 
    ```bash
-   claude plugin install ai-usage-meter --marketplace "C:\Users\<you>\Documents\AI Usage Meter Mod"
+   claude plugin install ai-usage-meter --marketplace "C:\Users\<you>\Documents\Session Pilot"
    ```
 
    **`error: unknown option '--marketplace'`?** Your `claude` is still older than 2.1.287. Update it (step 2), or install with two commands, which also work on older versions:
 
    ```bash
-   claude plugin marketplace add "C:\Users\<you>\Documents\AI Usage Meter Mod"
+   claude plugin marketplace add "C:\Users\<you>\Documents\Session Pilot"
    ```
 
    ```bash
@@ -131,7 +135,7 @@ Check it with `claude plugin validate .` and `claude plugin test .` in this fold
 Two prompts ship inside the mod, in [`prompts/`](prompts): `End_Session_Prompt_v1.1.md` and `New_Session_Prompt_v1.3.md` (Prompt 0, the universal start). They work on any PC; nothing outside the mod folder is needed.
 
 - **Close session** (band at red, the `/meter` pane, or `/meter close-session`) sends the end-of-session check: Claude lists what the session did, compares it with `CLAUDE.md`, `MEMORY.md` and the session notes, updates them, and ends with the first message for the next session and the line `You are safe to close this session now` or `!!! It's NOT safe to close this session, risk of losing data !!! – <reason>`.
-- **Start session** (band of a new session before the first message, the `/meter` pane, or `/meter start-session`) sends Prompt 0: Claude finds out whether the project is new, a re-start or broken, reads or creates the files, runs the health check, and ends with `Ready to start: YES` or `NO – <reason>`.
+- **Start session** (band of a new session before the first message, the `/meter` pane, or `/meter start`; in the desktop app the band only appears after the first message, so type `/meter start` as that first message) sends Prompt 0: Claude finds out whether the project is new, a re-start or broken, reads or creates the files, runs the health check, and ends with `Ready to start: YES` or `NO – <reason>`.
 - **One click does it all.** The mod fills in the project folder (and the task: the hand-over, or "propose the next step from the latest note") and adds a few lines: the click counts as "go"; in a git repository no backup files are made for files git already keeps; Claude reports each step with the mod's own tool `session_progress`; and the status line at the end.
 - **Progress and result in the band:** `Closing session… step 3 of 6 · 50%`, then `✓ Now it's safe to end this session` or `✓ Everything is ready to start this session`. A NO shows `Not safe to close: <reason>`; a reply that ends without a status line shows `Close session stopped at step 2 of 6`. Green only appears when Claude wrote YES.
 - **The hand-over:** the mod keeps Close session's first message for the next session, per project folder, and Start session sends it along.

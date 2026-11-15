@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "AI Usage Meter-mod",
-    "subtitle": "Je Claude-limieten en context, in Claude Code",
-    "version": "Versie 1.9.0",
-    "date": "14 november 2026",
-    "project": "AI Usage Meter-mod",
+    "title": "Session Pilot",
+    "subtitle": "Je sessies, limieten en tokens, in Claude Code",
+    "version": "Versie 2.0.0",
+    "date": "15 november 2026",
+    "project": "Session Pilot",
     "tocTitle": "Inhoud",
     "author": "Hans Tandt"
   },
@@ -15,13 +15,13 @@
     },
     {
       "type": "p",
-      "text": "Hoofdstuk 1 tot 11 zijn voor iedereen die Claude Code gebruikt. De bijlage is voor ontwikkelaars: hoe de mod werkt en hoe je hem controleert."
+      "text": "Hoofdstuk 1 tot 12 zijn voor iedereen die Claude Code gebruikt. De bijlage is voor ontwikkelaars: hoe de mod werkt en hoe je hem controleert."
     },
     {
       "type": "callout",
       "variant": "note",
       "title": "Onofficieel project",
-      "text": "De AI Usage Meter-mod is een onofficieel communityproject. Het is niet verbonden aan Anthropic en wordt niet door Anthropic goedgekeurd of gesponsord. \"Claude\" is een handelsmerk van Anthropic."
+      "text": "Session Pilot (vroeger de AI Usage Meter-mod) is een onofficieel communityproject. Het is niet verbonden aan Anthropic en wordt niet door Anthropic goedgekeurd of gesponsord. \"Claude\" is een handelsmerk van Anthropic."
     },
     {
       "type": "h1",
@@ -121,7 +121,7 @@
     },
     {
       "type": "p",
-      "text": "De mod is een map. Zet hem op een plek waar hij kan blijven, bijvoorbeeld `Documents\\AI Usage Meter Mod`: Claude Code leest de mod uit die map, dus verplaats of verwijder hem later niet."
+      "text": "De mod is een map. Zet hem op een plek waar hij kan blijven, bijvoorbeeld `Documents\\Session Pilot`: Claude Code leest de mod uit die map, dus verplaats of verwijder hem later niet."
     },
     {
       "type": "callout",
@@ -148,20 +148,26 @@
     {
       "type": "code",
       "lines": [
-        "claude plugin install ai-usage-meter --marketplace \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\""
+        "claude plugin install ai-usage-meter --marketplace \"C:\\Users\\<you>\\Documents\\Session Pilot\""
       ]
     },
     {
       "type": "callout",
       "variant": "trap",
       "title": "\"error: unknown option '--marketplace'\"",
-      "text": "Je `claude` is ouder dan 2.1.287, of PowerShell gebruikt nog de oude. Werk hem bij en open een nieuwe PowerShell. Kun je niet bijwerken? Installeer dan met twee opdrachten: `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`, daarna `claude plugin install ai-usage-meter@ai-usage-meter`. De band zelf heeft wel 2.1.287 of nieuwer nodig."
+      "text": "Je `claude` is ouder dan 2.1.287, of PowerShell gebruikt nog de oude. Werk hem bij en open een nieuwe PowerShell. Kun je niet bijwerken? Installeer dan met twee opdrachten: `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\Session Pilot\"`, daarna `claude plugin install ai-usage-meter@ai-usage-meter`. De band zelf heeft wel 2.1.287 of nieuwer nodig."
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "Had je de AI Usage Meter-mod?",
+      "text": "Session Pilot is dezelfde mod met een nieuwe naam: je instellingen blijven. Pak de nieuwe versie uit, kopieer alles uit de map Session Pilot over je oude map AI Usage Meter Mod (bestanden vervangen), en start Claude Code opnieuw. Laat de oude map staan waar ze staat: Claude Code leest de mod daaruit."
     },
     {
       "type": "callout",
       "variant": "tip",
       "title": "Probeer het eerst voor één sessie",
-      "text": "Typ in een terminal `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`. De mod laadt dan alleen voor die sessie, en er wordt niets geïnstalleerd."
+      "text": "Typ in een terminal `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\Session Pilot\"`. De mod laadt dan alleen voor die sessie, en er wordt niets geïnstalleerd."
     },
     {
       "type": "callout",
@@ -190,7 +196,7 @@
       "type": "code",
       "lines": [
         "\"env\": {",
-        "  \"CLAUDE_CODE_PLUGIN_DIRS\": \"C:\\\\Users\\\\<you>\\\\AppData\\\\Local\\\\AIUsageMeter\\\\plugin;C:\\\\Users\\\\<you>\\\\Documents\\\\AI Usage Meter Mod\"",
+        "  \"CLAUDE_CODE_PLUGIN_DIRS\": \"C:\\\\Users\\\\<you>\\\\AppData\\\\Local\\\\AIUsageMeter\\\\plugin;C:\\\\Users\\\\<you>\\\\Documents\\\\Session Pilot\"",
         "}"
       ],
       "caption": "Het blok env met de add-on van de balk en de mod. In JSON schrijf je elke \\ twee keer."
@@ -242,9 +248,15 @@
         ],
         [
           "Start session",
-          "In de band van een nieuwe sessie voor je eerste bericht, in het paneel /meter, of `/meter start-session`."
+          "In de band van een nieuwe sessie voor je eerste bericht, in het paneel /meter, of `/meter start`."
         ]
       ]
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "In de desktop-app: typ /meter start",
+      "text": "In de desktop-app verschijnt de band van een nieuwe sessie pas na je eerste bericht. Typ dus niet eerst een vraag: typ /meter start als allereerste bericht en druk op Enter. Dat doet hetzelfde als de knop Start session: Claude krijgt alleen de Start session-prompt en begint niet aan iets anders."
     },
     {
       "type": "figure",
@@ -469,6 +481,10 @@
           "Uit"
         ],
         [
+          "HTML companion",
+          "ask"
+        ],
+        [
           "Figures are old after",
           "60 minuten"
         ],
@@ -540,7 +556,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, versie 1.9.0, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
+          "ai-usage-meter@ai-usage-meter, versie 2.0.0, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
         ]
       ]
     },
@@ -701,6 +717,14 @@
         [
           "Zet Zoekhulpen (Explore) op Haiku aan, vraag een grote zoekopdracht",
           "Details van de lezer: zoekhulpen op Haiku gestart: 1 of meer"
+        ],
+        [
+          "Vraag Claude een plan van ongeveer twee bladzijden in Plan.md",
+          "\"An HTML version of Plan.md?\" met Make it en No in de band"
+        ],
+        [
+          "Klik op Make it",
+          "Plan.html naast Plan.md, met een inhoudstafel; Plan.md ongewijzigd"
         ]
       ]
     },
@@ -738,6 +762,10 @@
         [
           "Open daar een nieuwe sessie; klik op Start session voor je typt",
           "\"Preparing session…\", dan \"✓ Everything is ready to start this session\""
+        ],
+        [
+          "In de desktop-app: open een nieuwe sessie en typ /meter start als eerste bericht",
+          "\"Preparing session…\", dan \"✓ Everything is ready to start this session\"; Claude deed eerst niets anders"
         ],
         [
           "Lees het eerste antwoord van Claude",
@@ -860,6 +888,56 @@
       "variant": "tip",
       "title": "Een goed begin",
       "text": "Geel vanaf 250.000 tokens, rood vanaf 350.000, de cacheklok aan, de lezer en de zoekhulpen uit. Zet die aan op dagen met veel zoekwerk, en kijk naar het aandeel van Haiku in het paneel."
+    },
+    {
+      "type": "h1",
+      "text": "12. HTML-versies van je documenten"
+    },
+    {
+      "type": "p",
+      "text": "Een lang Markdown-document, zoals een plan of een vergelijking, leest moeilijk als één lange tekst. De mod kan een leesbare HTML-versie aanbieden: een webpagina met een inhoudstafel en eenvoudige schema's, die je in je browser opent. Dat kost extra tokens, want Claude schrijft het hele document opnieuw met een opmaak; daarom maakt de mod er nooit een zonder jouw ja. Het Markdown-bestand blijft het origineel: de HTML-versie is een leeskopie ernaast."
+    },
+    {
+      "type": "h2",
+      "text": "Hoe het werkt"
+    },
+    {
+      "type": "numbers",
+      "items": [
+        "Claude schrijft een lang Markdown-document dat je nog eens zult lezen: een plan, een specificatie, een vergelijking, een ontwerp of een proces.",
+        "Als Claude klaar is, vraagt de band \"An HTML version of Plan.md?\" met Make it en No. In het invoervak staat ook de grijze suggestie \"Make the HTML version of Plan.md\".",
+        "Ja zeggen: klik op Make it, of druk op Tab en dan op Enter. yes typen werkt ook.",
+        "Claude schrijft Plan.html naast Plan.md. Dubbelklik erop in Verkenner om het in je browser te openen.",
+        "Heb je de Markdown later gewijzigd? Dan biedt de mod aan om de HTML-versie bij te werken."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Wanneer het vraagt, en wanneer niet"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Alleen voor een lang document (meer dan ongeveer één scherm) dat ook een plan, een specificatie, een vergelijking of iets dergelijks is, of dat stappen, een proces of een tijdlijn beschrijft. In een map waar je al eens ja zei, vraagt het iets sneller.",
+        "Nooit voor CLAUDE.md, MEMORY.md, de sessienotities, wijzigingslogboeken of takenlijsten: die blijven Markdown.",
+        "Eén keer per document en per sessie.",
+        "Een ander bericht sturen, of op No klikken, telt als \"nu niet\". Na twee keer na elkaar vraagt het niets meer voor de rest van de sessie; /meter html ask zet de vragen weer aan.",
+        "De schema's staan getekend in het HTML-bestand zelf: de pagina werkt zonder internet en je kunt ze als één bestand doorsturen."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Aan- of uitzetten"
+    },
+    {
+      "type": "p",
+      "text": "Bij Settings in het paneel /meter heeft HTML companion drie keuzes: ask (standaard: de mod vraagt het je), on (de mod maakt de HTML-versie vanzelf, zonder te vragen) en off (nooit). Je kunt ook /meter html ask, /meter html on of /meter html off typen. /meter html alleen maakt de HTML-versie van het aangeboden document."
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Alleen als je het nog eens leest",
+      "text": "Zeg ja voor documenten die je nog eens leest of deelt, zoals een plan of een vergelijking. Voor een snelle notitie klik je op No: de Markdown volstaat, en je spaart de tokens."
     },
     {
       "type": "h1",

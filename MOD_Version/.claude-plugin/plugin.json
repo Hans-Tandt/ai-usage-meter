@@ -1,8 +1,10 @@
 {
   "name": "ai-usage-meter",
-  "version": "1.9.0",
-  "description": "AI Usage Meter: your 5-hour, weekly and context figures in a band above the prompt and a /meter pane, with session-notes warnings; works with or without the AI Usage Meter strip (unofficial; not affiliated with Anthropic)",
-  "author": { "name": "Hans Tandt" },
+  "version": "2.0.0",
+  "description": "Session Pilot (formerly the AI Usage Meter mod): your 5-hour, weekly and context figures in a band above the prompt and a /meter pane, with session-notes warnings; works with or without the AI Usage Meter strip (unofficial; not affiliated with Anthropic)",
+  "author": {
+    "name": "Hans Tandt"
+  },
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {
@@ -112,7 +114,11 @@
       "type": "string",
       "title": "Haiku reader",
       "description": "off: Opus reads everything. search: when Opus reads a lot in one turn, it gives further reading to a reader on Haiku, which finds files and lines; Opus reads those lines itself. summary: the reader also gives a short summary (for questions, not for code changes). The pane's On/Off switch overrides this per PC.",
-      "options": ["off", "search", "summary"],
+      "options": [
+        "off",
+        "search",
+        "summary"
+      ],
       "default": "off"
     },
     "readerThreshold": {
@@ -120,6 +126,17 @@
       "title": "Haiku reader: from (tokens read in one turn)",
       "description": "When Opus reads more than this in one turn, it is asked once to give further reading to the Haiku reader. At least 500.",
       "default": 2000
+    },
+    "htmlCompanion": {
+      "type": "string",
+      "title": "HTML companion",
+      "description": "After Claude writes a long Markdown document worth re-reading (a plan, a spec, a comparison), offer an HTML version with a table of contents and diagrams. ask: offer it, make it only on a yes. on: make it by itself. off: never. The Markdown stays the source of truth.",
+      "default": "ask",
+      "options": [
+        "ask",
+        "on",
+        "off"
+      ]
     },
     "robotSize": {
       "type": "number",

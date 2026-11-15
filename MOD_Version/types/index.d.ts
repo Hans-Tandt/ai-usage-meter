@@ -114,6 +114,11 @@ declare module 'claude-code' {
       cacheCfg: { on: boolean; minutes: number } // from /config
       settingsOpen: boolean // the Settings section is open in the pane
       configRows: SettingRow[] // the mod's own /config rows, as the pane's Settings section shows them
+      htmlCandidate: string | null // a Markdown file the main conversation wrote this turn
+      htmlOffer: { path: string; name: string; update: boolean; text: string } | null // the HTML version on offer
+      htmlOffered: string[] // Markdown files offered this session (each once, until accepted)
+      htmlRefusals: number // offers in a row not taken
+      htmlPaused: boolean // two refusals in a row: no more offers this session
     }
   }
 }

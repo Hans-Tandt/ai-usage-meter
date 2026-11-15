@@ -1,16 +1,16 @@
 {
   "meta": {
-    "title": "AI Usage Meter-Mod",
-    "subtitle": "Ihre Claude-Limits und Ihr Kontext, in Claude Code",
-    "version": "Version 1.9.0",
-    "date": "14. November 2026",
-    "project": "AI Usage Meter-Mod",
+    "title": "Session Pilot",
+    "subtitle": "Ihre Sitzungen, Limits und Tokens, in Claude Code",
+    "version": "Version 2.0.0",
+    "date": "15. November 2026",
+    "project": "Session Pilot",
     "tocTitle": "Inhalt"
   },
   "h_use": "So verwenden Sie dieses Handbuch",
-  "use": "Die Kapitel 1 bis 11 sind für alle, die Claude Code verwenden. Der Anhang ist für Entwickler: wie die Mod funktioniert und wie Sie sie prüfen.",
+  "use": "Die Kapitel 1 bis 12 sind für alle, die Claude Code verwenden. Der Anhang ist für Entwickler: wie die Mod funktioniert und wie Sie sie prüfen.",
   "unofficial_t": "Inoffizielles Projekt",
-  "unofficial": "Die AI Usage Meter-Mod ist ein inoffizielles Community-Projekt. Sie ist nicht mit Anthropic verbunden und wird von Anthropic weder unterstützt noch gesponsert. „Claude“ ist eine Marke von Anthropic.",
+  "unofficial": "Session Pilot (früher die AI Usage Meter-Mod) ist ein inoffizielles Community-Projekt. Sie ist nicht mit Anthropic verbunden und wird von Anthropic weder unterstützt noch gesponsert. „Claude“ ist eine Marke von Anthropic.",
   "h1": "1. Ihre Limits in Claude Code sehen",
   "p1": "Die Mod zeigt Ihre Claude-Nutzung in einem Band direkt über dem Eingabefeld, in das Sie tippen. Claude Code macht Platz dafür, sodass sie Ihre Arbeit nie verdeckt. Sie funktioniert im Tab Code der App und im Terminal.",
   "fig1": "Abbildung 1. Das Band über dem Eingabefeld. Bei Gelb und Rot sagt es Ihnen, was zu tun ist, mit einer Schaltfläche.",
@@ -69,7 +69,7 @@
   "p2": "Claude behält nur, was in sein Kontextfenster passt: alles, was Claude während einer Sitzung im Kopf behält. Ist das Fenster voll, komprimiert Claude Code es. Der ältere Teil des Gesprächs wird zu einer kurzen Zusammenfassung, und die Details sind weg. Claude arbeitet weiter, kann aber Pfade, Regeln und Entscheidungen vergessen.",
   "p2b": "Die Mod warnt Sie vorher, sodass Sie das Wichtige aufschreiben und eine neue Sitzung starten können. Sie zeigt auch, wie viel von Ihrem 5-Stunden- und Wochenlimit übrig ist, damit ein Limit Sie nie überrascht.",
   "h3": "3. Installieren",
-  "p3": "Die Mod ist ein Ordner. Legen Sie ihn an einen Ort, an dem er bleiben kann, zum Beispiel `Documents\\AI Usage Meter Mod`: Claude Code liest die Mod aus diesem Ordner, verschieben oder löschen Sie ihn also später nicht.",
+  "p3": "Die Mod ist ein Ordner. Legen Sie ihn an einen Ort, an dem er bleiben kann, zum Beispiel `Documents\\Session Pilot`: Claude Code liest die Mod aus diesem Ordner, verschieben oder löschen Sie ihn also später nicht.",
   "steps3": [
     "Entpacken Sie die Mod in diesen Ordner.",
     "Öffnen Sie PowerShell.",
@@ -82,7 +82,7 @@
   "need_t": "Was Sie brauchen",
   "need": "Claude Code 2.1.287 oder neuer und ein Claude-Abo mit Nutzungslimits (Pro oder Max). Ältere Versionen kennen den Installationsbefehl unten nicht und können das Band nicht zeigen: Aktualisieren Sie also zuerst (Schritt 3).",
   "try_t": "Zuerst für eine Sitzung ausprobieren",
-  "try": "Tippen Sie in einem Terminal `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`. Die Mod wird dann nur für diese Sitzung geladen, und nichts wird installiert.",
+  "try": "Tippen Sie in einem Terminal `claude --plugin-dir \"C:\\Users\\<you>\\Documents\\Session Pilot\"`. Die Mod wird dann nur für diese Sitzung geladen, und nichts wird installiert.",
   "key_t": "„Detected a custom API key“",
   "key": "Hat Windows eine Variable `ANTHROPIC_API_KEY`, fragt Claude Code, ob es sie verwenden soll. Wählen Sie No: Mit einem API-Schlüssel meldet Claude Code keine 5-Stunden- und Wochenlimits, Session und Week bleiben leer, und jede Nachricht wird pro Token abgerechnet.",
   "h4": "4. Sitzungsnotizen rechtzeitig schreiben",
@@ -214,6 +214,10 @@
       "Aus"
     ],
     [
+      "HTML companion",
+      "ask"
+    ],
+    [
       "Figures are old after",
       "60 Minuten"
     ],
@@ -270,6 +274,28 @@
   ],
   "save_tip_t": "Ein guter Start",
   "save_tip": "Gelb ab 250.000 Tokens, Rot ab 350.000, die Cache-Uhr an, der Leser und die Suchhelfer aus. Schalten Sie diese an Tagen mit viel Suchen ein und beobachten Sie Haikus Anteil im Bereich.",
+  "html_h": "12. HTML-Versionen Ihrer Dokumente",
+  "html_intro": "Ein langes Markdown-Dokument, etwa ein Plan oder ein Vergleich, liest sich als ein langer Text schwer. Die Mod kann eine lesbare HTML-Version anbieten: eine Webseite mit Inhaltsverzeichnis und einfachen Diagrammen, die Sie im Browser öffnen. Das kostet zusätzliche Tokens, weil Claude das ganze Dokument mit Layout neu schreibt; deshalb macht die Mod nie eine ohne Ihr Ja. Die Markdown-Datei bleibt das Original: Die HTML-Version ist eine Lesekopie daneben.",
+  "html_h_how": "So funktioniert es",
+  "html_how": [
+    "Claude schreibt ein langes Markdown-Dokument, das man wieder liest: einen Plan, eine Spezifikation, einen Vergleich, einen Entwurf oder einen Ablauf.",
+    "Wenn Claude fertig ist, fragt das Band „An HTML version of Plan.md?“ mit Make it und No. Im Eingabefeld steht außerdem der graue Vorschlag „Make the HTML version of Plan.md“.",
+    "Ja sagen: Klicken Sie auf Make it, oder drücken Sie Tab und dann Enter. yes tippen geht auch.",
+    "Claude schreibt Plan.html neben Plan.md. Doppelklicken Sie im Datei-Explorer darauf, um sie im Browser zu öffnen.",
+    "Später die Markdown-Datei geändert? Dann bietet die Mod an, die HTML-Version zu aktualisieren."
+  ],
+  "html_h_when": "Wann es fragt, und wann nicht",
+  "html_when": [
+    "Nur bei einem langen Dokument (mehr als etwa ein Bildschirm), das außerdem ein Plan, eine Spezifikation, ein Vergleich oder Ähnliches ist oder Schritte, einen Ablauf oder einen Zeitplan beschreibt. In einem Ordner, in dem Sie schon einmal Ja gesagt haben, fragt es etwas früher.",
+    "Nie bei CLAUDE.md, MEMORY.md, den Sitzungsnotizen, Änderungsprotokollen oder Aufgabenlisten: Die bleiben Markdown.",
+    "Einmal pro Dokument und Sitzung.",
+    "Eine andere Nachricht senden oder auf No klicken zählt als „jetzt nicht“. Nach zwei Mal hintereinander fragt es für den Rest der Sitzung nicht mehr; /meter html ask schaltet die Fragen wieder ein.",
+    "Die Diagramme sind in der HTML-Datei selbst gezeichnet: Die Seite funktioniert ohne Internet, und Sie können sie als eine Datei weitergeben."
+  ],
+  "html_h_set": "Ein- und ausschalten",
+  "html_set": "Unter Settings im Bereich /meter hat HTML companion drei Möglichkeiten: ask (Standard: Die Mod fragt Sie), on (die Mod macht die HTML-Version von selbst, ohne zu fragen) und off (nie). Sie können auch /meter html ask, /meter html on oder /meter html off tippen. /meter html allein macht die HTML-Version des angebotenen Dokuments.",
+  "html_tip_t": "Nur wenn Sie es wieder lesen",
+  "html_tip": "Sagen Sie Ja bei Dokumenten, die Sie wieder lesen oder teilen, etwa einem Plan oder einem Vergleich. Bei einer kurzen Notiz klicken Sie auf No: Markdown genügt, und Sie sparen die Tokens.",
   "h9": "Anhang: technische Details",
   "h9a": "So funktioniert es",
   "how": [
@@ -327,9 +353,11 @@
     ],
     [
       "Start session",
-      "Im Band einer neuen Sitzung vor Ihrer ersten Nachricht, im Bereich /meter oder mit `/meter start-session`."
+      "Im Band einer neuen Sitzung vor Ihrer ersten Nachricht, im Bereich /meter oder mit `/meter start`."
     ]
   ],
+  "start_t": "In der Desktop-App: Tippen Sie /meter start",
+  "start": "In der Desktop-App erscheint das Band einer neuen Sitzung erst nach Ihrer ersten Nachricht. Tippen Sie also nicht zuerst eine Frage: Tippen Sie /meter start als allererste Nachricht und drücken Sie Enter. Das wirkt wie die Schaltfläche Start session: Claude bekommt nur den Start-session-Prompt und fängt nichts anderes an.",
   "msg_h": [
     "Das Band sagt",
     "Was Sie tun"
@@ -387,7 +415,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, Version 1.9.0, enabled. „userConfig options not yet set“ ist normal: Jede Einstellung hat einen Standardwert."
+          "ai-usage-meter@ai-usage-meter, Version 2.0.0, enabled. „userConfig options not yet set“ ist normal: Jede Einstellung hat einen Standardwert."
         ]
       ]
     ],
@@ -500,6 +528,14 @@
         [
           "Schalten Sie Suchhelfer (Explore) auf Haiku ein, lassen Sie groß suchen",
           "Details des Lesers: Suchhelfer auf Haiku gestartet: 1 oder mehr"
+        ],
+        [
+          "Lassen Sie Claude einen Plan von etwa zwei Seiten in Plan.md schreiben",
+          "„An HTML version of Plan.md?“ mit Make it und No im Band"
+        ],
+        [
+          "Klicken Sie auf Make it",
+          "Plan.html neben Plan.md, mit Inhaltsverzeichnis; Plan.md unverändert"
         ]
       ]
     ],
@@ -527,6 +563,10 @@
           "„Preparing session…“, dann „✓ Everything is ready to start this session“"
         ],
         [
+          "In der Desktop-App: Öffnen Sie eine neue Sitzung und tippen Sie /meter start als erste Nachricht",
+          "„Preparing session…“, dann „✓ Everything is ready to start this session“; Claude hat vorher nichts anderes getan"
+        ],
+        [
           "Lesen Sie Claudes erste Antwort",
           "Es macht bei der Übergabe von Close session weiter"
         ]
@@ -547,5 +587,7 @@
     ]
   ],
   "mp_t": "„error: unknown option '--marketplace'“",
-  "mp": "Ihr `claude` ist älter als 2.1.287, oder PowerShell nutzt noch das alte. Aktualisieren Sie es und öffnen Sie ein neues PowerShell. Aktualisieren nicht möglich? Installieren Sie dann mit zwei Befehlen: `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\AI Usage Meter Mod\"`, danach `claude plugin install ai-usage-meter@ai-usage-meter`. Das Band selbst braucht trotzdem 2.1.287 oder neuer."
+  "mp": "Ihr `claude` ist älter als 2.1.287, oder PowerShell nutzt noch das alte. Aktualisieren Sie es und öffnen Sie ein neues PowerShell. Aktualisieren nicht möglich? Installieren Sie dann mit zwei Befehlen: `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\Session Pilot\"`, danach `claude plugin install ai-usage-meter@ai-usage-meter`. Das Band selbst braucht trotzdem 2.1.287 oder neuer.",
+  "upd_t": "Sie hatten die AI Usage Meter-Mod?",
+  "upd": "Session Pilot ist dieselbe Mod mit neuem Namen: Ihre Einstellungen bleiben. Entpacken Sie die neue Version, kopieren Sie alles aus ihrem Ordner Session Pilot über Ihren alten Ordner AI Usage Meter Mod (Dateien ersetzen) und starten Sie Claude Code neu. Lassen Sie den alten Ordner, wo er ist: Claude Code liest die Mod von dort."
 }
