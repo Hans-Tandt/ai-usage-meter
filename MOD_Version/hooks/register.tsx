@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, PluginOptions, Register, Timer } from 'claude-code'
 
-import type { ContextInfo, MeterSettings, OtherSession, Routine, Window } from '../types'
+import type { ContextInfo, MeterSettings, OtherSession, Routine, SettingRow, Window } from '../types'
 import { DEFAULTS, band, contextLevel, contextMessage, limitLevel, pane, tokenLevel } from './draw'
 import type { Actions, Kit, View } from './draw'
 import { ROBOT_MS, effortLevel, robotKey, robotModel, type RobotLook, type RobotModel, type RobotState } from './robot'
@@ -86,29 +86,96 @@ const htmlPaused = atom({ plugin: 'ai-usage-meter', key: 'htmlPaused' } as const
 // mod's settings can't be reached there. The pane lists the mod's own /config rows and changes them with
 // $.config.set, as the menu would; Claude Code then reloads the mod with the new values.
 
-async function refreshConfig($: EngineInterface) {
+// The values Claude Code handed this load, and the ones the mod runs with: Claude Code's plus the pane's own saved
+// changes, for when Claude Code can't change a setting itself (2.1.326 in the desktop app fails $.config.list and
+// $.config.set). A saved change keeps the value it replaced: when /config shows another value later, that one wins.
+let engineOptions: PluginOptions = {}
+let liveOptions: Record<string, PluginOptions[string]> = {}
+const OVERRIDES = 'settingOverrides'
+type Override = { value: boolean | string | number; base?: PluginOptions[string] }
+
+async function savedOverrides($: EngineInterface): Promise<Record<string, Override>> {
+  return { ...(((await $.store.get(OVERRIDES)) as Record<string, Override> | undefined) ?? {}) }
+}
+
+async function loadOverrides($: EngineInterface) {
   try {
-    const rows = (await $.config.list()).filter(
-      r => r.provider.plugin.startsWith('ai-usage-meter') || r.key.startsWith('ai-usage-meter'),
-    )
-    await update($, configRows, () =>
-      rows.map(r => ({
+    const saved = await savedOverrides($)
+    let dropped = false
+    for (const [field, o] of Object.entries(saved)) {
+      if (JSON.stringify(engineOptions[field]) === JSON.stringify(o.base)) liveOptions[field] = o.value
+      else {
+        delete saved[field] // changed in /config since: that value wins
+        dropped = true
+      }
+    }
+    if (dropped) await $.store.set(OVERRIDES, saved)
+  } catch {}
+}
+
+async function refreshConfig($: EngineInterface) {
+  let rows: SettingRow[] = []
+  try {
+    rows = (await $.config.list())
+      .filter(r => r.provider.plugin.startsWith('ai-usage-meter') || r.key.startsWith('ai-usage-meter'))
+      .map(r => ({
         key: r.key,
         field: r.key.slice(r.key.lastIndexOf('.') + 1),
         label: r.label,
         kind: r.kind,
-        value: r.value,
+        value: liveOptions[r.key.slice(r.key.lastIndexOf('.') + 1)] ?? r.value,
         options: r.options,
         isLocked: r.isLocked,
-      })),
-    )
+      }))
+  } catch {}
+  if (rows.length === 0) rows = await manifestRows($)
+  try {
+    await update($, configRows, () => rows)
   } catch {}
 }
 
+// The mod's own list of its settings: the manifest's userConfig, with the values the mod runs with.
+async function manifestRows($: EngineInterface): Promise<SettingRow[]> {
+  try {
+    type Field = { type?: string; title?: string; default?: PluginOptions[string]; options?: string[] }
+    const m = JSON.parse(await $.fs.read(`${$.plugin.root}/.claude-plugin/plugin.json`)) as { userConfig?: Record<string, Field> }
+    return Object.entries(m.userConfig ?? {}).map(([field, f]): SettingRow => {
+      const kind = f.type === 'boolean' ? 'boolean' : f.type === 'number' ? 'number' : f.options && f.options.length > 0 ? 'choice' : 'text'
+      const value = liveOptions[field] ?? f.default ?? (kind === 'boolean' ? false : kind === 'number' ? 0 : '')
+      return { key: `${$.plugin.name}.${field}`, field, label: f.title ?? field, kind, value, options: f.options, isLocked: false }
+    })
+  } catch {
+    return []
+  }
+}
+
+// The settings the mod runs with changed: apply them now, without waiting for a reload.
+async function applyLive($: EngineInterface) {
+  const o = liveOptions as PluginOptions
+  await loadSettings($, o)
+  await startRobot($, o, true)
+  await startReader($, o)
+}
+
 async function changeSetting($: EngineInterface, key: string, value: boolean | string | number) {
+  const field = key.slice(key.lastIndexOf('.') + 1)
+  let stored = false
   try {
     const r = await $.config.set({ key, value })
-    if ('deny' in r && r.deny) $.ui.toast(`Session Pilot: this setting can't be changed here (${r.deny}).`)
+    if ('deny' in r && r.deny) {
+      $.ui.toast(`Session Pilot: this setting can't be changed here (${r.deny}).`)
+      await refreshConfig($)
+      return
+    }
+    stored = true // Claude Code keeps it, and reloads the mod with it
+  } catch {}
+  try {
+    const saved = await savedOverrides($)
+    if (stored) delete saved[field]
+    else saved[field] = { value, base: engineOptions[field] }
+    await $.store.set(OVERRIDES, saved)
+    liveOptions[field] = value
+    await applyLive($)
   } catch {
     $.ui.toast("Session Pilot: this setting can't be changed here.")
   }
@@ -843,7 +910,11 @@ async function demo($: EngineInterface, args: string[]): Promise<{ text: string 
   return { text: `Demo: 5h at ${pct}%, week at ${Math.round(pct / 2)}%. Type /meter demo off to go back.` }
 }
 
-export const register: Register = (on, options) => {
+export const register: Register = (on, engine) => {
+  // Claude Code's values, plus the pane's own saved changes (see changeSetting); every hook reads `options`.
+  engineOptions = engine
+  liveOptions = { ...engine }
+  const options = liveOptions as PluginOptions
   on('session.start', async ($, e, next) => {
     const result = await next(e)
     await $.command.register({
@@ -876,6 +947,7 @@ export const register: Register = (on, options) => {
       await update($, bandHidden, () => false)
       if ((await $.store.get('bandHidden')) === true) await update($, bandHidden, () => true)
     } catch {}
+    await loadOverrides($)
     await loadSettings($, options)
     await refreshConfig($) // also after a change in the pane: Claude Code reloads the mod with the new values
     try {

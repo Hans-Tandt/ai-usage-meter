@@ -3,6 +3,14 @@
 Newest version on top. How to update: unzip the new version over your mod folder, then quit and restart
 Claude Code. Your settings stay.
 
+## 2.0.1 · 21 November 2026
+
+**Fixed**
+- **Settings in the pane work again.** The Claude desktop app updated itself to Claude Code 2.1.326, which can no
+  longer read or change a mod's settings from a mod, so the pane said "The settings could not be read here".
+  Session Pilot now lists its settings from its own manifest, and when Claude Code can't save a change, it keeps
+  the change itself and applies it at once. A value you set later in a terminal's /config still wins.
+
 ## 2.0.0 · 15 November 2026
 
 **New name: Session Pilot.** The mod does much more than measure now, so it has a new name. It is the same

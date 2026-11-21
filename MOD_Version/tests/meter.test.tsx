@@ -99,7 +99,7 @@ test('the pane shows the limits, the context and the buttons', async ($, on) => 
     expect(await ui.find({ type: 'Text', text: /Session \(5-hour limit\)/ })).toBeTruthy()
     expect(await ui.find({ type: 'Text', text: /finish the task and update your session notes/ })).toBeTruthy()
     expect(await ui.find({ type: 'Button', key: 'compact' })).toBeTruthy()
-    expect(await ui.find({ type: 'Text', text: /Session Pilot 2\.0\.0 · Hans Tandt · hanstandt\.be/ })).toBeTruthy()
+    expect(await ui.find({ type: 'Text', text: /Session Pilot 2\.0\.1 · Hans Tandt · hanstandt\.be/ })).toBeTruthy()
     await ui.unmount()
   }
 })
@@ -708,4 +708,40 @@ test('two offers in a row not taken pause the offers; /meter html ask turns them
   await $.turn.complete(turnEnd('Done.'))
   await clock.advance(400)
   expect(suggested[2]).toBe('Make the HTML version of Design.md')
+})
+
+test('when Claude Code cannot list or change settings (2.1.326 on the desktop), the pane still lists and changes them', async ($, on) => {
+  engine(on)
+  const broken = () => {
+    throw new TypeError("Cannot destructure property 'configRowHandles' from null or undefined value")
+  }
+  const MANIFEST = JSON.stringify({
+    name: 'ai-usage-meter',
+    userConfig: {
+      cacheClock: { type: 'boolean', title: 'Cache clock', default: true },
+      cacheMinutes: { type: 'number', title: 'Cache clock: cache lifetime (minutes)', default: 60 },
+      htmlCompanion: { type: 'string', title: 'HTML companion', default: 'ask', options: ['ask', 'on', 'off'] },
+    },
+  })
+  on('fs.read', (_, e) => {
+    if (/plugin\.json$/.test(e.path)) return { value: MANIFEST }
+    throw new Error('no file')
+  })
+  on('config.list', broken)
+  on('config.set', broken)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+
+  const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  await pane.press({ key: 'settings' })
+  expect(await pane.find({ type: 'Text', text: /could not be read/ })).toBeFalsy()
+  expect(await pane.find({ type: 'Text', text: /^Cache clock$/ })).toBeTruthy()
+  expect((await pane.find({ type: 'Button', key: 'set:cacheClock' }))?.props.label).toBe('On')
+  await pane.press({ key: 'set:cacheClock' })
+  expect((await pane.find({ type: 'Button', key: 'set:cacheClock' }))?.props.label).toBe('Off')
+  await pane.press({ key: 'dec:cacheMinutes' })
+  expect(await pane.find({ type: 'Text', text: /^5 min$/ })).toBeTruthy()
+  await pane.press({ key: 'set:htmlCompanion' })
+  expect((await pane.find({ type: 'Button', key: 'set:htmlCompanion' }))?.props.label).toBe('on')
+  await pane.unmount()
 })

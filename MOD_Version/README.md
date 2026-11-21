@@ -4,7 +4,7 @@
 
 > Unofficial community project. Not affiliated with, endorsed by or sponsored by Anthropic. "Claude" is a trademark of Anthropic.
 
-Version 2.0.0 · Made by Hans Tandt · MIT licence · [What's new](CHANGELOG.md)
+Version 2.0.1 · Made by Hans Tandt · MIT licence · [What's new](CHANGELOG.md)
 
 ![The band above the prompt at green, yellow and red](images/band-levels_en.png)
 

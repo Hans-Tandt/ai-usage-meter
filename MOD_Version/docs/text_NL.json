@@ -2,8 +2,8 @@
   "meta": {
     "title": "Session Pilot",
     "subtitle": "Je sessies, limieten en tokens, in Claude Code",
-    "version": "Versie 2.0.0",
-    "date": "15 november 2026",
+    "version": "Versie 2.0.1",
+    "date": "21 november 2026",
     "project": "Session Pilot",
     "tocTitle": "Inhoud"
   },
@@ -415,7 +415,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, versie 2.0.0, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
+          "ai-usage-meter@ai-usage-meter, versie 2.0.1, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
         ]
       ]
     ],

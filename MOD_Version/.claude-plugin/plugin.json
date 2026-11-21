@@ -1,6 +1,6 @@
 {
   "name": "ai-usage-meter",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Session Pilot (formerly the AI Usage Meter mod): your 5-hour, weekly and context figures in a band above the prompt and a /meter pane, with session-notes warnings; works with or without the AI Usage Meter strip (unofficial; not affiliated with Anthropic)",
   "author": {
     "name": "Hans Tandt"

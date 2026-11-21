@@ -228,7 +228,7 @@ def pane():
     line([("text", " 93%", DANGER, 14, True), ("text", "WebsiteRedesign", WHITE), ("text", "· 4m ago")])
     line([("text", " 37%", OK, 14, True), ("text", "MealPlanner", WHITE), ("text", "· 1h 12m ago")], 32)
     line([("text", "Levels: limits 80/95%, context 80/90%.", DIM, 13), ("button", "Settings")], 36)
-    line([("text", "Session Pilot 2.0.0 · Hans Tandt · hanstandt.be", DIM, 13)])
+    line([("text", "Session Pilot 2.0.1 · Hans Tandt · hanstandt.be", DIM, 13)])
     return im.crop((0, 0, W * S, (y + 6) * S))
 
 

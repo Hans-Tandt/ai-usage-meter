@@ -2,8 +2,8 @@
   "meta": {
     "title": "Session Pilot",
     "subtitle": "Vos sessions, limites et tokens, dans Claude Code",
-    "version": "Version 2.0.0",
-    "date": "15 novembre 2026",
+    "version": "Version 2.0.1",
+    "date": "21 novembre 2026",
     "project": "Session Pilot",
     "tocTitle": "Table des matières",
     "author": "Hans Tandt"
@@ -556,7 +556,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, version 2.0.0, enabled. « userConfig options not yet set » est normal : chaque réglage a une valeur par défaut."
+          "ai-usage-meter@ai-usage-meter, version 2.0.1, enabled. « userConfig options not yet set » est normal : chaque réglage a une valeur par défaut."
         ]
       ]
     },

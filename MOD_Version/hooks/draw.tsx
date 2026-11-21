@@ -7,7 +7,7 @@ import { haikuShare, totalTokens, type ModelTokens } from './reader'
 // What the band and the pane draw. Pure functions of plain data: every surface (terminal, desktop) gets the same tree.
 
 // Shown on the last line of the pane. Raise it together with the version in plugin.json.
-export const VERSION = '2.0.0'
+export const VERSION = '2.0.1'
 
 // Svg is there on the desktop app, VS Code and mobile; the terminal draws the bars with line characters.
 export type Kit = Pick<Elements['desktop'], 'Box' | 'Text' | 'Button'> & { Svg?: Elements['desktop']['Svg'] }

@@ -12,7 +12,7 @@ https://hanstandt.be/projects/ai-usage-meter/
 
 | Folder | What it is | Version |
 | --- | --- | --- |
-| [`MOD_Version/`](MOD_Version/) | **Session Pilot, the mod for Claude Code (recommended).** Formerly the AI Usage Meter mod. A band above the prompt, a `/meter` details pane and short messages, inside Claude Code itself (desktop app and terminal), with safe Close session and Start session, token savers and an optional HTML companion. New features only go here. | 2.0.0 |
+| [`MOD_Version/`](MOD_Version/) | **Session Pilot, the mod for Claude Code (recommended).** Formerly the AI Usage Meter mod. A band above the prompt, a `/meter` details pane and short messages, inside Claude Code itself (desktop app and terminal), with safe Close session and Start session, token savers and an optional HTML companion. New features only go here. | 2.0.1 |
 | [`source/`](source/) | **The strip for Windows.** A small always-on-top window. It stays available as it is; only serious problems are still fixed. | 1.6 |
 
 Each folder has its own README with the full details, how to build it and how to remove it.
