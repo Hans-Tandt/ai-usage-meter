@@ -47,6 +47,7 @@ The same list, in English, French, Dutch and German, is chapter 9 of the manual 
 | Do this | You should see |
 |---|---|
 | Type `/meter settings` (or click **Details**, then **Settings**) | The settings at the bottom of the pane, each with a button |
+| Type `/meter language nl` (or choose **Language** under **Settings**) | The band and the pane in Dutch; the buttons stay in English (set it back with `/meter language en`) |
 | Click **−** next to **Cache clock: cache lifetime** | 5 min (set it back to 60 with **+** afterwards) |
 | Switch **Blink at red** off, then `/meter demo here 93` | Red without blinking (switch it on again afterwards) |
 | Switch **Little robot in the band** off | The robot is gone (switch it on again afterwards) |

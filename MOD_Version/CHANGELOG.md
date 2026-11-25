@@ -3,6 +3,15 @@
 Newest version on top. How to update: unzip the new version over your mod folder, then quit and restart
 Claude Code. Your settings stay.
 
+## 2.1.0 · 25 November 2026
+
+**New**
+- **Four languages.** Under **Settings**, *Language* switches the band, the pane, the Settings list and the short
+  messages to English, Nederlands, Français or Deutsch, at once (or type `/meter language nl`). Button labels
+  and the names Session, Week and Compress stay in English, as in the manuals; what the mod sends to Claude
+  stays in English. The HTML companion asks in your language, and "ja" or "oui" also say yes.
+- **Manuals:** each manual shows the screens in its own language (pictures and quoted messages).
+
 ## 2.0.1 · 21 November 2026
 
 **Fixed**

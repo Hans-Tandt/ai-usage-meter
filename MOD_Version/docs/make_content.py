@@ -19,6 +19,10 @@ SETTINGS_JSON = [
 ]
 
 
+# Languages whose chapter 6 heading would otherwise end a page, with the pane picture on the next one.
+BREAK_BEFORE_PANE = {"NL"}
+
+
 def blocks(lang, t):
     low = lang.lower()
     return [
@@ -31,6 +35,7 @@ def blocks(lang, t):
         {"type": "table", "header": t["see_h"], "widths": [2, 3], "rows": t["see"]},
         {"type": "callout", "variant": "note", "title": t["robot_t"], "text": t["robot"]},
         {"type": "callout", "variant": "tip", "title": t["fold_t"], "text": t["fold"]},
+        {"type": "callout", "variant": "note", "title": t["lang_t"], "text": t["lang"]},  # the Language setting
         {"type": "h1", "text": t["h2"]},
         {"type": "p", "text": t["p2"]},
         {"type": "p", "text": t["p2b"]},
@@ -61,8 +66,9 @@ def blocks(lang, t):
         {"type": "table", "header": t["msg_h"], "widths": [3, 4], "rows": t["msg"]},
         {"type": "callout", "variant": "note", "title": t["go_t"], "text": t["go"]},
         {"type": "callout", "variant": "tip", "title": t["hand_t"], "text": t["hand"]},
+        *([{"type": "pagebreak"}] if lang in BREAK_BEFORE_PANE else []),  # else the heading is stranded above the tall pane picture
         {"type": "h1", "text": t["h5"]},
-        {"type": "figure", "path": "figures/pane.png", "width": 330, "caption": t["fig2"], "alt": t["alt2"]},
+        {"type": "figure", "path": f"figures/pane_{low}.png", "width": 330, "caption": t["fig2"], "alt": t["alt2"]},
         {"type": "table", "header": t["cmd_h"], "widths": [2, 3], "rows": t["cmd"]},
         {"type": "p", "text": t["p5"]},
         {"type": "callout", "variant": "note", "title": t["reader_t"], "text": t["reader"]},

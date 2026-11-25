@@ -2,8 +2,8 @@
   "meta": {
     "title": "Session Pilot",
     "subtitle": "Ihre Sitzungen, Limits und Tokens, in Claude Code",
-    "version": "Version 2.0.1",
-    "date": "21. November 2026",
+    "version": "Version 2.1.0",
+    "date": "25. November 2026",
     "project": "Session Pilot",
     "tocTitle": "Inhalt"
   },
@@ -33,19 +33,19 @@
       "Wie voll dieses Gespräch ist. Ist es voll, fasst Claude Code es kurz zusammen (Komprimieren), und Details gehen verloren: Sichern Sie vorher Ihre Notizen."
     ],
     [
-      "~6 turns",
+      "~6 Runden",
       "Ungefähr wie viele Nachrichten, mit Claudes Antworten, noch vor dem Komprimieren passen, wenn sie so lang sind wie die letzten."
     ],
     [
-      "5h: 100% in 1h 20m",
+      "5h: 100 % in 1h 20min",
       "In Ihrem bisherigen Tempo erreichen Sie das Limit vor dem Zurücksetzen."
     ],
     [
-      "limits updated 1h 10m ago",
+      "Limits vor 1h 10min aktualisiert",
       "Die Werte sind alt. Claude Code schickt mit seiner nächsten Antwort neue."
     ],
     [
-      "cache 42m",
+      "Cache 42min",
       "Wie lange das Gespräch noch günstig weitergeht: noch 42 Minuten (Kapitel 11)."
     ],
     [
@@ -57,7 +57,7 @@
       "Nur wenn Sie unter Settings eine Tokenzahl eingestellt haben: Das Gespräch hat sie überschritten (Kapitel 11)."
     ],
     [
-      "other: MyProject 92%",
+      "andere: MyProject 92 %",
       "Eine andere Claude Code-Sitzung auf diesem PC steht auf Rot."
     ]
   ],
@@ -87,9 +87,9 @@
   "key": "Hat Windows eine Variable `ANTHROPIC_API_KEY`, fragt Claude Code, ob es sie verwenden soll. Wählen Sie No: Mit einem API-Schlüssel meldet Claude Code keine 5-Stunden- und Wochenlimits, Session und Week bleiben leer, und jede Nachricht wird pro Token abgerechnet.",
   "h4": "4. Sitzungsnotizen rechtzeitig schreiben",
   "steps4": [
-    "Bei Gelb (80 %) erscheint eine zweite Zeile: finish the task and update your session notes („Aufgabe abschließen und Notizen aktualisieren“).",
+    "Bei Gelb (80 %) erscheint eine zweite Zeile: schließen Sie die Aufgabe ab und aktualisieren Sie Ihre Sitzungsnotizen.",
     "Klicken Sie auf Write session notes. Claude schreibt auf, was erledigt ist, die Entscheidungen, was noch offen ist und die nächsten Schritte.",
-    "Bei Rot (90 %) steht dort start a new session. Starten Sie eine neue Sitzung und lassen Sie sie die Notizen lesen. Sie blinkt, bis der Kontext wieder sinkt."
+    "Bei Rot (90 %) steht dort starten Sie eine neue Sitzung. Starten Sie eine neue Sitzung und lassen Sie sie die Notizen lesen. Sie blinkt, bis der Kontext wieder sinkt."
   ],
   "p4": "Bei Rot sagt die Statuszeile unter dem Eingabefeld dasselbe, sodass Sie es auch bei ausgeblendetem Band sehen.",
   "new_t": "Eine neue Sitzung ist besser als Compact",
@@ -105,6 +105,10 @@
     [
       "`/meter`",
       "den Detailbereich zu öffnen. Oder klicken Sie im Band auf Details; ein zweiter Klick schließt ihn wieder."
+    ],
+    [
+      "`/meter language de`",
+      "Band, Bereich und Meldungen auf Deutsch stellen (en, nl, fr oder de)."
     ],
     [
       "`/meter close`",
@@ -139,94 +143,98 @@
   ],
   "term": "Im Terminal funktioniert die Mod genauso. Die Balken sind Linien, und `/meter` öffnet den Bereich im Vollbild-Layout (`/tui fullscreen`, mindestens 110 Spalten) neben dem Gespräch, sonst über dem Eingabefeld.",
   "h6": "7. Einstellungen ändern",
-  "p6": "Öffnen Sie den Bereich /meter (Details im Band anklicken) und klicken Sie ganz unten auf Settings, oder tippen Sie /meter settings. Jede Einstellung hat ihre eigene Schaltfläche: On oder Off zum Ein- und Ausschalten, − oder + für eine Zahl, und ein Klick auf eine Auswahl (etwa beim Haiku-Leser) springt zur nächsten Option. Eine Änderung gilt sofort. Der Bereich zeigt die englischen Namen der Einstellungen. Nur die Farben ändern Sie dort nicht: Öffnen Sie ein Terminal, tippen Sie claude, dann /config, und suchen Sie die Zeilen von ai-usage-meter. In der Desktop-App öffnet /config das eigene Einstellungsfenster der App, und dort sind die Einstellungen der Mod nicht zu finden.",
+  "p6": "Öffnen Sie den Bereich /meter (Details im Band anklicken) und klicken Sie ganz unten auf Settings, oder tippen Sie /meter settings. Jede Einstellung hat ihre eigene Schaltfläche: On oder Off zum Ein- und Ausschalten, − oder + für eine Zahl, und ein Klick auf eine Auswahl (etwa beim Haiku-Leser) springt zur nächsten Option. Eine Änderung gilt sofort. Nur die Farben ändern Sie dort nicht: Öffnen Sie ein Terminal, tippen Sie claude, dann /config, und suchen Sie die Zeilen von ai-usage-meter. In der Desktop-App öffnet /config das eigene Einstellungsfenster der App, und dort sind die Einstellungen der Mod nicht zu finden. Die erste Einstellung, Sprache, legt die Sprache von Band, Bereich und Meldungen fest: English, Nederlands, Français oder Deutsch (oder tippen Sie /meter language de). Die Schaltflächen und Session, Week und Compress bleiben englisch.",
   "set_h": [
     "Einstellung",
     "Standard"
   ],
   "set": [
     [
-      "Limits: first and second warning",
+      "Sprache",
+      "en (English)"
+    ],
+    [
+      "Limits: erste und zweite Warnung",
       "80 % und 95 %"
     ],
     [
-      "Context: yellow and red",
+      "Kontext: Gelb und Rot",
       "80 % und 90 % des Komprimierungspunkts"
     ],
     [
-      "Message at the limit warnings",
+      "Meldung bei den Limitwarnungen",
       "An"
     ],
     [
-      "Message when a limit resets",
+      "Meldung beim Zurücksetzen eines Limits",
       "An"
     ],
     [
-      "Message when compaction has run",
+      "Meldung nach einer Komprimierung",
       "An"
     ],
     [
-      "Blink at red",
+      "Bei Rot blinken",
       "An"
     ],
     [
-      "Little robot in the band",
+      "Kleiner Roboter im Band",
       "An"
     ],
     [
-      "Robot: a different robot for each model",
+      "Roboter: ein Roboter pro Modell",
       "An"
     ],
     [
-      "Robot: show the effort level",
+      "Roboter: Aufwandsstufe zeigen",
       "An"
     ],
     [
-      "Robot size",
+      "Robotergröße",
       "3 (mittel)"
     ],
     [
-      "Haiku reader",
+      "Haiku-Leser",
       "off"
     ],
     [
-      "Haiku reader: from (tokens read in one turn)",
+      "Haiku-Leser: ab (in einer Runde gelesene Tokens)",
       "2000"
     ],
     [
-      "Context: yellow from (tokens)",
+      "Kontext: Gelb ab (Tokens)",
       "0 (aus)"
     ],
     [
-      "Context: red from (tokens)",
+      "Kontext: Rot ab (Tokens)",
       "0 (aus)"
     ],
     [
-      "Cache clock",
+      "Cache-Uhr",
       "An"
     ],
     [
-      "Cache clock: cache lifetime",
+      "Cache-Uhr: Cache-Dauer",
       "60 Minuten"
     ],
     [
-      "Search helpers (Explore) on Haiku",
+      "Suchhelfer (Explore) auf Haiku",
       "Aus"
     ],
     [
-      "HTML companion",
+      "HTML-Begleiter",
       "ask"
     ],
     [
-      "Figures are old after",
+      "Werte sind alt nach",
       "60 Minuten"
     ],
     [
-      "Colours: below the warnings, first, second",
+      "Farben: unter den Warnungen, erste, zweite",
       "#3FB950, #F0883E, #F85149"
     ],
     [
-      "Use the strip's Settings when it is installed",
+      "Die Settings der Leiste verwenden, wenn sie installiert ist",
       "An"
     ]
   ],
@@ -256,18 +264,18 @@
     "Für eine große Suche kann Claude einen Helfer losschicken. Der Helfer sucht für sich, und nur seine kurze Antwort kommt in Ihr Gespräch zurück. Ihr Gespräch wächst also nicht um alles, was der Helfer gelesen hat."
   ],
   "save_h_tok": "Eine Warnung ab einer Tokenzahl (standardmäßig aus)",
-  "save_tok": "Das Band wird normalerweise bei 80 % gelb und bei 90 % rot, gemessen am Punkt, an dem das Komprimieren beginnt. In einem sehr großen Gesprächsfenster (1 Million Tokens) kommen 80 % erst bei etwa 775.000 Tokens, obwohl jede Nachricht längst teuer ist. Unter Settings (Kapitel 7) können Sie deshalb zusätzlich eine Tokenzahl angeben, zum Beispiel Gelb ab 250.000 und Rot ab 350.000. Die Warnung kommt dann bei dem, was zuerst erreicht wird, und nennt es, zum Beispiel „262k tokens: finish the task and update your session notes“. Lassen Sie 0 bei einem Fenster normaler Größe: Dann ändert sich nichts.",
+  "save_tok": "Das Band wird normalerweise bei 80 % gelb und bei 90 % rot, gemessen am Punkt, an dem das Komprimieren beginnt. In einem sehr großen Gesprächsfenster (1 Million Tokens) kommen 80 % erst bei etwa 775.000 Tokens, obwohl jede Nachricht längst teuer ist. Unter Settings (Kapitel 7) können Sie deshalb zusätzlich eine Tokenzahl angeben, zum Beispiel Gelb ab 250.000 und Rot ab 350.000. Die Warnung kommt dann bei dem, was zuerst erreicht wird, und nennt es, zum Beispiel „262k Tokens: schließen Sie die Aufgabe ab und aktualisieren Sie Ihre Sitzungsnotizen“. Lassen Sie 0 bei einem Fenster normaler Größe: Dann ändert sich nichts.",
   "save_h_cache": "Die Cache-Uhr und Keep warm",
-  "save_cache": "Nach jeder Antwort zeigt das Band, wie lange die bereitliegende Kopie des Gesprächs noch bereitliegt, zum Beispiel „cache 42m“: noch 42 Minuten. In den letzten 5 Minuten wird es orange. Danach steht dort „cache cold“: Ihre nächste Nachricht kostet einmal den vollen Preis, danach liegt die Kopie wieder bereit.",
+  "save_cache": "Nach jeder Antwort zeigt das Band, wie lange die bereitliegende Kopie des Gesprächs noch bereitliegt, zum Beispiel „Cache 42min“: noch 42 Minuten. In den letzten 5 Minuten wird es orange. Danach steht dort „Cache kalt“: Ihre nächste Nachricht kostet einmal den vollen Preis, danach liegt die Kopie wieder bereit.",
   "save_warm": "Keep warm, eine Schaltfläche im Bereich /meter, stellt diese Uhr wieder auf Anfang. Es schickt Claude eine winzige, verborgene Frage („antworte mit dem Wort: ok“). Um sie zu beantworten, liest Claude das Gespräch aus der bereitliegenden Kopie, und dadurch bleibt die Kopie eine weitere volle Periode bereit. Frage und Antwort erscheinen nicht in Ihrem Gespräch: Sie sehen nur eine kurze Meldung, dass es geklappt hat. Keep warm läuft nie von selbst: Ein Klick ist eine Frage.",
   "save_ex_t": "Beispiel: die Mittagspause",
-  "save_ex": "Sie sind mitten in einer langen Aufgabe, und das Band zeigt „cache 8m“. Sie gehen 45 Minuten zum Mittagessen. Klicken Sie vorher auf Keep warm: Die Uhr springt auf 60 Minuten zurück, und Ihre erste Nachricht nach dem Essen kostet weiterhin den niedrigen Preis. Ohne Keep warm würde die Kopie während des Essens ablaufen, und diese erste Nachricht würde das ganze Gespräch zum vollen Preis neu lesen. Gehen Sie für heute nach Hause? Dann klicken Sie nicht: Sie würden für eine Frage zahlen, die Sie nie nutzen.",
+  "save_ex": "Sie sind mitten in einer langen Aufgabe, und das Band zeigt „Cache 8min“. Sie gehen 45 Minuten zum Mittagessen. Klicken Sie vorher auf Keep warm: Die Uhr springt auf 60 Minuten zurück, und Ihre erste Nachricht nach dem Essen kostet weiterhin den niedrigen Preis. Ohne Keep warm würde die Kopie während des Essens ablaufen, und diese erste Nachricht würde das ganze Gespräch zum vollen Preis neu lesen. Gehen Sie für heute nach Hause? Dann klicken Sie nicht: Sie würden für eine Frage zahlen, die Sie nie nutzen.",
   "save_h_help": "Suchhelfer auf Haiku (standardmäßig aus)",
   "save_help": "Wenn Claude viele Dateien durchsuchen muss, schickt Claude Code seinen Suchhelfer los (Explore). Normalerweise nutzt dieser Helfer dasselbe Modell wie Ihr Gespräch, oft das teure Opus. Mit „Search helpers (Explore) on Haiku“ unter Settings eingeschaltet nutzt er stattdessen das günstigere Haiku. Suchen und Lesen kann Haiku gut; Opus denkt weiter selbst nach und macht die Änderungen. Andere Helfer behalten ihr Modell. Details neben dem Haiku-Leser im Bereich zeigt, wie viele Suchhelfer auf Haiku liefen.",
   "save_h_care": "Gut zu wissen",
   "save_care": [
     "Die Mod kann Ihnen nicht genau sagen, wie viel Sie gespart haben. Sie zählt die Tokens pro Modell, aber was dieselbe Arbeit ohne diese Werkzeuge gekostet hätte, lässt sich nur schätzen. Vergleichen Sie dazu die Session-Zahl bei gleicher Art von Aufgabe, einmal mit und einmal ohne die Werkzeuge.",
-    "Keep warm kostet jedes Mal ein wenig: Claude liest das Gespräch aus der bereitliegenden Kopie. Es lohnt sich nur, wenn Sie zurückkommen und weitermachen, bevor die Uhr abläuft. Steht im Band schon „cache cold“, hilft Keep warm nicht mehr, und die Mod sagt es Ihnen.",
+    "Keep warm kostet jedes Mal ein wenig: Claude liest das Gespräch aus der bereitliegenden Kopie. Es lohnt sich nur, wenn Sie zurückkommen und weitermachen, bevor die Uhr abläuft. Steht im Band schon „Cache kalt“, hilft Keep warm nicht mehr, und die Mod sagt es Ihnen.",
     "Haiku kann Details übersehen. Lassen Sie es finden und lesen, und lassen Sie Opus das Ergebnis prüfen. Opus liest eine Datei immer selbst, bevor es sie ändert. Für heikle Arbeit schalten Sie die Haiku-Werkzeuge aus.",
     "Die Mod sieht nicht, wie lange die Kopie wirklich bereitliegt: Sie nutzt die Zeit aus Settings (60 Minuten). Stellen Sie 5 Minuten ein, wenn Sie einen API-Schlüssel nutzen.",
     "Jede Frage, die die Mod an ein Modell schickt (Keep warm, die Suchen des Lesers), zählt ebenfalls für Ihre Limits."
@@ -279,7 +287,7 @@
   "html_h_how": "So funktioniert es",
   "html_how": [
     "Claude schreibt ein langes Markdown-Dokument, das man wieder liest: einen Plan, eine Spezifikation, einen Vergleich, einen Entwurf oder einen Ablauf.",
-    "Wenn Claude fertig ist, fragt das Band „An HTML version of Plan.md?“ mit Make it und No. Im Eingabefeld steht außerdem der graue Vorschlag „Make the HTML version of Plan.md“.",
+    "Wenn Claude fertig ist, fragt das Band „Eine HTML-Version von Plan.md?“ mit Make it und No. Im Eingabefeld steht außerdem der graue Vorschlag „Erstelle die HTML-Version von Plan.md“.",
     "Ja sagen: Klicken Sie auf Make it, oder drücken Sie Tab und dann Enter. yes tippen geht auch.",
     "Claude schreibt Plan.html neben Plan.md. Doppelklicken Sie im Datei-Explorer darauf, um sie im Browser zu öffnen.",
     "Später die Markdown-Datei geändert? Dann bietet die Mod an, die HTML-Version zu aktualisieren."
@@ -341,7 +349,7 @@
   "h_cs": "5. Sitzungen sicher schließen und starten",
   "p_cs": "Zwei Schaltflächen führen zwei Prompts aus, die mit der Mod kommen. Close session prüft alles, was diese Sitzung getan hat, und speichert es in CLAUDE.md, MEMORY.md und den Sitzungsnotizen. Start session liest diese Dateien in der nächsten Sitzung oder legt sie in einem neuen Projekt an und macht dort weiter, wo Sie aufgehört haben. Führen Sie Close session später in derselben Sitzung noch einmal aus, aktualisiert es die bereits geschriebene Notiz, statt eine zweite hinzuzufügen: Die offenen Schritte bleiben Wort für Wort erhalten, ältere Notizen werden nie gekürzt.",
   "fig3": "Abbildung 2. Close session im Band: erst der Fortschritt, dann das Ergebnis.",
-  "alt3": "Zwei Bänder: eine orange Zeile „Closing session… step 3 of 6 · 50%“ mit einem Balken und eine grüne Zeile „Now it's safe to end this session“.",
+  "alt3": "Zwei Bänder: eine orange Zeile „Sitzung wird beendet… Schritt 3 von 6 · 50 %“ mit einem Balken und eine grüne Zeile „Sie können diese Sitzung jetzt sicher beenden“.",
   "where_h": [
     "Schaltfläche",
     "Wo"
@@ -364,23 +372,23 @@
   ],
   "msg": [
     [
-      "Closing session… step 3 of 6 · 50%",
+      "Sitzung wird beendet… Schritt 3 von 6 · 50 %",
       "Warten: Claude arbeitet die Prüfung ab."
     ],
     [
-      "✓ Now it's safe to end this session",
+      "✓ Sie können diese Sitzung jetzt sicher beenden",
       "Alles ist gespeichert. Schließen Sie die Sitzung."
     ],
     [
-      "✓ Everything is ready to start this session",
+      "✓ Alles ist bereit, um diese Sitzung zu starten",
       "Claude hat die Dateien gelesen. Beginnen Sie Ihre Aufgabe."
     ],
     [
-      "It's NOT safe to close this session: <reason>",
+      "Diese Sitzung zu beenden ist NICHT sicher: <Grund>",
       "Claude hat ein Problem gefunden. Lesen Sie die Antwort, beheben Sie es und starten Sie Close session erneut."
     ],
     [
-      "Close session stopped at step 2 of 6",
+      "Close session bei Schritt 2 von 6 gestoppt",
       "Die Antwort endete zu früh. Prüfen Sie sie oder starten Sie Close session erneut."
     ]
   ],
@@ -415,7 +423,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, Version 2.0.1, enabled. „userConfig options not yet set“ ist normal: Jede Einstellung hat einen Standardwert."
+          "ai-usage-meter@ai-usage-meter, Version 2.1.0, enabled. „userConfig options not yet set“ ist normal: Jede Einstellung hat einen Standardwert."
         ]
       ]
     ],
@@ -453,11 +461,11 @@
       [
         [
           "`/meter demo here 85`",
-          "Compress orange; „finish the task and update your session notes“ mit Write session notes"
+          "Compress orange; „schließen Sie die Aufgabe ab und aktualisieren Sie Ihre Sitzungsnotizen“ mit Write session notes"
         ],
         [
           "`/meter demo here 93`",
-          "Compress rot; „start a new session“ blinkt; Close session und Compact"
+          "Compress rot; „starten Sie eine neue Sitzung“ blinkt; Close session und Compact"
         ],
         [
           "`/meter demo 96`",
@@ -465,7 +473,7 @@
         ],
         [
           "`/meter demo context 92 A`",
-          "„other: demo-A 92%“ im Band"
+          "„andere: demo-A 92 %“ im Band"
         ],
         [
           "`/meter demo off`",
@@ -494,6 +502,10 @@
           "Die Einstellungen unten im Bereich, jede mit ihrer Schaltfläche"
         ],
         [
+          "Tippen Sie `/meter language de` (oder Sprache unter Settings)",
+          "Band und Bereich auf Deutsch; die Schaltflächen bleiben englisch"
+        ],
+        [
           "Schalten Sie Blink at red aus, dann `/meter demo here 93`",
           "Rot ohne Blinken (schalten Sie es danach wieder ein)"
         ],
@@ -519,11 +531,11 @@
         ],
         [
           "Stellen Sie Kontext: Gelb ab auf 50000, dann /meter demo here 40",
-          "64k tokens: finish the task and update your session notes (danach zurückstellen)"
+          "64k tokens: schließen Sie die Aufgabe ab und aktualisieren Sie Ihre Sitzungsnotizen"
         ],
         [
           "Schauen Sie nach Claudes Antwort auf das Band",
-          "cache 59m, rückwärts zählend; Keep warm im Bereich"
+          "Cache 59min, rückwärts zählend; Keep warm im Bereich"
         ],
         [
           "Schalten Sie Suchhelfer (Explore) auf Haiku ein, lassen Sie groß suchen",
@@ -531,7 +543,7 @@
         ],
         [
           "Lassen Sie Claude einen Plan von etwa zwei Seiten in Plan.md schreiben",
-          "„An HTML version of Plan.md?“ mit Make it und No im Band"
+          "„Eine HTML-Version von Plan.md?“ mit Make it und No im Band"
         ],
         [
           "Klicken Sie auf Make it",
@@ -548,7 +560,7 @@
         ],
         [
           "Klicken Sie auf Close session (Bereich, oder Band bei Rot)",
-          "„Closing session… step 1 of 6“ bis 6, dann „✓ Now it's safe to end this session“"
+          "„Sitzung wird beendet… Schritt 1 von 6“ bis 6, dann „✓ Sie können diese Sitzung jetzt sicher beenden“"
         ],
         [
           "Sehen Sie im Testordner nach",
@@ -560,11 +572,11 @@
         ],
         [
           "Öffnen Sie dort eine neue Sitzung; klicken Sie vor dem Tippen auf Start session",
-          "„Preparing session…“, dann „✓ Everything is ready to start this session“"
+          "„Sitzung wird vorbereitet…“, dann „✓ Alles ist bereit, um diese Sitzung zu starten“"
         ],
         [
           "In der Desktop-App: Öffnen Sie eine neue Sitzung und tippen Sie /meter start als erste Nachricht",
-          "„Preparing session…“, dann „✓ Everything is ready to start this session“; Claude hat vorher nichts anderes getan"
+          "„Sitzung wird vorbereitet…“, dann „✓ Alles ist bereit, um diese Sitzung zu starten“; Claude hat vorher nichts anderes getan"
         ],
         [
           "Lesen Sie Claudes erste Antwort",
@@ -577,7 +589,7 @@
       [
         [
           "Klicken Sie auf Close session und drücken Sie dann Esc, um Claude zu stoppen",
-          "Orange: „Close session stopped at step … of 6“, nie grün"
+          "Orange: „Close session bei Schritt … von 6 gestoppt“, nie grün"
         ],
         [
           "Klicken Sie zweimal schnell auf Close session",
@@ -589,5 +601,7 @@
   "mp_t": "„error: unknown option '--marketplace'“",
   "mp": "Ihr `claude` ist älter als 2.1.287, oder PowerShell nutzt noch das alte. Aktualisieren Sie es und öffnen Sie ein neues PowerShell. Aktualisieren nicht möglich? Installieren Sie dann mit zwei Befehlen: `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\Session Pilot\"`, danach `claude plugin install ai-usage-meter@ai-usage-meter`. Das Band selbst braucht trotzdem 2.1.287 oder neuer.",
   "upd_t": "Sie hatten die AI Usage Meter-Mod?",
-  "upd": "Session Pilot ist dieselbe Mod mit neuem Namen: Ihre Einstellungen bleiben. Entpacken Sie die neue Version, kopieren Sie alles aus ihrem Ordner Session Pilot über Ihren alten Ordner AI Usage Meter Mod (Dateien ersetzen) und starten Sie Claude Code neu. Lassen Sie den alten Ordner, wo er ist: Claude Code liest die Mod von dort."
+  "upd": "Session Pilot ist dieselbe Mod mit neuem Namen: Ihre Einstellungen bleiben. Entpacken Sie die neue Version, kopieren Sie alles aus ihrem Ordner Session Pilot über Ihren alten Ordner AI Usage Meter Mod (Dateien ersetzen) und starten Sie Claude Code neu. Lassen Sie den alten Ordner, wo er ist: Claude Code liest die Mod von dort.",
+  "lang_t": "Die Mod auf Deutsch",
+  "lang": "Dieses Handbuch zeigt die Bildschirme auf Deutsch: Wählen Sie Deutsch bei Sprache unter Settings (oder tippen Sie /meter language de). Bis dahin spricht die Mod Englisch. Die Schaltflächen und Session, Week und Compress bleiben englisch."
 }

@@ -4,7 +4,7 @@
 
 > Unofficial community project. Not affiliated with, endorsed by or sponsored by Anthropic. "Claude" is a trademark of Anthropic.
 
-Version 2.0.1 · Made by Hans Tandt · MIT licence · [What's new](CHANGELOG.md)
+Version 2.1.0 · Made by Hans Tandt · MIT licence · [What's new](CHANGELOG.md)
 
 ![The band above the prompt at green, yellow and red](images/band-levels_en.png)
 
@@ -20,6 +20,7 @@ The manual (17–18 pages) is in [`docs/out`](docs/out), as PDF and Word: [Engli
 - **Close session and Start session**: one click runs a full end-of-session or start-of-session routine (see below).
 - **The Haiku reader** (off by default): when Opus reads a lot in one turn, it gives further searching and reading to a reader on Haiku, which sends back only files, line numbers and the exact lines; Opus still reads those lines itself before it changes anything. The `/meter` pane has its On/Off switch and a token counter per model (this session and this week); mode and limit are under **Settings** in the pane.
 - **Token savers**: a cache clock in the band (`cache 42m`, then `cache cold`) with **Keep warm** in the pane; optional warnings at a token number (for example yellow from 250,000) as well as at the % of compaction; and optionally Claude Code's search helper (Explore) on Haiku. Chapter 11 of the manual explains how Claude uses tokens and what each tool can and cannot save.
+- **Four languages**: under **Settings**, *Language* switches the band, the pane and the short messages to English, Nederlands, Français or Deutsch (or type `/meter language nl`). Button labels and the names Session, Week and Compress stay in English; what the mod sends to Claude stays in English too.
 - **The HTML companion** (asks by default): after Claude writes a long Markdown document worth re-reading (a plan, a spec, a comparison), the band asks *An HTML version of Plan.md?* and the prompt box suggests it (Tab, Enter). On a yes Claude writes `Plan.html` next to it: one self-contained page with a table of contents and diagrams drawn inside the file, so it works offline. The Markdown stays the original. Never for `CLAUDE.md`, `MEMORY.md`, session notes or task lists; two offers not taken pause it for the session.
 - **A little pixel robot** beside **Details** (an original design): it blinks now and then, scans while Claude works, its antenna shows the Compress colour, and it cheers when Close session says it is safe. Each model has its own robot (Opus a crown, Sonnet ears, Haiku a short antenna, Fable two antenna points), and a bar of five marks under it (and five chest lights) shows the effort level. In the terminal it is a short face: `[o_o]` Opus, `(o_o)` Sonnet, `{o_o}` Haiku, `<o_o>` Fable. Its size and options are under **Settings** in the pane.
 - **Short messages (toasts)**: at each limit level (once per window, for all sessions together), when a limit resets, at the yellow and red context levels, and after compaction.
@@ -37,6 +38,7 @@ On the desktop the bars are drawn as rounded bars; in the terminal as lines. In 
 | `/meter start` | Run Start session (also `/meter start-session`). In the desktop app, type it as the first message of a new session: the band only appears after that first message |
 | `/meter close` | Close the pane |
 | `/meter settings` | Open the pane with the mod's settings at the bottom |
+| `/meter language nl` | Switch the screens to Dutch (en, nl, fr or de) |
 | `/meter html` | Make the HTML version on offer; `/meter html ask`, `on` or `off` sets the HTML companion |
 | `/meter band off` / `/meter band on` | Hide or show the band |
 | `/meter demo 85` | Demo figures for Session and Week |
@@ -55,6 +57,7 @@ Open the `/meter` pane (click **Details** in the band) and click **Settings** at
 | Context: yellow and red from a number of tokens | 0 (off) |
 | Cache clock, and the cache lifetime | on, 60 minutes (set 5 with an API key) |
 | Search helpers (Explore) on Haiku | off |
+| Language | en (English); nl, fr, de |
 | HTML companion | ask (on: make it without asking; off: never) |
 | Messages at the limit warnings, on a reset, after compaction | on |
 | Blink at red | on |

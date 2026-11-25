@@ -19,6 +19,7 @@ import {
   startPrompt,
 } from './routine'
 import type { RoutineTask } from './routine'
+import { LANG_NAMES, toLang, tr } from './i18n'
 import { baseName, htmlMode, htmlPathFor, htmlPrompt, htmlWorth, isAccept, isMarkdownCandidate, offerText } from './html'
 import {
   NO_TOKENS,
@@ -163,7 +164,7 @@ async function changeSetting($: EngineInterface, key: string, value: boolean | s
   try {
     const r = await $.config.set({ key, value })
     if ('deny' in r && r.deny) {
-      $.ui.toast(`Session Pilot: this setting can't be changed here (${r.deny}).`)
+      $.ui.toast(`Session Pilot: ${(await L($)).cantChange(r.deny)}`)
       await refreshConfig($)
       return
     }
@@ -177,9 +178,14 @@ async function changeSetting($: EngineInterface, key: string, value: boolean | s
     liveOptions[field] = value
     await applyLive($)
   } catch {
-    $.ui.toast("Session Pilot: this setting can't be changed here.")
+    $.ui.toast(`Session Pilot: ${(await L($)).cantChange()}`)
   }
   await refreshConfig($)
+}
+
+// The short messages in the chosen language (setting Language).
+async function L($: EngineInterface) {
+  return tr(toLang((await read($, settings)).lang))
 }
 
 // ---------- the HTML companion (hooks/html.ts) ----------
@@ -215,7 +221,7 @@ async function considerHtml($: EngineInterface, o: PluginOptions) {
       return
     }
     if ((await read($, htmlOffered)).includes(path)) return // once per file and session, unless accepted
-    const offer = { path, name, update: updating, text: offerText(name, updating) }
+    const offer = { path, name, update: updating, text: offerText(name, updating, (await read($, settings)).lang) }
     await update($, htmlOffer, () => offer)
     await update($, htmlOffered, list => [...list, path])
     // The prompt box takes a suggestion only once the turn is over.
@@ -246,7 +252,7 @@ async function htmlRefused($: EngineInterface) {
   await update($, htmlRefusals, () => n)
   if (n >= 2 && !(await read($, htmlPaused))) {
     await update($, htmlPaused, () => true)
-    $.ui.toast('Session Pilot: no more HTML offers in this session. /meter html ask turns them on again.')
+    $.ui.toast(`Session Pilot: ${(await L($)).htmlPaused}`)
   }
 }
 
@@ -259,7 +265,7 @@ async function keepWarm($: EngineInterface) {
     const at = await read($, lastReplyAt)
     const nowMs = await $.clock.now()
     if (!at || nowMs - at >= cfg.minutes * 60000) {
-      $.ui.toast('Session Pilot: the cache is already cold; Keep warm only helps before it runs out.')
+      $.ui.toast(`Session Pilot: ${(await L($)).cacheAlreadyCold}`)
       return
     }
     await update($, warming, () => true)
@@ -267,12 +273,12 @@ async function keepWarm($: EngineInterface) {
     if (r.isAnswered) {
       const warmedAt = await $.clock.now()
       await update($, lastReplyAt, () => warmedAt)
-      $.ui.toast('Session Pilot: cache kept warm for another period.')
+      $.ui.toast(`Session Pilot: ${(await L($)).warmed}`)
     } else {
-      $.ui.toast(`Session Pilot: Keep warm did not work (${r.reason}).`)
+      $.ui.toast(`Session Pilot: ${(await L($)).warmFailed(r.reason)}`)
     }
   } catch {
-    $.ui.toast('Session Pilot: Keep warm did not work.')
+    $.ui.toast(`Session Pilot: ${(await L($).catch(() => tr('en'))).warmFailed()}`)
   } finally {
     await update($, warming, () => false).catch(() => {})
   }
@@ -438,7 +444,7 @@ async function handoverKey($: EngineInterface) {
 async function runRoutine($: EngineInterface, task: RoutineTask) {
   const now = await read($, routine)
   if (now && (now.status === 'queued' || now.status === 'running')) {
-    $.ui.toast('Session Pilot: a Close session or Start session is already running.')
+    $.ui.toast(`Session Pilot: ${(await L($)).routineBusy}`)
     return
   }
   let template: string | undefined
@@ -446,7 +452,7 @@ async function runRoutine($: EngineInterface, task: RoutineTask) {
     template = extractPrompt(await $.fs.read(`${$.plugin.root}/${PROMPT_FILES[task]}`), HEADINGS[task])
   } catch {}
   if (!template) {
-    $.ui.toast(`Session Pilot: the prompt file ${PROMPT_FILES[task]} is missing or has no prompt block.`)
+    $.ui.toast(`Session Pilot: ${(await L($)).promptMissing(PROMPT_FILES[task])}`)
     return
   }
   const folder = await $.session.cwd()
@@ -465,7 +471,7 @@ async function runRoutine($: EngineInterface, task: RoutineTask) {
   } catch {
     await update($, working, () => false)
     await update($, routine, () => null)
-    $.ui.toast('Session Pilot: Claude Code did not take the prompt. Try again when Claude is idle.')
+    $.ui.toast(`Session Pilot: ${(await L($)).promptRefused}`)
   }
 }
 
@@ -482,15 +488,16 @@ async function finishRoutine($: EngineInterface, answer: string) {
     await $.store.delete(await handoverKey($))
   }
   let next: Routine
-  if (!outcome) next = { ...r, status: 'stopped', reason: `stopped at step ${r.step} of ${r.total}` }
+  const T = await L($)
+  if (!outcome) next = { ...r, status: 'stopped', reason: T.stoppedAt(r.step, r.total) }
   else if (outcome.ok) next = { ...r, status: 'done', step: r.total }
   else next = { ...r, status: 'failed', reason: outcome.reason }
   await update($, routine, () => next)
   const what = r.task === 'close' ? 'Close session' : 'Start session'
   $.ui.toast(
     next.status === 'done'
-      ? `Session Pilot: ${r.task === 'close' ? "now it's safe to end this session" : 'everything is ready to start this session'}.`
-      : `Session Pilot: ${what}: ${next.reason ?? 'not finished'}. Check Claude's reply.`,
+      ? `Session Pilot: ${T.routineDone(r.task === 'close')}`
+      : `Session Pilot: ${T.routineNotDone(what, next.reason ?? T.seeReply)}`,
     { timeoutMs: 10000 },
   )
 }
@@ -622,6 +629,7 @@ function fromOptions(o: PluginOptions): MeterSettings {
   }
   return {
     source: 'config',
+    lang: toLang(o.language),
     tokenYellow: 0, // set in loadSettings, whoever decides the rest
     tokenRed: 0,
     warn1: num('warn1', DEFAULTS.warn1, 1, 100),
@@ -667,6 +675,7 @@ async function loadSettings($: EngineInterface, options: PluginOptions) {
     const tok = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.round(v) : 0)
     s.tokenYellow = tok(options.tokenYellow)
     s.tokenRed = tok(options.tokenRed)
+    s.lang = toLang(options.language) // the strip has no language: always the mod's own setting
     if (s.tokenYellow > 0 && s.tokenRed > 0 && s.tokenYellow >= s.tokenRed) s.tokenYellow = 0
     const old = await read($, settings)
     if (JSON.stringify(old) !== JSON.stringify(s)) await update($, settings, () => s)
@@ -726,14 +735,15 @@ async function checkLimits($: EngineInterface, list: Window[]) {
     const s = await read($, settings)
     for (const w of list) {
       if (w.kind !== 'five_hour' && w.kind !== 'seven_day') continue
-      const name = w.kind === 'five_hour' ? '5-hour limit' : 'Weekly limit'
+      const T = await L($)
+      const name = T.limitName(w.kind)
       const period = w.resetsAt ?? ''
 
       const last = (await $.store.get(`reset:${w.kind}`)) as string | undefined
       if (period !== '' && last !== period) {
         await $.store.set(`reset:${w.kind}`, period)
         if (last && s.notifyReset && Date.parse(period) > Date.parse(last) + 30 * 60000 && w.percentUsed < s.warn1) {
-          $.ui.toast(`Session Pilot: the ${name.toLowerCase()} has reset (${Math.round(w.percentUsed)}% used).`)
+          $.ui.toast(`Session Pilot: ${T.limitReset(name, Math.round(w.percentUsed))}`)
         }
       }
 
@@ -744,9 +754,7 @@ async function checkLimits($: EngineInterface, list: Window[]) {
         await $.store.set(key, level)
         if (s.notify) {
           $.ui.toast(
-            level === 2
-              ? `Session Pilot: ${name} at ${Math.round(w.percentUsed)}%. Finish what you are doing.`
-              : `Session Pilot: ${name} at ${Math.round(w.percentUsed)}%.`,
+            `Session Pilot: ${T.limitAt(name.charAt(0).toUpperCase() + name.slice(1), Math.round(w.percentUsed), level === 2)}`,
             { timeoutMs: 8000 },
           )
         }
@@ -764,7 +772,7 @@ async function checkContext($: EngineInterface) {
     const level = contextLevel(s, c.toCompact, c.tokens)
     const shown = await read($, ctxLevel)
     if (level < shown && c.toCompact < s.sessLevel1 - 5 && tokenLevel(s, c.tokens) === 0) await update($, ctxLevel, () => 0)
-    if (level === 2) $.ui.status(`Session Pilot: ${contextMessage({ ...(await view($)), context: c })?.text ?? 'start a new session'}`)
+    if (level === 2) $.ui.status(`Session Pilot: ${contextMessage({ ...(await view($)), context: c })?.text ?? (await L($)).startNew}`)
     else $.ui.status(undefined)
     await syncBlink($)
     if (level <= shown) return
@@ -827,7 +835,7 @@ function actions($: EngineInterface): Actions {
     hide: () => {
       void update($, bandHidden, () => true)
       void $.store.set('bandHidden', true)
-      $.ui.toast('Session Pilot: band hidden. /meter band on shows it again.')
+      void L($).then(T => $.ui.toast(`Session Pilot: ${T.bandHidden}`)).catch(() => {})
     },
     open: () => void togglePane($).catch(() => {}),
     // The pane's reader switch; the choice is kept for the next sessions too.
@@ -866,7 +874,7 @@ async function demo($: EngineInterface, args: string[]): Promise<{ text: string 
     await update($, ctxLevel, () => 0)
     await recordContext($)
     await scan($)
-    return { text: 'Meter back to your real figures; demo sessions ended.' }
+    return { text: (await L($)).demoOff }
   }
   if (args[0] === 'here') {
     const pct = Math.max(0, Math.min(150, Number(args[1])))
@@ -881,7 +889,7 @@ async function demo($: EngineInterface, args: string[]): Promise<{ text: string 
     }))
     await update($, turns, () => [0.6, 0.66, 0.71, 0.75, 0.8].map(f => Math.round(point * (pct / 100) * f)).concat(Math.round((point * pct) / 100)))
     await checkContext($)
-    return { text: `Demo: this session at ${pct}% of compaction (until Claude's next reply). /meter demo off ends it.` }
+    return { text: (await L($)).demoHere(pct) }
   }
   if (args[0] === 'context') {
     const pct = Math.max(0, Math.min(150, Number(args[1])))
@@ -898,7 +906,7 @@ async function demo($: EngineInterface, args: string[]): Promise<{ text: string 
       ended: false,
     })
     await scan($)
-    return { text: `Demo session "${name}" at ${pct}% of compaction. Type /meter demo off to end it.` }
+    return { text: (await L($)).demoContext(name, pct) }
   }
   const pct = Math.max(0, Math.min(100, Number(args[0])))
   if (Number.isNaN(pct)) return { text: 'Usage: /meter demo <0-100>, /meter demo here <percent>, /meter demo context <percent> [name], or /meter demo off' }
@@ -907,7 +915,7 @@ async function demo($: EngineInterface, args: string[]): Promise<{ text: string 
     { kind: 'five_hour', percentUsed: pct, resetsAt },
     { kind: 'seven_day', percentUsed: Math.round(pct / 2), resetsAt },
   ])
-  return { text: `Demo: 5h at ${pct}%, week at ${Math.round(pct / 2)}%. Type /meter demo off to go back.` }
+  return { text: (await L($)).demoLimits(pct, Math.round(pct / 2)) }
 }
 
 export const register: Register = (on, engine) => {
@@ -920,8 +928,8 @@ export const register: Register = (on, engine) => {
     await $.command.register({
       name: 'meter',
       description:
-        'Session Pilot: open the details pane; /meter start (Start session), /meter settings, /meter html [on|ask|off], /meter close-session, /meter start-session, /meter close, /meter band on|off, /meter demo 85|here 85|off',
-      argumentHint: '[start | settings | html [on|ask|off] | close-session | start-session | close | band on | band off | demo …]',
+        'Session Pilot: open the details pane; /meter start (Start session), /meter settings, /meter language en|nl|fr|de, /meter html [on|ask|off], /meter close-session, /meter start-session, /meter close, /meter band on|off, /meter demo 85|here 85|off',
+      argumentHint: '[start | settings | language en|nl|fr|de | html [on|ask|off] | close-session | start-session | close | band on | band off | demo …]',
     })
     // Claude reports the steps of Close session / Start session with this tool; the band shows them in %.
     try {
@@ -984,12 +992,19 @@ export const register: Register = (on, engine) => {
       const task = args === 'close-session' ? 'close' : 'start'
       // A prompt can't be queued while this command is still being handled: send it just after.
       $.clock.after(50, () => void runRoutine($, task))
-      return { text: `Session Pilot: ${task === 'close' ? 'Close session' : 'Start session'} sent. The band shows its progress.` }
+      return { text: `Session Pilot: ${(await L($)).sent(task === 'close' ? 'Close session' : 'Start session')}` }
     }
     if (args === 'close') {
       await $.ui.close({ id: PANE })
       await update($, paneOpen, () => false)
-      return { text: 'Session Pilot pane closed.' }
+      return { text: `Session Pilot: ${(await L($)).paneClosed}` }
+    }
+    if (words[0] === 'language') {
+      const want = words[1]
+      if (want !== 'en' && want !== 'nl' && want !== 'fr' && want !== 'de') return { text: (await L($)).languageUsage }
+      const row = (await read($, configRows)).find(r => r.field === 'language')
+      await changeSetting($, row?.key ?? 'ai-usage-meter.language', want)
+      return { text: `Session Pilot: ${tr(want).languageSet(LANG_NAMES[want])}` }
     }
     if (words[0] === 'html') {
       const m = words[1]
@@ -998,19 +1013,19 @@ export const register: Register = (on, engine) => {
         await update($, htmlRefusals, () => 0)
         const row = (await read($, configRows)).find(r => r.field === 'htmlCompanion')
         await changeSetting($, row?.key ?? 'ai-usage-meter.htmlCompanion', m)
-        return { text: `Session Pilot: HTML companion ${m === 'ask' ? 'asks first' : m}.` }
+        return { text: `Session Pilot: ${(await L($)).htmlMode(m)}` }
       }
       const o = await read($, htmlOffer)
-      if (!o) return { text: 'Session Pilot: no Markdown document on offer for an HTML version. /meter html on|ask|off sets the mode.' }
+      if (!o) return { text: `Session Pilot: ${(await L($)).htmlNone}` }
       $.clock.after(50, () => void sendHtml($, o.path, o.update))
-      return { text: `Session Pilot: making the HTML version of ${o.name}.` }
+      return { text: `Session Pilot: ${(await L($)).htmlMaking(o.name)}` }
     }
     if (args === 'settings') {
       await update($, settingsOpen, () => true)
       await refreshConfig($)
       await scan($)
       if (!(await read($, paneOpen))) await openPane($)
-      return { text: 'Session Pilot: the settings are at the bottom of the pane.' }
+      return { text: `Session Pilot: ${(await L($)).settingsAtBottom}` }
     }
     if (args === 'band off' || args === 'band on') {
       const hidden = args === 'band off'
@@ -1020,7 +1035,7 @@ export const register: Register = (on, engine) => {
     }
     await scan($)
     const opened = await openPane($)
-    return { text: opened.isPlaced ? 'Session Pilot pane opened.' : 'Session Pilot: widen the window to see the pane.' }
+    return { text: `Session Pilot: ${opened.isPlaced ? (await L($)).paneOpened : (await L($)).widen}` }
   })
 
   on('session.measure', async ($, e, next) => {
@@ -1193,7 +1208,7 @@ export const register: Register = (on, engine) => {
       await update($, turns, () => [])
       if ((await read($, settings)).notifyCompaction) {
         $.ui.toast(
-          'Session Pilot: compaction ran. Older parts of this conversation are now a summary: check that paths, rules and decisions are still right.',
+          `Session Pilot: ${(await L($)).compactionRan}`,
           { timeoutMs: 10000 },
         )
       }

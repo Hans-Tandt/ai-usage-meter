@@ -3,11 +3,12 @@ import type { Elements } from 'claude-code'
 import type { ContextInfo, MeterSettings, OtherSession, Routine, SettingRow, Window } from '../types'
 import { robot, type RobotModel, type RobotState } from './robot'
 import { haikuShare, totalTokens, type ModelTokens } from './reader'
+import { LANG_NAMES, toLang, tr, type Strings } from './i18n'
 
 // What the band and the pane draw. Pure functions of plain data: every surface (terminal, desktop) gets the same tree.
 
 // Shown on the last line of the pane. Raise it together with the version in plugin.json.
-export const VERSION = '2.0.1'
+export const VERSION = '2.1.0'
 
 // Svg is there on the desktop app, VS Code and mobile; the terminal draws the bars with line characters.
 export type Kit = Pick<Elements['desktop'], 'Box' | 'Text' | 'Button'> & { Svg?: Elements['desktop']['Svg'] }
@@ -75,6 +76,7 @@ export const DEFAULTS: MeterSettings = {
   colorOk: '#3FB950',
   colorWarn: '#F0883E',
   colorDanger: '#F85149',
+  lang: 'en',
 }
 
 const HOUR = 3600000
@@ -139,12 +141,18 @@ export function isStale(v: View) {
   return v.limitsAt > 0 && v.now - v.limitsAt > v.settings.staleMinutes * 60000
 }
 
-export function duration(ms: number) {
+export function duration(ms: number, u: Strings['units'] = { m: 'm', h: 'h', d: 'd' }) {
   const m = Math.max(0, Math.round(ms / 60000))
-  if (m < 60) return `${m}m`
+  if (m < 60) return `${m}${u.m}`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ${String(m % 60).padStart(2, '0')}m`
-  return `${Math.floor(h / 24)}d ${h % 24}h`
+  if (h < 24) return `${h}${u.h} ${String(m % 60).padStart(2, '0')}${u.m}`
+  return `${Math.floor(h / 24)}${u.d} ${h % 24}${u.h}`
+}
+
+// The texts in the chosen language (setting Language), and a duration in its units.
+function texts(v: View) {
+  const L = tr(toLang(v.settings.lang))
+  return { L, d: (ms: number) => duration(ms, L.units) }
 }
 
 function clock(t: number) {
@@ -152,10 +160,10 @@ function clock(t: number) {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
-function day(t: number, now: number) {
+function day(t: number, now: number, days: readonly string[]) {
   const d = new Date(t)
   if (t - now < 20 * HOUR) return clock(t)
-  return `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()]} ${clock(t)}`
+  return `${days[d.getDay()]} ${clock(t)}`
 }
 
 function tokens(n: number) {
@@ -175,23 +183,24 @@ function cacheSection(kit: Kit, v: View, act: Actions) {
   const left = cacheLeft(v)
   if (left === undefined) return null
   const s = v.settings
+  const { L, d } = texts(v)
   const ctx = v.context?.tokens
-  const size = ctx ? `${tokens(ctx)} tokens` : 'the conversation'
+  const size = ctx ? L.tokens(tokens(ctx)) : L.conversation
   return (
     <Box key="cache" flexDirection="column" marginBottom={1}>
       <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
-        <Text bold>Cache</Text>
+        <Text bold>{L.cacheHeader}</Text>
         {left > 0 ? (
-          <Text color={left < 5 * 60000 ? s.colorWarn : undefined}>warm for {duration(left)}</Text>
+          <Text color={left < 5 * 60000 ? s.colorWarn : undefined}>{L.warmFor(d(left))}</Text>
         ) : (
-          <Text dimColor>cold</Text>
+          <Text dimColor>{L.cold}</Text>
         )}
         {left > 0 && <Button key="warm" label={v.cache.warming ? 'Warming…' : 'Keep warm'} onPress={act.warm} />}
       </Box>
       <Text dimColor>
         {left > 0
-          ? `Keep warm asks one tiny question, which re-reads ${size} from the cache: cheaper than new input, but it counts.`
-          : `Your next message re-reads ${size} at full price, once; after that it is cached again.`}
+          ? L.warmHelp(size)
+          : L.coldHelp(size)}
       </Text>
     </Box>
   )
@@ -202,10 +211,11 @@ function cacheSection(kit: Kit, v: View, act: Actions) {
 function readerSection(kit: Kit, v: View, act: Actions) {
   const { Box, Text, Button } = kit
   const r = v.reader
+  const { L } = texts(v)
   const week = r.week?.tokens
-  const share = totalTokens(r.session) > 0 ? `Haiku ${haikuShare(r.session)} % · ${r.runs} runs` : 'no tokens counted yet'
+  const share = totalTokens(r.session) > 0 ? L.share(haikuShare(r.session), r.runs) : L.noTokens
   const families = (['opus', 'sonnet', 'haiku', 'fable', 'other'] as const).filter(m => r.session[m] > 0 || (week?.[m] ?? 0) > 0)
-  const NAMES = { opus: 'Opus', sonnet: 'Sonnet', haiku: 'Haiku', fable: 'Fable', other: 'Other' }
+  const NAMES = { opus: 'Opus', sonnet: 'Sonnet', haiku: 'Haiku', fable: 'Fable', other: L.otherModel }
   const row = (label: string, a: string, b: string) => (
     <Text>
       {label.padEnd(13)}
@@ -216,29 +226,22 @@ function readerSection(kit: Kit, v: View, act: Actions) {
   return (
     <Box key="reader" flexDirection="column" marginBottom={1}>
       <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
-        <Text bold>Haiku reader</Text>
+        <Text bold>{L.readerHeader}</Text>
         <Button key="reader" label={r.on ? 'On' : 'Off'} onPress={act.reader} />
         <Text dimColor>{share}</Text>
         <Button key="readerInfo" label={r.open ? 'Hide' : 'Details'} onPress={act.readerInfo} />
       </Box>
       {r.open && (
         <Box flexDirection="column" marginTop={1}>
-          {row('Tokens', 'session', 'this week')}
+          {row(L.tokensRow, L.sessionCol, L.weekCol)}
           {families.map(m => row(NAMES[m], tokens(r.session[m]), week ? tokens(week[m]) : '–'))}
-          {row('Haiku share', `${haikuShare(r.session)} %`, week ? `${haikuShare(week)} %` : '–')}
-          {row('Reader runs', String(r.runs), r.week ? String(r.week.runs) : '–')}
-          {r.helpersMoved > 0 && <Text dimColor>Search helpers (Explore) started on Haiku: {r.helpersMoved}</Text>}
+          {row(L.shareRow, `${haikuShare(r.session)} %`, week ? `${haikuShare(week)} %` : '–')}
+          {row(L.runsRow, String(r.runs), r.week ? String(r.week.runs) : '–')}
+          {r.helpersMoved > 0 && <Text dimColor>{L.helpersMoved(r.helpersMoved)}</Text>}
           <Text dimColor>
-            {r.mode === 'summary'
-              ? 'Mode: search and summarize. Haiku finds the lines and adds a short summary.'
-              : 'Mode: search only. Haiku finds files and lines; Opus reads those lines itself.'}{' '}
-            When Opus reads more than {tokens(r.threshold)} tokens in one turn, it is asked to use the reader. Mode and
-            limit are under Settings at the bottom of this pane.
+            {r.mode === 'summary' ? L.modeSummary : L.modeSearch} {L.readerWhen(tokens(r.threshold))}
           </Text>
-          <Text dimColor>
-            Haiku's share is of tokens, not of your limits: a Haiku token costs less. Claude Code's own helpers may also
-            run on Haiku.
-          </Text>
+          <Text dimColor>{L.readerShareNote}</Text>
         </Box>
       )}
     </Box>
@@ -312,10 +315,11 @@ export function contextMessage(v: View) {
   const c = v.context
   if (!c || c.toCompact === undefined) return undefined
   const level = contextLevel(v.settings, c.toCompact, c.tokens)
+  const { L } = texts(v)
   // Say what set it off: the token number, or the % of the compaction point
-  const what = tokenLevel(v.settings, c.tokens) === level && c.tokens !== undefined ? `${tokens(c.tokens)} tokens` : `${c.toCompact}% to compaction`
-  if (level === 2) return { level, text: `${what}: start a new session` }
-  if (level === 1) return { level, text: `${what}: finish the task and update your session notes` }
+  const what = tokenLevel(v.settings, c.tokens) === level && c.tokens !== undefined ? L.tokensWhat(tokens(c.tokens)) : L.toCompaction(c.toCompact)
+  if (level === 2) return { level, text: `${what}${L.colon}${L.startNew}` }
+  if (level === 1) return { level, text: `${what}${L.colon}${L.finishTask}` }
   return undefined
 }
 
@@ -328,35 +332,36 @@ export function routineLine(v: View) {
   const r = v.routine
   if (!r) return undefined
   const s = v.settings
-  const name = r.task === 'close' ? 'Closing session' : 'Preparing session'
+  const { L } = texts(v)
+  const name = r.task === 'close' ? L.closing : L.preparing
   const pct = Math.round((Math.min(r.step, r.total) / Math.max(1, r.total)) * 100)
   switch (r.status) {
     case 'queued':
-      return { color: s.colorWarn, pct: undefined, text: `${name}: waiting for Claude to finish the current reply…` }
+      return { color: s.colorWarn, pct: undefined, text: L.waiting(name) }
     case 'running':
       return {
         color: s.colorWarn,
         pct,
-        text: `${name}… step ${r.step} of ${r.total} · ${pct}%${r.note ? ` · ${r.note}` : ''}`,
+        text: L.step(name, r.step, r.total, pct, r.note),
       }
     case 'done':
       return {
         color: s.colorOk,
         pct: undefined,
-        text: r.task === 'close' ? "✓ Now it's safe to end this session" : '✓ Everything is ready to start this session',
+        text: r.task === 'close' ? L.safeToEnd : L.readyToStart,
       }
     case 'failed':
       return {
         // Red when closing is not safe: data can be lost
         color: r.task === 'close' ? s.colorDanger : s.colorWarn,
         pct: undefined,
-        text: `${r.task === 'close' ? "It's NOT safe to close this session" : 'Not ready to start'}: ${r.reason ?? "see Claude's reply"}`,
+        text: `${r.task === 'close' ? L.notSafe : L.notReady}${L.colon}${r.reason ?? L.seeReply}`,
       }
     case 'stopped':
       return {
         color: s.colorWarn,
         pct: undefined,
-        text: `${r.task === 'close' ? 'Close session' : 'Start session'} ${r.reason ?? 'stopped'}: check Claude's reply`,
+        text: L.stoppedLine(r.task === 'close' ? 'Close session' : 'Start session', r.reason ?? L.stoppedAt(r.step, r.total)),
       }
   }
 }
@@ -366,6 +371,7 @@ export function routineLine(v: View) {
 export function band(kit: Kit, v: View, columns: number, act: Actions) {
   const { Box, Text, Button } = kit
   const s = v.settings
+  const { L, d } = texts(v)
   const stale = isStale(v)
   const wide = columns >= 96
   const mid = columns >= 70
@@ -396,7 +402,7 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
   const week = windowOf(v, 'seven_day')
   const reset = (w: Window | undefined) => {
     const t = resetMs(w)
-    return wide && t !== undefined ? `↻${duration(t - v.now)}` : ''
+    return wide && t !== undefined ? `↻${d(t - v.now)}` : ''
   }
   const c = v.context
   const left = turnsLeft(c, v.turns)
@@ -408,15 +414,15 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
     [week, 'Week'],
   ] as const) {
     const t = hitsFullIn(w, v.now)
-    if (t !== undefined) notes.push({ key: `pace-${name}`, level: 1, text: `${name}: 100% in ${duration(t)}` })
+    if (t !== undefined) notes.push({ key: `pace-${name}`, level: 1, text: L.hundredIn(name, d(t)) })
   }
-  if (stale) notes.push({ key: 'stale', level: 0, text: `limits updated ${duration(v.now - v.limitsAt)} ago` })
+  if (stale) notes.push({ key: 'stale', level: 0, text: L.limitsUpdated(d(v.now - v.limitsAt)) })
   if (v.reader.on && totalTokens(v.reader.session) > 0) notes.push({ key: 'haiku', level: 0, text: `Haiku ${haikuShare(v.reader.session)} %` })
   // The cache clock: minutes left, orange in the last 5; "cache cold" once it ran out
   const cacheMs = cacheLeft(v)
-  if (cacheMs !== undefined) notes.push(cacheMs > 0 ? { key: 'cache', level: cacheMs < 5 * 60000 ? 1 : 0, text: `cache ${duration(cacheMs)}` } : { key: 'cache', level: 0, text: 'cache cold' })
+  if (cacheMs !== undefined) notes.push(cacheMs > 0 ? { key: 'cache', level: cacheMs < 5 * 60000 ? 1 : 0, text: L.cacheNote(d(cacheMs)) } : { key: 'cache', level: 0, text: L.cacheCold })
   const other = redOther(v)
-  if (other) notes.push({ key: 'other', level: 2, text: `other: ${other.folder} ${other.toCompact}%` })
+  if (other) notes.push({ key: 'other', level: 2, text: L.other(other.folder, other.toCompact) })
   const warning = contextMessage(v)
   const routineRow = routineLine(v)
   // While Close / Start session runs, its own line replaces the warning and its buttons.
@@ -453,10 +459,10 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
             contextLevel(s, ctxPct ?? 0, c?.tokens),
             wide && left !== undefined && left <= 30
               ? left === 0
-                ? 'next turn'
-                : `~${left} turns`
+                ? L.nextTurn
+                : L.turnsShort(left)
               : c?.basis === 'window' && mid
-                ? 'of window'
+                ? L.ofWindowShort
                 : '',
           )}
           {notes.map(n => (
@@ -491,16 +497,14 @@ export function band(kit: Kit, v: View, columns: number, act: Actions) {
       )}
       {!warning && !v.routine && v.html.offer && (
         <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1} marginTop={1}>
-          <Text dimColor>
-            {v.html.offer.update ? 'Update the HTML version of' : 'An HTML version of'} {v.html.offer.name}?
-          </Text>
+          <Text dimColor>{L.htmlOffer(v.html.offer.name, v.html.offer.update)}</Text>
           <Button key="htmlYes" label={v.html.offer.update ? 'Update it' : 'Make it'} variant="primary" onPress={act.htmlYes} />
           <Button key="htmlNo" label="No" onPress={act.htmlNo} />
         </Box>
       )}
       {!warning && !v.routine && !v.prompted && (
         <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1} marginTop={1}>
-          <Text dimColor>New session:</Text>
+          <Text dimColor>{L.newSession}</Text>
           <Button key="start" label="Start session" variant="primary" onPress={act.start} />
         </Box>
       )}
@@ -531,13 +535,14 @@ export function stepSetting(field: string, value: number, dir: 1 | -1): number {
   return [...list].reverse().find(x => x < value) ?? list[0] ?? value
 }
 
-function settingValue(field: string, value: SettingRow['value']) {
-  if (typeof value === 'boolean') return value ? 'On' : 'Off'
+function settingValue(field: string, value: SettingRow['value'], L: Strings) {
+  if (typeof value === 'boolean') return value ? 'On' : 'Off' // a button label: English, like every button
+  if (field === 'language') return LANG_NAMES[toLang(value)]
   if (typeof value !== 'number') return String(value)
-  if (field === 'tokenYellow' || field === 'tokenRed') return value === 0 ? 'off' : `${tokens(value)} tokens`
-  if (field === 'readerThreshold') return `${tokens(value)} tokens`
-  if (field === 'cacheMinutes' || field === 'staleMinutes') return `${value} min`
-  if (field === 'robotSize') return ({ 2: 'small', 3: 'medium', 4: 'large' } as Record<number, string>)[value] ?? String(value)
+  if (field === 'tokenYellow' || field === 'tokenRed') return value === 0 ? L.off : L.tokensN(tokens(value))
+  if (field === 'readerThreshold') return L.tokensN(tokens(value))
+  if (field === 'cacheMinutes' || field === 'staleMinutes') return L.minutes(value)
+  if (field === 'robotSize') return L.sizes[value] ?? String(value)
   return field.startsWith('warn') || field.startsWith('sessLevel') ? `${value} %` : String(value)
 }
 
@@ -546,14 +551,15 @@ function settingValue(field: string, value: SettingRow['value']) {
 function settingsSection(kit: Kit, v: View, act: Actions) {
   const { Box, Text, Button } = kit
   const rows = v.config.rows
+  const { L } = texts(v)
   return (
     <Box key="settingsSection" flexDirection="column" marginTop={1}>
-      <Text bold>Settings</Text>
-      {rows.length === 0 && <Text dimColor>The settings could not be read here. In a terminal: claude, then /config.</Text>}
+      <Text bold>{L.settingsHeader}</Text>
+      {rows.length === 0 && <Text dimColor>{L.settingsUnread}</Text>}
       {rows.map(r => {
-        const shown = settingValue(r.field, r.value)
+        const shown = settingValue(r.field, r.value, L)
         let controls
-        if (r.isLocked) controls = <Text dimColor>{shown} (set by your organization)</Text>
+        if (r.isLocked) controls = <Text dimColor>{L.locked(shown)}</Text>
         else if (r.kind === 'boolean')
           controls = <Button key={`set:${r.field}`} label={shown} onPress={() => act.setting(r.key, !r.value)} />
         else if (r.kind === 'choice' && r.options && r.options.length > 0) {
@@ -572,16 +578,14 @@ function settingsSection(kit: Kit, v: View, act: Actions) {
         } else controls = <Text dimColor>{shown}</Text>
         return (
           <Box key={`row:${r.field}`} flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
-            <Text>{r.label}</Text>
+            <Text>{L.labels[r.field] ?? r.label}</Text>
             {controls}
           </Box>
         )
       })}
       <Text dimColor>
-        A change applies at once. The colours are changed in a terminal: type claude, then /config.
-        {v.settings.source === 'strip'
-          ? " The AI Usage Meter strip is installed: its Settings window decides the levels, colours and messages, unless you switch off \"Use the strip's Settings\"."
-          : ''}
+        {L.settingsFoot}
+        {v.settings.source === 'strip' ? L.settingsStrip : ''}
       </Text>
     </Box>
   )
@@ -590,6 +594,7 @@ function settingsSection(kit: Kit, v: View, act: Actions) {
 export function pane(kit: Kit, v: View, columns: number, act: Actions) {
   const { Box, Text, Button } = kit
   const s = v.settings
+  const { L, d } = texts(v)
   const stale = isStale(v)
   const cells = Math.max(10, Math.min(30, columns - 26))
   const px = Math.max(120, Math.min(260, (columns - 12) * 7))
@@ -600,7 +605,7 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
       return (
         <Box key={kind} flexDirection="column" marginBottom={1}>
           <Text bold>{title}</Text>
-          <Text dimColor>No figure yet: it comes with Claude's next reply.</Text>
+          <Text dimColor>{L.noFigure}</Text>
         </Box>
       )
     }
@@ -617,14 +622,12 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
           </Text>
         </Box>
         {t !== undefined && (
-          <Text dimColor>
-            Resets {day(t, v.now)}, in {duration(t - v.now)}
-          </Text>
+          <Text dimColor>{L.resets(day(t, v.now, L.days), d(t - v.now))}</Text>
         )}
         {full !== undefined ? (
-          <Text color={s.colorWarn}>At this pace: 100% in {duration(full)}, before the reset</Text>
+          <Text color={s.colorWarn}>{L.paceFull(d(full))}</Text>
         ) : (
-          <Text dimColor>At this pace the reset comes first</Text>
+          <Text dimColor>{L.paceOk}</Text>
         )}
       </Box>
     )
@@ -639,18 +642,18 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
 
   return (
     <Box flexDirection="column">
-      {limit('five_hour', 'Session (5-hour limit)')}
-      {limit('seven_day', 'Week (weekly limit)')}
+      {limit('five_hour', L.sessionTitle)}
+      {limit('seven_day', L.weekTitle)}
       <Text dimColor={!stale} color={stale ? s.colorWarn : undefined}>
         {v.limitsAt > 0
-          ? `Limits updated ${duration(v.now - v.limitsAt)} ago${stale ? ': old figures, Claude Code reports new ones with its next reply' : ''}`
-          : 'No limits reported yet'}
+          ? L.limitsUpdatedLong(d(v.now - v.limitsAt), stale)
+          : L.noLimits}
       </Text>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
-        <Text bold>Compress (this session's context)</Text>
+        <Text bold>{L.compressTitle}</Text>
         {c?.toCompact === undefined ? (
-          <Text dimColor>No figure yet: it comes with Claude's next reply.</Text>
+          <Text dimColor>{L.noFigure}</Text>
         ) : (
           <Box flexDirection="column">
             <Box flexDirection="row" alignItems="center" gap={1}>
@@ -658,33 +661,29 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
               <Text color={color(s, level)} bold>
                 {c.toCompact}%
               </Text>
-              <Text dimColor>{c.basis === 'window' ? 'of the window' : 'to compaction'}</Text>
+              <Text dimColor>{c.basis === 'window' ? L.ofWindow : L.toCompactionShort}</Text>
             </Box>
             {c.tokens !== undefined && (
               <Text dimColor>
-                {tokens(c.tokens)} tokens
-                {c.point ? ` of ${tokens(c.point)} (compaction point)` : ''}
-                {c.window ? ` · window ${tokens(c.window)}` : ''}
+                {L.tokensOf(tokens(c.tokens), c.point ? tokens(c.point) : undefined, c.window ? tokens(c.window) : undefined)}
               </Text>
             )}
             {v.turns.length >= 2 && (
               <Box flexDirection="row" alignItems="center" gap={1}>
-                <Text dimColor>Last turns</Text>
+                <Text dimColor>{L.lastTurns}</Text>
                 {spark(kit, v.turns, color(s, level))}
                 {left !== undefined && (
                   <Text dimColor>
-                    {left === 0
-                      ? 'the next turn like these will reach compaction'
-                      : `about ${left} more turns like these before compaction`}
+                    {left === 0 ? L.nextTurnReaches : L.moreTurns(left)}
                   </Text>
                 )}
               </Box>
             )}
             <Text dimColor>
               {v.compactions > 0
-                ? `Compacted ${v.compactions}× in this session, last at ${clock(v.compactedAt)}`
-                : 'Not compacted yet in this session'}
-              {v.cost !== null ? `  ·  cost so far $${v.cost.toFixed(2)} (API prices)` : ''}
+                ? L.compacted(v.compactions, clock(v.compactedAt))
+                : L.notCompacted}
+              {v.cost !== null ? L.cost(v.cost.toFixed(2)) : ''}
             </Text>
           </Box>
         )}
@@ -696,9 +695,7 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
             {warning.text}
           </Text>
           <Text dimColor>
-            {warning.level === 2
-              ? 'After compaction Claude keeps only a summary of the older conversation. Write down what matters, then start a new session.'
-              : 'Write down what was done, the decisions and the next steps, so a new session can continue.'}
+            {warning.level === 2 ? L.warnRedHelp : L.warnYellowHelp}
           </Text>
         </Box>
       )}
@@ -713,7 +710,7 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
         </Box>
       )}
 
-      <Text bold>Session</Text>
+      <Text bold>{L.sessionHeader}</Text>
       <Box flexDirection="row" flexWrap="wrap" gap={1} marginBottom={1}>
         <Button key="close" label="Close session" hotkey="e" variant="primary" onPress={act.close} />
         <Button key="start" label="Start session" hotkey="s" onPress={act.start} />
@@ -722,17 +719,14 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
         <Button key="hide" label="Hide the band" hotkey="h" onPress={act.hide} />
       </Box>
       <Box marginBottom={1}>
-        <Text dimColor>
-          Close session checks and updates CLAUDE.md, MEMORY.md and the session notes, then says when it is safe to
-          close. Start session reads them (or creates them in a new project) and picks up where the last session stopped.
-        </Text>
+        <Text dimColor>{L.routineHelp}</Text>
       </Box>
 
       {cacheSection(kit, v, act)}
       {readerSection(kit, v, act)}
 
-      <Text bold>Other sessions on this PC</Text>
-      {others.length === 0 && <Text dimColor>None live.</Text>}
+      <Text bold>{L.othersHeader}</Text>
+      {others.length === 0 && <Text dimColor>{L.noneLive}</Text>}
       {others.slice(0, 8).map(o => {
         const l = contextLevel(s, o.toCompact)
         return (
@@ -741,20 +735,20 @@ export function pane(kit: Kit, v: View, columns: number, act: Actions) {
               {String(o.toCompact).padStart(3)}%
             </Text>{' '}
             {o.folder}
-            <Text dimColor> · {duration(v.now - o.lastSeen)} ago</Text>
+            <Text dimColor>{L.ago(d(v.now - o.lastSeen))}</Text>
           </Text>
         )
       })}
 
       <Box marginTop={1} flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
         <Text dimColor>
-          Levels: limits {s.warn1}/{s.warn2}%, context {s.sessLevel1}/{s.sessLevel2}%.
-          {s.source === 'strip' ? " The AI Usage Meter strip's Settings decide them." : ''}
+          {L.levels(s.warn1, s.warn2, s.sessLevel1, s.sessLevel2)}
+          {s.source === 'strip' ? L.stripDecides : ''}
         </Text>
         <Button key="settings" label={v.config.open ? 'Hide settings' : 'Settings'} onPress={act.settings} />
       </Box>
       {v.config.open && settingsSection(kit, v, act)}
-      {v.modelName && <Text dimColor>Model: {v.modelName}</Text>}
+      {v.modelName && <Text dimColor>{L.model(v.modelName)}</Text>}
       <Text dimColor>Session Pilot {VERSION} · Hans Tandt · hanstandt.be</Text>
     </Box>
   )

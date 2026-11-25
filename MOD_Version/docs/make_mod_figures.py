@@ -1,14 +1,19 @@
 # Draws the manual's figures of the mod inside Claude Code (version 1.7), with demo data:
 # the band above the prompt at green, yellow and red, and the /meter pane.
-# The mod's own words are English in every manual (product words); the labels under the bands are translated.
-# Usage: py make_mod_figures.py en|fr|nl|de   -> figures/band-levels_<lang>.png and figures/pane.png
+# The mod's texts come from docs/ui_texts.json (node docs/make_ui_texts.mjs, from hooks/i18n.ts), in the manual's
+# language; product words and button labels stay English, as on screen. The labels under the bands are translated.
+# Usage: py make_mod_figures.py en|fr|nl|de   -> figures/band-levels_<lang>.png, band-routine_<lang>.png, pane_<lang>.png
+# (and figures/pane.png, the English one, for the README)
 # Colours: the Claude desktop app's dark panel, and the strip's default green, orange and red.
+import json
 import sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 HERE = Path(__file__).parent
 FIG = HERE / "figures"
+UI = json.loads((HERE / "ui_texts.json").read_text(encoding="utf-8"))
+VERSION_LINE = "Session Pilot 2.1.0 · Hans Tandt · hanstandt.be"
 # The translated labels under the bands come from the strip's figure script.
 sys.path.insert(0, str(HERE.parent.parent / "source" / "docs"))
 from make_figures import T, TEXT  # noqa: E402
@@ -134,35 +139,66 @@ def gauge(p, label, pct, colour, tail):
         p.x += 18
 
 
-def band(ctx, colour, warning=None, buttons=(), turns="~9 turns"):
-    W = 860
-    H = 62 if not warning else 108  # room for the robot at size 3 and its effort bar
+def wrap(d, text, width, size=13, bold=False):
+    """Splits text into lines that fit `width` (screen pixels)."""
+    f = font(size, bold)
+    lines, cur = [], ""
+    for word in text.split(" "):
+        test = f"{cur} {word}".strip()
+        if d.textlength(test, font=f) / S <= width or not cur:
+            cur = test
+        else:
+            lines.append(cur)
+            cur = word
+    return lines + ([cur] if cur else [])
+
+
+def band_top(d, W, ui, ctx, colour, turns, robot_state):
+    """The band's first row; returns how far it reached (screen pixels)."""
+    p = Pen(d, 14, 31)
+    p.button("Details", gap=16)  # a fixed place at the left, away from Claude Code's [-]
+    p.robot(robot_state, colour)
+    gauge(p, "Session", 34, OK, ui["reset5h"])
+    gauge(p, "Week", 21, OK, ui["resetWeek"])
+    gauge(p, "Compress", ctx, colour, turns)
+    p.text(ui["cache"], DIM, 13)  # the cache clock, one of the band's dim notes
+    Pen(d, W - 34, 31).text("[-]", DIM)  # Claude Code's own mark: folds the band away
+    return p.x
+
+
+def band_width(ui, ctx, colour, turns, robot_state):
+    probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    reach = band_top(probe, 2000, ui, ctx, colour, turns, robot_state)
+    return max(860, int(reach + 50))
+
+
+def band(ctx, colour, ui, warning=None, buttons=(), turns=""):
+    state = {OK: "idle", WARN: "yellow", DANGER: "red"}[colour]
+    W = band_width(ui, ctx, colour, turns, state)
+    probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    rows = 0
+    if warning:
+        text = ("■ " if colour == DANGER else "▲ ") + warning
+        tw = probe.textlength(text, font=font(14, True)) / S
+        bw = sum(probe.textlength(b, font=font(13, i == 0)) / S + 28 for i, b in enumerate(buttons))
+        rows = 1 if 14 + tw + 12 + bw <= W - 14 else 2  # a long warning (German) puts its buttons on a new line
+    H = 62 if not warning else (108 if rows == 1 else 142)  # room for the robot at size 3 and its effort bar
     im = Image.new("RGB", (W * S, H * S), BG)
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, W * S - 1, H * S - 1], outline=EDGE, width=2 * S)
-    p = Pen(d, 14, 31)
-    p.button("Details", gap=16)  # a fixed place at the left, away from Claude Code's [-]
-    p.robot({OK: "idle", WARN: "yellow", DANGER: "red"}[colour], colour)
-    gauge(p, "Session", 34, OK, "↻3h 04m")
-    gauge(p, "Week", 21, OK, "↻4d 5h")
-    gauge(p, "Compress", ctx, colour, turns)
-    p.text("cache 42m", DIM, 13)  # the cache clock (1.9.0), one of the band's dim notes
-    Pen(d, W - 34, 31).text("[-]", DIM)  # Claude Code's own mark: folds the band away
+    band_top(d, W, ui, ctx, colour, turns, state)
     if warning:
         # The warning row sits one line lower, so the full-size buttons don't touch the gauges
         p = Pen(d, 14, 84)
-        p.text(("■ " if colour == DANGER else "▲ ") + warning, colour, bold=True, gap=12)
+        p.text(text, colour, bold=True, gap=12)
+        if rows == 2:
+            p = Pen(d, 14, 118)
         for i, b in enumerate(buttons):
             p.button(b, primary=i == 0)
     return im
 
 
-def band_levels(t):
-    rows = [
-        (band(46, OK, turns=""), t["green"]),
-        (band(84, WARN, "84% to compaction: finish the task and update your session notes", ["Write session notes"], "~6 turns"), t["yellow"]),
-        (band(93, DANGER, "93% to compaction: start a new session", ["Close session", "Compact"], "~2 turns"), t["red"]),
-    ]
+def stack(rows):
     pad, gap = 6 * S, 14 * S
     f = ImageFont.truetype("C:/Windows/Fonts/arial.ttf", 15 * S)
     width = max(b.width for b, _ in rows) + 2 * pad
@@ -177,8 +213,16 @@ def band_levels(t):
     return im
 
 
-def pane():
-    W, H = 470, 960
+def band_levels(t, ui):
+    return stack([
+        (band(46, OK, ui), t["green"]),
+        (band(84, WARN, ui, ui["yellow"], ["Write session notes"], ui["turns6"]), t["yellow"]),
+        (band(93, DANGER, ui, ui["red"], ["Close session", "Compact"], ui["turns2"]), t["red"]),
+    ])
+
+
+def pane(ui):
+    W, H = 470, 1100
     im = Image.new("RGB", (W * S, H * S), BG)
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, W * S - 1, H * S - 1], outline=EDGE, width=2 * S)
@@ -191,44 +235,44 @@ def pane():
             getattr(p, kind)(*args)
         y += step
 
-    for title, pct, reset, pace in (
-        ("Session (5-hour limit)", 34, "Resets 14:30, in 3h 04m", "At this pace the reset comes first"),
-        ("Week (weekly limit)", 21, "Resets Thu 17:00, in 4d 5h", "At this pace the reset comes first"),
-    ):
+    def para(text, colour=DIM, size=13, bold=False, after=34):
+        lines = wrap(d, text, W - 36, size, bold)
+        for i, ln in enumerate(lines):
+            line([("text", ln, colour, size, bold)], 18 if i < len(lines) - 1 else after)
+
+    for title, pct, reset in ((ui["sessionTitle"], 34, ui["resets5h"]), (ui["weekTitle"], 21, ui["resetsWeek"])):
         line([("text", title, WHITE, 14, True)])
         line([("bar", pct, OK, 220, 9, 8), ("text", f"{pct}%", OK, 14, True)])
         line([("text", reset)])
-        line([("text", pace)], 34)
-    line([("text", "Limits updated 2m ago")], 34)
-    line([("text", "Compress (this session's context)", WHITE, 14, True)])
-    line([("bar", 84, WARN, 220, 9, 8), ("text", "84%", WARN, 14, True), ("text", "to compaction")])
-    line([("text", "134k tokens of 160k (compaction point) · window 200k")])
+        line([("text", ui["paceOk"])], 34)
+    line([("text", ui["updated"])], 34)
+    line([("text", ui["compressTitle"], WHITE, 14, True)])
+    line([("bar", 84, WARN, 220, 9, 8), ("text", "84%", WARN, 14, True), ("text", ui["toCompaction"])])
+    para(ui["tokensOf"], DIM, 14, after=22)
     # what the last turns added, as small columns
     p = Pen(d, 18, y)
-    p.text("Last turns")
+    p.text(ui["lastTurns"])
     for i, v in enumerate((4, 7, 5, 12, 9, 16, 11)):
         bh = 2 + v
         d.rounded_rectangle([(p.x + i * 7) * S, (y + 8 - bh) * S, (p.x + i * 7 + 5) * S, (y + 8) * S], radius=1 * S, fill=WARN)
     p.x += 7 * 7 + 6
-    p.text("about 6 more turns like these before compaction")
     y += 22
-    line([("text", "Not compacted yet in this session  ·  cost so far $4.12 (API prices)")], 34)
-    line([("text", "84% to compaction: finish the task and update your session notes", WARN, 13, True)], 32)
-    line([("text", "Session", WHITE, 14, True)], 30)
+    para(ui["moreTurns"], DIM, 14, after=22)
+    para(ui["compactedCost"], DIM, 14)
+    para(ui["yellow"], WARN, 13, True, after=32)
+    line([("text", ui["sessionHeader"], WHITE, 14, True)], 30)
     line([("button", "Close session", True), ("button", "Start session"), ("button", "Write session notes")], 34)
     line([("button", "Compact"), ("button", "Hide the band")], 32)
-    line([("text", "Close session checks and updates CLAUDE.md, MEMORY.md and the", DIM, 13)], 18)
-    line([("text", "session notes, then says when it is safe to close.", DIM, 13)], 34)
-    # The cache clock (1.9.0): minutes left, with Keep warm while it is still warm
-    line([("text", "Cache", WHITE, 14, True), ("text", "warm for 42m", DIM, 14), ("button", "Keep warm")], 24)
-    line([("text", "Keep warm asks one tiny question, which re-reads 134k tokens", DIM, 13)], 18)
-    line([("text", "from the cache: cheaper than new input, but it counts.", DIM, 13)], 34)
-    line([("text", "Haiku reader", WHITE, 14, True), ("button", "On"), ("text", "Haiku 19 % · 7 runs", DIM, 13), ("button", "Details")], 36)
-    line([("text", "Other sessions on this PC", WHITE, 14, True)])
-    line([("text", " 93%", DANGER, 14, True), ("text", "WebsiteRedesign", WHITE), ("text", "· 4m ago")])
-    line([("text", " 37%", OK, 14, True), ("text", "MealPlanner", WHITE), ("text", "· 1h 12m ago")], 32)
-    line([("text", "Levels: limits 80/95%, context 80/90%.", DIM, 13), ("button", "Settings")], 36)
-    line([("text", "Session Pilot 2.0.1 · Hans Tandt · hanstandt.be", DIM, 13)])
+    para(ui["routineHelp"].split(". ")[0] + ".")
+    # The cache clock: minutes left, with Keep warm while it is still warm
+    line([("text", ui["cacheHeader"], WHITE, 14, True), ("text", ui["warmFor"], DIM, 14), ("button", "Keep warm")], 24)
+    para(ui["warmHelp"])
+    line([("text", ui["readerHeader"], WHITE, 14, True), ("button", "On"), ("text", ui["share"], DIM, 13), ("button", "Details")], 36)
+    line([("text", ui["othersHeader"], WHITE, 14, True)])
+    line([("text", " 93%", DANGER, 14, True), ("text", "WebsiteRedesign", WHITE), ("text", ui["ago4"].strip())])
+    line([("text", " 37%", OK, 14, True), ("text", "MealPlanner", WHITE), ("text", ui["ago72"].strip())], 32)
+    line([("text", ui["levels"], DIM, 13), ("button", "Settings")], 36)
+    line([("text", VERSION_LINE, DIM, 13)])
     return im.crop((0, 0, W * S, (y + 6) * S))
 
 
@@ -241,56 +285,44 @@ ROUTINE = {
 }
 
 
-def routine_band(text, colour, pct=None):
-    W, H = 860, 108
+def routine_band(text, colour, ui, pct=None):
+    happy = text.startswith("✓")
+    state, antenna = ("happy", OK) if happy else ("red", DANGER)
+    W = band_width(ui, 93, DANGER, ui["nextTurn"], state)
+    H = 108
     im = Image.new("RGB", (W * S, H * S), BG)
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, W * S - 1, H * S - 1], outline=EDGE, width=2 * S)
-    p = Pen(d, 14, 31)
-    p.button("Details", gap=16)
-    p.robot("happy" if text.startswith("✓") else "red", OK if text.startswith("✓") else DANGER)
-    gauge(p, "Session", 34, OK, "↻3h 04m")
-    gauge(p, "Week", 21, OK, "↻4d 5h")
-    gauge(p, "Compress", 93, DANGER, "next turn")
-    Pen(d, W - 34, 31).text("[-]", DIM)
+    band_top(d, W, ui, 93, DANGER, ui["nextTurn"], state)
     p = Pen(d, 14, 84)
     if pct is not None:
         p.bar(pct, colour, w=56)
-    if text.startswith("✓"):  # Segoe UI Bold has no check mark
+    if happy:  # Segoe UI Bold has no check mark
         p.text("✓", colour, sym=True, gap=4)
         text = text[1:].lstrip()
     p.text(text, colour, bold=True)
     return im
 
 
-def band_routine(lang):
+def band_routine(lang, ui):
     running, done = ROUTINE[lang]
-    rows = [
-        (routine_band("Closing session… step 3 of 6 · 50% · files compared", WARN, 50), running),
-        (routine_band("✓ Now it's safe to end this session", OK), done),
-    ]
-    pad, gap = 6 * S, 14 * S
-    f = ImageFont.truetype("C:/Windows/Fonts/arial.ttf", 15 * S)
-    width = max(b.width for b, _ in rows) + 2 * pad
-    height = sum(b.height + 26 * S + gap for b, _ in rows)
-    im = Image.new("RGB", (width, height), "white")
-    d = ImageDraw.Draw(im)
-    y = pad
-    for b, label in rows:
-        im.paste(b, (pad, y))
-        d.text((pad, y + b.height + 4 * S), label, font=f, fill=TEXT)
-        y += b.height + 26 * S + gap
-    return im
+    return stack([
+        (routine_band(ui["stepLine"], WARN, ui, 50), running),
+        (routine_band(ui["safe"], OK, ui), done),
+    ])
 
 
 if __name__ == "__main__":
     lang = sys.argv[1] if len(sys.argv) > 1 else "en"
+    ui = UI[lang]
     out = FIG / f"band-levels_{lang}.png"
-    band_levels(T[lang]).save(out)
+    band_levels(T[lang], ui).save(out)
     print(out.name, Image.open(out).size)
     out = FIG / f"band-routine_{lang}.png"
-    band_routine(lang).save(out)
+    band_routine(lang, ui).save(out)
+    print(out.name, Image.open(out).size)
+    out = FIG / f"pane_{lang}.png"
+    pane(ui).save(out)
     print(out.name, Image.open(out).size)
     if lang == "en":
-        pane().save(FIG / "pane.png")
-        print("pane.png", Image.open(FIG / "pane.png").size)
+        pane(ui).save(FIG / "pane.png")  # the README's picture

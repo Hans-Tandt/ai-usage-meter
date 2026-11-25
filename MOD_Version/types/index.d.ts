@@ -25,6 +25,7 @@ export type ContextInfo = {
 // otherwise the mod's own options from /config. `source` says which.
 export type MeterSettings = {
   source: 'strip' | 'config'
+  lang: 'en' | 'nl' | 'fr' | 'de' // the mod's screen language (setting Language)
   warn1: number // 5h / Week: orange from
   warn2: number // 5h / Week: red from
   sessLevel1: number // context: yellow from (% of the compaction point)

@@ -1,6 +1,6 @@
 {
   "name": "ai-usage-meter",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Session Pilot (formerly the AI Usage Meter mod): your 5-hour, weekly and context figures in a band above the prompt and a /meter pane, with session-notes warnings; works with or without the AI Usage Meter strip (unofficial; not affiliated with Anthropic)",
   "author": {
     "name": "Hans Tandt"
@@ -8,6 +8,18 @@
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language / Taal / Langue / Sprache",
+      "description": "The language of the band, the pane and the short messages: en (English), nl (Nederlands), fr (Français), de (Deutsch). Button labels and the names Session, Week and Compress stay in English.",
+      "default": "en",
+      "options": [
+        "en",
+        "nl",
+        "fr",
+        "de"
+      ]
+    },
     "useStripSettings": {
       "type": "boolean",
       "title": "Use the strip's Settings when it is installed",

@@ -99,7 +99,7 @@ test('the pane shows the limits, the context and the buttons', async ($, on) => 
     expect(await ui.find({ type: 'Text', text: /Session \(5-hour limit\)/ })).toBeTruthy()
     expect(await ui.find({ type: 'Text', text: /finish the task and update your session notes/ })).toBeTruthy()
     expect(await ui.find({ type: 'Button', key: 'compact' })).toBeTruthy()
-    expect(await ui.find({ type: 'Text', text: /Session Pilot 2\.0\.1 · Hans Tandt · hanstandt\.be/ })).toBeTruthy()
+    expect(await ui.find({ type: 'Text', text: /Session Pilot 2\.1\.0 · Hans Tandt · hanstandt\.be/ })).toBeTruthy()
     await ui.unmount()
   }
 })
@@ -744,4 +744,58 @@ test('when Claude Code cannot list or change settings (2.1.326 on the desktop), 
   await pane.press({ key: 'set:htmlCompanion' })
   expect((await pane.find({ type: 'Button', key: 'set:htmlCompanion' }))?.props.label).toBe('on')
   await pane.unmount()
+})
+
+// ---------- languages ----------
+
+test('in Dutch the band, the pane and the settings speak Dutch; buttons and Session, Week, Compress stay English', { options: { language: 'nl' } }, async ($, on) => {
+  engine(on)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+  await $.command.run({ command: 'meter', args: 'demo here 85', ...TYPED })
+  const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await band.find({ type: 'Text', text: /85% tot comprimeren: rond de taak af en werk je sessienotities bij/ })).toBeTruthy()
+  expect(await band.find({ type: 'Text', text: /^Compress$/ })).toBeTruthy()
+  expect(await band.find({ type: 'Button', key: 'notes' })).toBeTruthy() // Write session notes, in English
+  await band.unmount()
+  const pane = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await pane.find({ type: 'Text', text: /^Andere sessies op deze pc$/ })).toBeTruthy()
+  expect(await pane.find({ type: 'Text', text: /^Session \(limiet van 5 uur\)$/ })).toBeTruthy()
+  await pane.press({ key: 'settings' })
+  expect(await pane.find({ type: 'Text', text: /^Instellingen$/ })).toBeTruthy()
+  await pane.unmount()
+})
+
+test('/meter language fr switches the band to French at once', async ($, on) => {
+  engine(on)
+  on('config.set', (_, e) => ({ value: e.value }) as never)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.command.run({ command: 'meter', args: 'demo 40', ...TYPED })
+  await $.command.run({ command: 'meter', args: 'demo here 93', ...TYPED })
+  let band = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await band.find({ type: 'Text', text: /93% to compaction: start a new session/ })).toBeTruthy()
+  await band.unmount()
+  const r = (await $.command.run({ command: 'meter', args: 'language fr', ...TYPED })) as { text?: string }
+  expect(r.text).toContain('Français')
+  band = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await band.find({ type: 'Text', text: /93 % avant la compaction : démarrez une nouvelle session/ })).toBeTruthy()
+  await band.unmount()
+  const bad = (await $.command.run({ command: 'meter', args: 'language xx', ...TYPED })) as { text?: string }
+  expect(bad.text).toContain('/meter language en|nl|fr|de')
+})
+
+test('in German the HTML offer and its Tab suggestion are German, and "ja" accepts it', { options: { language: 'de' } }, async ($, on) => {
+  const sent: string[] = []
+  const suggested: string[] = []
+  const clock = htmlEngine(on, { 'D:/Dev/MyProject/Plan.md': PLAN_MD }, sent, suggested)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  await $.tool.call({ tool: 'Write', file_path: 'D:/Dev/MyProject/Plan.md', content: PLAN_MD })
+  await $.turn.complete(turnEnd('Plan geschrieben.'))
+  await clock.advance(400)
+  expect(suggested).toEqual(['Erstelle die HTML-Version von Plan.md'])
+  const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await band.find({ type: 'Text', text: /^Eine HTML-Version von Plan\.md\?$/ })).toBeTruthy()
+  await band.unmount()
+  await $.prompt.submit({ text: 'ja' } as never)
+  expect(sent[0]).toContain('Companion HTML view') // the rules for Claude stay English
 })

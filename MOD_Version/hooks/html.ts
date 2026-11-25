@@ -50,13 +50,20 @@ export function htmlWorth(name: string, text: string, acceptedBefore: boolean): 
 }
 
 // The words of the offer: the Tab suggestion in the prompt box, and what the person sends to accept it.
-export function offerText(name: string, update: boolean) {
-  return `${update ? 'Update' : 'Make'} the HTML version of ${name}`
+export function offerText(name: string, update: boolean, lang: string = 'en') {
+  const t: Record<string, [string, string]> = {
+    en: [`Make the HTML version of ${name}`, `Update the HTML version of ${name}`],
+    nl: [`Maak de HTML-versie van ${name}`, `Werk de HTML-versie van ${name} bij`],
+    fr: [`Crée la version HTML de ${name}`, `Mets à jour la version HTML de ${name}`],
+    de: [`Erstelle die HTML-Version von ${name}`, `Aktualisiere die HTML-Version von ${name}`],
+  }
+  const [make, upd] = t[lang] ?? t.en ?? ['', '']
+  return update ? upd : make
 }
 
 export function isAccept(text: string, offer: string) {
   const t = text.trim().replace(/[.!]+$/, '').toLowerCase()
-  return t === offer.toLowerCase() || t === 'yes' || t === 'html'
+  return t === offer.toLowerCase() || ['yes', 'ja', 'oui', 'html'].includes(t)
 }
 
 // What Claude gets once the person said yes.

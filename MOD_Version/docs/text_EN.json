@@ -2,8 +2,8 @@
   "meta": {
     "title": "Session Pilot",
     "subtitle": "Your sessions, limits and tokens, inside Claude Code",
-    "version": "Version 2.0.1",
-    "date": "21 November 2026",
+    "version": "Version 2.1.0",
+    "date": "25 November 2026",
     "project": "Session Pilot",
     "tocTitle": "Contents"
   },
@@ -107,6 +107,10 @@
       "Open the details pane. Or click Details in the band; click it again to close the pane."
     ],
     [
+      "`/meter language nl`",
+      "Switch the band, the pane and the messages to Dutch (en, nl, fr or de)."
+    ],
+    [
       "`/meter close`",
       "Close the pane."
     ],
@@ -139,12 +143,16 @@
   ],
   "term": "In the terminal the mod works the same. The bars are drawn as lines, and `/meter` opens the pane beside the conversation in the fullscreen layout (`/tui fullscreen`, at least 110 columns), or above the prompt.",
   "h6": "7. Change the settings",
-  "p6": "Open the /meter pane (click Details in the band) and click Settings at the bottom, or type /meter settings. Every setting has its own button: click On or Off to switch it, − or + to change a number, and a choice (such as the Haiku reader) to go to the next option. A change applies at once. Only the colours can't be changed there: open a terminal, type claude, then /config, and look for the ai-usage-meter rows. In the desktop app, /config opens the app's own Settings window, which doesn't have the mod's settings.",
+  "p6": "Open the /meter pane (click Details in the band) and click Settings at the bottom, or type /meter settings. Every setting has its own button: click On or Off to switch it, − or + to change a number, and a choice (such as the Haiku reader) to go to the next option. A change applies at once. Only the colours can't be changed there: open a terminal, type claude, then /config, and look for the ai-usage-meter rows. In the desktop app, /config opens the app's own Settings window, which doesn't have the mod's settings. The first setting, Language, sets the language of the band, the pane and the short messages: English, Nederlands, Français or Deutsch (or type /meter language nl). Button labels and the names Session, Week and Compress stay in English.",
   "set_h": [
     "Setting",
     "Default"
   ],
   "set": [
+    [
+      "Language",
+      "en (English)"
+    ],
     [
       "Limits: first and second warning",
       "80 % and 95 %"
@@ -415,7 +423,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, version 2.0.1, enabled. \"userConfig options not yet set\" is normal: every setting has a default."
+          "ai-usage-meter@ai-usage-meter, version 2.1.0, enabled. \"userConfig options not yet set\" is normal: every setting has a default."
         ]
       ]
     ],
@@ -492,6 +500,10 @@
         [
           "Type `/meter settings` (or click Details, then Settings)",
           "The settings at the bottom of the pane, each with a button"
+        ],
+        [
+          "Type `/meter language nl` (or choose Language under Settings)",
+          "The band and the pane in Dutch; the buttons stay in English (set it back with /meter language en)"
         ],
         [
           "Switch Blink at red off, then `/meter demo here 93`",
@@ -589,5 +601,7 @@
   "mp_t": "\"error: unknown option '--marketplace'\"",
   "mp": "Your `claude` is older than 2.1.287, or PowerShell still uses the old one. Update it and open a new PowerShell. Cannot update? Install with two commands instead: `claude plugin marketplace add \"C:\\Users\\<you>\\Documents\\Session Pilot\"`, then `claude plugin install ai-usage-meter@ai-usage-meter`. The band itself still needs 2.1.287 or later.",
   "upd_t": "Coming from the AI Usage Meter mod?",
-  "upd": "Session Pilot is the same mod with a new name: your settings stay. Unzip the new version, copy everything inside its Session Pilot folder over your old AI Usage Meter Mod folder (replace the files), and restart Claude Code. Keep the old folder where it is: Claude Code reads the mod from there."
+  "upd": "Session Pilot is the same mod with a new name: your settings stay. Unzip the new version, copy everything inside its Session Pilot folder over your old AI Usage Meter Mod folder (replace the files), and restart Claude Code. Keep the old folder where it is: Claude Code reads the mod from there.",
+  "lang_t": "Other languages",
+  "lang": "Under Settings, Language switches the screens to Nederlands, Français or Deutsch. Button labels and the names Session, Week and Compress stay in English in every language."
 }

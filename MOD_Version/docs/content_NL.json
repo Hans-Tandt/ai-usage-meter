@@ -2,8 +2,8 @@
   "meta": {
     "title": "Session Pilot",
     "subtitle": "Je sessies, limieten en tokens, in Claude Code",
-    "version": "Versie 2.0.1",
-    "date": "21 november 2026",
+    "version": "Versie 2.1.0",
+    "date": "25 november 2026",
     "project": "Session Pilot",
     "tocTitle": "Inhoud",
     "author": "Hans Tandt"
@@ -62,15 +62,15 @@
           "Hoe vol dit gesprek is. Is het vol, dan maakt Claude Code er een korte samenvatting van (comprimeren) en gaan details verloren: bewaar je notities daarvoor."
         ],
         [
-          "~6 turns",
+          "~6 beurten",
           "Ongeveer hoeveel berichten, met de antwoorden van Claude, er nog bij passen voor het comprimeren, als ze even lang zijn als de laatste."
         ],
         [
-          "5h: 100% in 1h 20m",
+          "5h: 100% over 1u 20m",
           "In je huidige tempo bereik je de limiet voor de reset."
         ],
         [
-          "limits updated 1h 10m ago",
+          "limieten 1u 10m geleden bijgewerkt",
           "De cijfers zijn oud. Claude Code stuurt nieuwe met zijn volgende antwoord."
         ],
         [
@@ -86,7 +86,7 @@
           "Alleen als je een aantal tokens instelde bij Settings: het gesprek ging erover (hoofdstuk 11)."
         ],
         [
-          "other: MyProject 92%",
+          "andere: MyProject 92%",
           "Een andere Claude Code-sessie op deze pc staat op rood."
         ]
       ]
@@ -102,6 +102,12 @@
       "variant": "tip",
       "title": "De band is weg en je ziet [+]",
       "text": "Claude Code heeft hem zelf ingeklapt: een klik op zijn teken `[-]` rechts in de band, of `ctrl+x ctrl+a`. Klik op `[+]` of druk nog eens op `ctrl+x ctrl+a` om de band terug te krijgen. De mod kan hem niet in- of uitklappen."
+    },
+    {
+      "type": "callout",
+      "variant": "note",
+      "title": "De mod in het Nederlands",
+      "text": "Deze handleiding toont de schermen in het Nederlands: kies Nederlands bij Taal onder Settings (of typ /meter language nl). Tot dan spreekt de mod Engels. De namen van de knoppen en Session, Week en Compress blijven Engels."
     },
     {
       "type": "h1",
@@ -208,9 +214,9 @@
     {
       "type": "numbers",
       "items": [
-        "Bij geel (80 %) verschijnt een tweede regel: finish the task and update your session notes (rond de taak af en werk je notities bij).",
+        "Bij geel (80 %) verschijnt een tweede regel: rond de taak af en werk je sessienotities bij.",
         "Klik op Write session notes. Claude schrijft op wat er gedaan is, de beslissingen, wat nog open staat en de volgende stappen.",
-        "Bij rood (90 %) staat er start a new session. Start een nieuwe sessie en laat die de notities lezen. Hij knippert tot de context weer zakt."
+        "Bij rood (90 %) staat er start een nieuwe sessie. Start een nieuwe sessie en laat die de notities lezen. Hij knippert tot de context weer zakt."
       ]
     },
     {
@@ -263,7 +269,7 @@
       "path": "figures/band-routine_nl.png",
       "width": 560,
       "caption": "Figuur 2. Close session in de band: eerst de voortgang, dan het resultaat.",
-      "alt": "Twee banden: een oranje regel \"Closing session… step 3 of 6 · 50%\" met een balk, en een groene regel \"Now it's safe to end this session\"."
+      "alt": "Twee banden: een oranje regel \"Sessie afsluiten… stap 3 van 6 · 50%\" met een balk, en een groene regel \"Je kunt deze sessie nu veilig afsluiten\"."
     },
     {
       "type": "table",
@@ -277,23 +283,23 @@
       ],
       "rows": [
         [
-          "Closing session… step 3 of 6 · 50%",
+          "Sessie afsluiten… stap 3 van 6 · 50%",
           "Wacht: Claude werkt de controle af."
         ],
         [
-          "✓ Now it's safe to end this session",
+          "✓ Je kunt deze sessie nu veilig afsluiten",
           "Alles is bewaard. Sluit de sessie."
         ],
         [
-          "✓ Everything is ready to start this session",
+          "✓ Alles is klaar om deze sessie te starten",
           "Claude heeft de bestanden gelezen. Begin aan je taak."
         ],
         [
-          "It's NOT safe to close this session: <reason>",
+          "Deze sessie afsluiten is NIET veilig: <reden>",
           "Claude vond een probleem. Lees het antwoord, los het op en start Close session opnieuw."
         ],
         [
-          "Close session stopped at step 2 of 6",
+          "Close session gestopt bij stap 2 van 6",
           "Het antwoord stopte te vroeg. Controleer het, of start Close session opnieuw."
         ]
       ]
@@ -311,12 +317,15 @@
       "text": "Close session eindigt met het eerste bericht voor de volgende sessie. De mod bewaart het, en Start session in de volgende sessie van dezelfde map stuurt het mee. Claude gaat precies verder waar je stopte."
     },
     {
+      "type": "pagebreak"
+    },
+    {
       "type": "h1",
       "text": "6. Open de details"
     },
     {
       "type": "figure",
-      "path": "figures/pane.png",
+      "path": "figures/pane_nl.png",
       "width": 330,
       "caption": "Figuur 3. /meter toont beide limieten, de context van deze sessie, de laatste beurten en je andere sessies.",
       "alt": "Het detailpaneel: de balken Session en Week met resettijden, de balk Compress op 84 %, een kleine grafiek van de laatste beurten, drie knoppen en twee andere sessies."
@@ -335,6 +344,10 @@
         [
           "`/meter`",
           "Het detailpaneel te openen. Of klik op Details in de band; klik nog eens om het te sluiten."
+        ],
+        [
+          "`/meter language nl`",
+          "De band, het paneel en de meldingen in het Nederlands zetten (en, nl, fr of de)."
         ],
         [
           "`/meter close`",
@@ -399,7 +412,7 @@
     },
     {
       "type": "p",
-      "text": "Open het paneel /meter (klik op Details in de band) en klik onderaan op Settings, of typ /meter settings. Elke instelling heeft een eigen knop: klik op On of Off om ze aan of uit te zetten, op − of + om een getal te veranderen, en op een keuze (zoals de Haiku-lezer) om naar de volgende optie te gaan. Een wijziging geldt meteen. Het paneel toont de Engelse namen van de instellingen. Alleen de kleuren verander je daar niet: open een terminal, typ claude, dan /config, en zoek de regels van ai-usage-meter. In de desktop-app opent /config het eigen instellingenvenster van de app, en daar staan de instellingen van de mod niet in."
+      "text": "Open het paneel /meter (klik op Details in de band) en klik onderaan op Settings, of typ /meter settings. Elke instelling heeft een eigen knop: klik op On of Off om ze aan of uit te zetten, op − of + om een getal te veranderen, en op een keuze (zoals de Haiku-lezer) om naar de volgende optie te gaan. Een wijziging geldt meteen. Alleen de kleuren verander je daar niet: open een terminal, typ claude, dan /config, en zoek de regels van ai-usage-meter. In de desktop-app opent /config het eigen instellingenvenster van de app, en daar staan de instellingen van de mod niet in. De eerste instelling, Taal, kiest de taal van de band, het paneel en de meldingen: English, Nederlands, Français of Deutsch (of typ /meter language nl). De namen van de knoppen en Session, Week en Compress blijven Engels."
     },
     {
       "type": "table",
@@ -413,87 +426,91 @@
       ],
       "rows": [
         [
-          "Limits: first and second warning",
+          "Taal",
+          "en (English)"
+        ],
+        [
+          "Limieten: eerste en tweede waarschuwing",
           "80 % en 95 %"
         ],
         [
-          "Context: yellow and red",
+          "Context: geel en rood",
           "80 % en 90 % van het comprimeerpunt"
         ],
         [
-          "Message at the limit warnings",
+          "Melding bij de limietwaarschuwingen",
           "Aan"
         ],
         [
-          "Message when a limit resets",
+          "Melding als een limiet gereset is",
           "Aan"
         ],
         [
-          "Message when compaction has run",
+          "Melding na het comprimeren",
           "Aan"
         ],
         [
-          "Blink at red",
+          "Knipperen bij rood",
           "Aan"
         ],
         [
-          "Little robot in the band",
+          "Robotje in de band",
           "Aan"
         ],
         [
-          "Robot: a different robot for each model",
+          "Robot: een robotje per model",
           "Aan"
         ],
         [
-          "Robot: show the effort level",
+          "Robot: het inspanningsniveau tonen",
           "Aan"
         ],
         [
-          "Robot size",
+          "Grootte van het robotje",
           "3 (middel)"
         ],
         [
-          "Haiku reader",
+          "Haiku-lezer",
           "off"
         ],
         [
-          "Haiku reader: from (tokens read in one turn)",
+          "Haiku-lezer: vanaf (tokens gelezen in één beurt)",
           "2000"
         ],
         [
-          "Context: yellow from (tokens)",
+          "Context: geel vanaf (tokens)",
           "0 (uit)"
         ],
         [
-          "Context: red from (tokens)",
+          "Context: rood vanaf (tokens)",
           "0 (uit)"
         ],
         [
-          "Cache clock",
+          "Cacheklok",
           "Aan"
         ],
         [
-          "Cache clock: cache lifetime",
+          "Cacheklok: cacheduur",
           "60 minuten"
         ],
         [
-          "Search helpers (Explore) on Haiku",
+          "Zoekhulpen (Explore) op Haiku",
           "Uit"
         ],
         [
-          "HTML companion",
+          "HTML-companion",
           "ask"
         ],
         [
-          "Figures are old after",
+          "Cijfers zijn oud na",
           "60 minuten"
         ],
         [
-          "Colours: below the warnings, first, second",
+          "Kleuren: onder de waarschuwingen, eerste, tweede",
           "#3FB950, #F0883E, #F85149"
         ],
         [
-          "Use the strip's Settings when it is installed",
+          "De Settings van de balk gebruiken als die geïnstalleerd is",
           "Aan"
         ]
       ],
@@ -556,7 +573,7 @@
         ],
         [
           "`claude plugin list`",
-          "ai-usage-meter@ai-usage-meter, versie 2.0.1, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
+          "ai-usage-meter@ai-usage-meter, versie 2.1.0, enabled. \"userConfig options not yet set\" is normaal: elke instelling heeft een standaardwaarde."
         ]
       ]
     },
@@ -618,11 +635,11 @@
       "rows": [
         [
           "`/meter demo here 85`",
-          "Compress oranje; \"finish the task and update your session notes\" met Write session notes"
+          "Compress oranje; \"rond de taak af en werk je sessienotities bij\" met Write session notes"
         ],
         [
           "`/meter demo here 93`",
-          "Compress rood; \"start a new session\" knippert; Close session en Compact"
+          "Compress rood; \"start een nieuwe sessie\" knippert; Close session en Compact"
         ],
         [
           "`/meter demo 96`",
@@ -630,7 +647,7 @@
         ],
         [
           "`/meter demo context 92 A`",
-          "\"other: demo-A 92%\" in de band"
+          "\"andere: demo-A 92%\" in de band"
         ],
         [
           "`/meter demo off`",
@@ -683,6 +700,10 @@
           "De instellingen onderaan het paneel, elk met een knop"
         ],
         [
+          "Typ `/meter language nl` (of kies Taal bij Settings)",
+          "De band en het paneel in het Nederlands; de knoppen blijven Engels"
+        ],
+        [
           "Zet Blink at red uit, dan `/meter demo here 93`",
           "Rood zonder knipperen (zet het daarna weer aan)"
         ],
@@ -708,7 +729,7 @@
         ],
         [
           "Zet Context: geel vanaf op 50000, dan /meter demo here 40",
-          "64k tokens: finish the task and update your session notes (zet het daarna terug)"
+          "64k tokens: rond de taak af en werk je sessienotities bij"
         ],
         [
           "Kijk na het antwoord van Claude naar de band",
@@ -720,7 +741,7 @@
         ],
         [
           "Vraag Claude een plan van ongeveer twee bladzijden in Plan.md",
-          "\"An HTML version of Plan.md?\" met Make it en No in de band"
+          "\"Een HTML-versie van Plan.md?\" met Make it en No in de band"
         ],
         [
           "Klik op Make it",
@@ -749,7 +770,7 @@
         ],
         [
           "Klik op Close session (paneel, of band bij rood)",
-          "\"Closing session… step 1 of 6\" tot 6, dan \"✓ Now it's safe to end this session\""
+          "\"Sessie afsluiten… stap 1 van 6\" tot 6, dan \"✓ Je kunt deze sessie nu veilig afsluiten\""
         ],
         [
           "Kijk in de testmap",
@@ -761,11 +782,11 @@
         ],
         [
           "Open daar een nieuwe sessie; klik op Start session voor je typt",
-          "\"Preparing session…\", dan \"✓ Everything is ready to start this session\""
+          "\"Sessie voorbereiden…\", dan \"✓ Alles is klaar om deze sessie te starten\""
         ],
         [
           "In de desktop-app: open een nieuwe sessie en typ /meter start als eerste bericht",
-          "\"Preparing session…\", dan \"✓ Everything is ready to start this session\"; Claude deed eerst niets anders"
+          "\"Sessie voorbereiden…\", dan \"✓ Alles is klaar om deze sessie te starten\"; Claude deed eerst niets anders"
         ],
         [
           "Lees het eerste antwoord van Claude",
@@ -790,7 +811,7 @@
       "rows": [
         [
           "Klik op Close session en druk dan op Esc om Claude te stoppen",
-          "Oranje: \"Close session stopped at step … of 6\", nooit groen"
+          "Oranje: \"Close session gestopt bij stap … van 6\", nooit groen"
         ],
         [
           "Klik twee keer snel op Close session",
@@ -841,7 +862,7 @@
     },
     {
       "type": "p",
-      "text": "De band wordt normaal geel bij 80 % en rood bij 90 % van het punt waar het comprimeren begint. In een heel groot gespreksvenster (1 miljoen tokens) komt 80 % pas rond 775.000 tokens, terwijl elk bericht al lang duur is. Bij Settings (hoofdstuk 7) kun je daarom ook een aantal tokens opgeven, bijvoorbeeld geel vanaf 250.000 en rood vanaf 350.000. De waarschuwing komt dan bij wat het eerst bereikt is, en zegt welke, bijvoorbeeld \"262k tokens: finish the task and update your session notes\". Laat het op 0 bij een venster van gewone grootte: dan verandert er niets."
+      "text": "De band wordt normaal geel bij 80 % en rood bij 90 % van het punt waar het comprimeren begint. In een heel groot gespreksvenster (1 miljoen tokens) komt 80 % pas rond 775.000 tokens, terwijl elk bericht al lang duur is. Bij Settings (hoofdstuk 7) kun je daarom ook een aantal tokens opgeven, bijvoorbeeld geel vanaf 250.000 en rood vanaf 350.000. De waarschuwing komt dan bij wat het eerst bereikt is, en zegt welke, bijvoorbeeld \"262k tokens: rond de taak af en werk je sessienotities bij\". Laat het op 0 bij een venster van gewone grootte: dan verandert er niets."
     },
     {
       "type": "h2",
@@ -849,7 +870,7 @@
     },
     {
       "type": "p",
-      "text": "Na elk antwoord toont de band hoe lang de klaarliggende kopie van het gesprek nog klaarligt, bijvoorbeeld \"cache 42m\": nog 42 minuten. In de laatste 5 minuten wordt het oranje. Daarna staat er \"cache cold\": je volgende bericht kost één keer de volle prijs, en daarna ligt de kopie weer klaar."
+      "text": "Na elk antwoord toont de band hoe lang de klaarliggende kopie van het gesprek nog klaarligt, bijvoorbeeld \"cache 42m\": nog 42 minuten. In de laatste 5 minuten wordt het oranje. Daarna staat er \"cache koud\": je volgende bericht kost één keer de volle prijs, en daarna ligt de kopie weer klaar."
     },
     {
       "type": "p",
@@ -877,7 +898,7 @@
       "type": "bullets",
       "items": [
         "De mod kan niet precies zeggen hoeveel je bespaarde. Hij telt de tokens per model, maar wat hetzelfde werk zonder deze hulpmiddelen zou hebben gekost, is alleen te schatten. Vergelijk daarvoor het Session-cijfer bij hetzelfde soort taak, één keer met en één keer zonder.",
-        "Keep warm kost elke keer een beetje: Claude leest het gesprek uit de klaarliggende kopie. Het loont alleen als je terugkomt en verdergaat voor de klok afloopt. Staat er al \"cache cold\" in de band, dan helpt Keep warm niet meer, en de mod zegt dat ook.",
+        "Keep warm kost elke keer een beetje: Claude leest het gesprek uit de klaarliggende kopie. Het loont alleen als je terugkomt en verdergaat voor de klok afloopt. Staat er al \"cache koud\" in de band, dan helpt Keep warm niet meer, en de mod zegt dat ook.",
         "Haiku kan details missen. Laat het zoeken en lezen, en laat Opus het resultaat nakijken. Opus leest een bestand altijd zelf voor het dat wijzigt. Zet de Haiku-hulpmiddelen uit voor nauwkeurig werk.",
         "De mod ziet niet hoe lang de kopie echt klaarligt: hij gebruikt de tijd uit Settings (60 minuten). Zet 5 minuten als je een API-sleutel gebruikt.",
         "Elke vraag die de mod aan een model stuurt (Keep warm, de zoekopdrachten van de lezer), telt ook mee voor je limieten."
@@ -905,7 +926,7 @@
       "type": "numbers",
       "items": [
         "Claude schrijft een lang Markdown-document dat je nog eens zult lezen: een plan, een specificatie, een vergelijking, een ontwerp of een proces.",
-        "Als Claude klaar is, vraagt de band \"An HTML version of Plan.md?\" met Make it en No. In het invoervak staat ook de grijze suggestie \"Make the HTML version of Plan.md\".",
+        "Als Claude klaar is, vraagt de band \"Een HTML-versie van Plan.md?\" met Make it en No. In het invoervak staat ook de grijze suggestie \"Maak de HTML-versie van Plan.md\".",
         "Ja zeggen: klik op Make it, of druk op Tab en dan op Enter. yes typen werkt ook.",
         "Claude schrijft Plan.html naast Plan.md. Dubbelklik erop in Verkenner om het in je browser te openen.",
         "Heb je de Markdown later gewijzigd? Dan biedt de mod aan om de HTML-versie bij te werken."
